@@ -1,6 +1,9 @@
-import { Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, FileText, Mail, Settings, Sparkles } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { LayoutDashboard, FileText, Mail, Settings, Sparkles, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "./ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
@@ -11,6 +14,13 @@ const navigation = [
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Logged out successfully");
+    navigate("/login");
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -52,11 +62,19 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
           {/* Footer */}
           <div className="border-t border-border p-4">
-            <div className="rounded-lg bg-gradient-card p-3">
+            <div className="rounded-lg bg-gradient-card p-3 mb-3">
               <p className="text-xs font-medium text-foreground">AI Credits</p>
               <p className="text-2xl font-bold text-primary">1,247</p>
               <p className="text-xs text-muted-foreground">Remaining this month</p>
             </div>
+            <Button
+              variant="ghost"
+              className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/10"
+              onClick={handleLogout}
+            >
+              <LogOut className="mr-2 h-4 w-4" />
+              Logout
+            </Button>
           </div>
         </div>
       </aside>
