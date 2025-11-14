@@ -5,15 +5,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Save, Key, Link as LinkIcon, Loader2 } from "lucide-react";
+import { Save, Key, Link as LinkIcon, Loader2, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 
 const Settings = () => {
   const [shopUrl, setShopUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     loadCredentials();
@@ -39,6 +41,7 @@ const Settings = () => {
     } else if (data) {
       setShopUrl(data.shop_url);
       setApiKey(data.api_key);
+      setIsConnected(true);
     }
     setLoading(false);
   };
@@ -79,7 +82,8 @@ const Settings = () => {
     if (error) {
       toast.error("Failed to save settings: " + error.message);
     } else {
-      toast.success("Settings saved successfully!");
+      toast.success("Shopify store connected successfully!");
+      setIsConnected(true);
     }
     setSaving(false);
   };
@@ -96,14 +100,22 @@ const Settings = () => {
         {/* Shopify Integration */}
         <Card className="border-border bg-card">
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                <LinkIcon className="h-5 w-5 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <LinkIcon className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle className="text-foreground">Shopify Store</CardTitle>
+                  <CardDescription className="text-muted-foreground">Connect your Shopify store</CardDescription>
+                </div>
               </div>
-              <div>
-                <CardTitle className="text-foreground">Shopify Store</CardTitle>
-                <CardDescription className="text-muted-foreground">Connect your Shopify store</CardDescription>
-              </div>
+              {isConnected && (
+                <Badge variant="secondary" className="gap-1">
+                  <CheckCircle2 className="h-3 w-3" />
+                  Connected
+                </Badge>
+              )}
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -130,10 +142,11 @@ const Settings = () => {
                 disabled={loading}
               />
             </div>
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-              <LinkIcon className="mr-2 h-4 w-4" />
-              Connect Store
-            </Button>
+            {!isConnected && (
+              <p className="text-sm text-muted-foreground">
+                Click "Save All Changes" below to connect your store
+              </p>
+            )}
           </CardContent>
         </Card>
 
