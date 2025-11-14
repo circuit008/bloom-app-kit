@@ -1,15 +1,87 @@
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Save, Key, Link as LinkIcon } from "lucide-react";
+import { Save, Key, Link as LinkIcon, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Settings = () => {
-  const handleSave = () => {
-    toast.success("Settings saved successfully!");
+  const [shopUrl, setShopUrl] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    loadCredentials();
+  }, []);
+
+  const loadCredentials = async () => {
+    setLoading(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from("shopify_credentials")
+      .select("*")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      console.error("Error loading credentials:", error);
+    } else if (data) {
+      setShopUrl(data.shop_url);
+      setApiKey(data.api_key);
+    }
+    setLoading(false);
+  };
+
+  const handleSave = async () => {
+    if (!shopUrl || !apiKey) {
+      toast.error("Please fill in all Shopify credentials");
+      return;
+    }
+
+    setSaving(true);
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      toast.error("You must be logged in to save settings");
+      setSaving(false);
+      return;
+    }
+
+    const { data: existing } = await supabase
+      .from("shopify_credentials")
+      .select("id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    let error;
+    if (existing) {
+      ({ error } = await supabase
+        .from("shopify_credentials")
+        .update({ shop_url: shopUrl, api_key: apiKey })
+        .eq("user_id", user.id));
+    } else {
+      ({ error } = await supabase
+        .from("shopify_credentials")
+        .insert({ user_id: user.id, shop_url: shopUrl, api_key: apiKey }));
+    }
+
+    if (error) {
+      toast.error("Failed to save settings: " + error.message);
+    } else {
+      toast.success("Settings saved successfully!");
+    }
+    setSaving(false);
   };
 
   return (
@@ -41,6 +113,9 @@ const Settings = () => {
                 id="shop-url"
                 placeholder="your-store.myshopify.com"
                 className="bg-secondary border-border text-foreground"
+                value={shopUrl}
+                onChange={(e) => setShopUrl(e.target.value)}
+                disabled={loading}
               />
             </div>
             <div className="space-y-2">
@@ -50,6 +125,9 @@ const Settings = () => {
                 type="password"
                 placeholder="Enter your Shopify API key"
                 className="bg-secondary border-border text-foreground"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                disabled={loading}
               />
             </div>
             <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
@@ -155,8 +233,17 @@ const Settings = () => {
 
       {/* Save Button */}
       <div className="flex justify-end">
-        <Button onClick={handleSave} size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-          <Save className="mr-2 h-4 w-4" />
+        <Button 
+          onClick={handleSave} 
+          size="lg" 
+          className="bg-primary text-primary-foreground hover:bg-primary/90"
+          disabled={saving || loading}
+        >
+          {saving ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="mr-2 h-4 w-4" />
+          )}
           Save All Changes
         </Button>
       </div>
