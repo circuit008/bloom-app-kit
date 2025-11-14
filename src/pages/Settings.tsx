@@ -153,37 +153,38 @@ const Settings = () => {
         {/* API Keys */}
         <Card className="border-border bg-card">
           <CardHeader>
-            <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
-                <Key className="h-5 w-5 text-accent" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10">
+                  <Key className="h-5 w-5 text-accent" />
+                </div>
+                <div>
+                  <CardTitle className="text-foreground">AI Configuration</CardTitle>
+                  <CardDescription className="text-muted-foreground">AI capabilities are ready to use</CardDescription>
+                </div>
               </div>
-              <div>
-                <CardTitle className="text-foreground">AI Configuration</CardTitle>
-                <CardDescription className="text-muted-foreground">Configure AI model settings</CardDescription>
-              </div>
+              <Badge variant="secondary" className="gap-1">
+                <CheckCircle2 className="h-3 w-3" />
+                Active
+              </Badge>
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="openai-key" className="text-foreground">OpenAI API Key</Label>
-              <Input
-                id="openai-key"
-                type="password"
-                placeholder="sk-..."
-                className="bg-secondary border-border text-foreground"
-              />
+            <div className="rounded-lg bg-accent/5 p-4 border border-accent/20">
+              <p className="text-sm text-foreground mb-2 font-medium">
+                ✨ Lovable AI Enabled
+              </p>
               <p className="text-xs text-muted-foreground">
-                Required for advanced AI features
+                Your app has access to advanced AI models including Google Gemini and OpenAI GPT-5. No API key configuration required.
               </p>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="model" className="text-foreground">AI Model</Label>
-              <Input
-                id="model"
-                value="gpt-4"
-                disabled
-                className="bg-secondary border-border text-foreground"
-              />
+              <Label className="text-foreground">Available Models</Label>
+              <div className="text-xs text-muted-foreground space-y-1">
+                <p>• google/gemini-2.5-flash (Default)</p>
+                <p>• google/gemini-2.5-pro</p>
+                <p>• openai/gpt-5</p>
+              </div>
             </div>
           </CardContent>
         </Card>
