@@ -6,14 +6,19 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sparkles, Copy, Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+
+const SHOPIFY_API_VERSION = '2025-07';
+const SHOPIFY_STORE_PERMANENT_DOMAIN = 'lovable-project-tpp8a.myshopify.com';
+const SHOPIFY_STOREFRONT_URL = `https://${SHOPIFY_STORE_PERMANENT_DOMAIN}/api/${SHOPIFY_API_VERSION}/graphql.json`;
+const SHOPIFY_STOREFRONT_TOKEN = 'c043f2d0827f12ebb2f53f006a41bdee';
 
 interface ShopifyProduct {
-  id: number;
-  title: string;
-  body_html: string;
-  vendor: string;
-  product_type: string;
+  node: {
+    id: string;
+    title: string;
+    description: string;
+    handle: string;
+  };
 }
 
 const ProductDescriptions = () => {
@@ -30,16 +35,52 @@ const ProductDescriptions = () => {
   const loadProducts = async () => {
     setIsLoadingProducts(true);
     try {
-      const { data, error } = await supabase.functions.invoke('fetch-shopify-products');
-      
-      if (error) {
-        console.error('Error fetching products:', error);
-        toast.error('Failed to load products. Please check your Shopify connection.');
+      const query = `
+        query GetProducts($first: Int!) {
+          products(first: $first) {
+            edges {
+              node {
+                id
+                title
+                description
+                handle
+              }
+            }
+          }
+        }
+      `;
+
+      const response = await fetch(SHOPIFY_STOREFRONT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Shopify-Storefront-Access-Token': SHOPIFY_STOREFRONT_TOKEN
+        },
+        body: JSON.stringify({
+          query,
+          variables: { first: 50 },
+        }),
+      });
+
+      if (response.status === 402) {
+        toast.error("Shopify: Payment required", {
+          description: "Shopify API access requires an active Shopify billing plan. Visit https://admin.shopify.com to upgrade."
+        });
         return;
       }
 
-      if (data?.products) {
-        setProducts(data.products);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.errors) {
+        throw new Error(`Shopify API error: ${data.errors.map((e: any) => e.message).join(', ')}`);
+      }
+
+      if (data.data?.products?.edges) {
+        setProducts(data.data.products.edges);
       }
     } catch (error) {
       console.error('Error loading products:', error);
@@ -57,7 +98,7 @@ const ProductDescriptions = () => {
 
     setIsGenerating(true);
     
-    const product = products.find(p => p.id.toString() === selectedProduct);
+    const product = products.find(p => p.node.id === selectedProduct);
     if (!product) {
       toast.error("Product not found");
       setIsGenerating(false);
@@ -66,7 +107,9 @@ const ProductDescriptions = () => {
     
     // Simulate AI generation with selected product
     setTimeout(() => {
-      const sampleDescription = `Discover the ${product.title} - a revolutionary product designed to enhance your lifestyle.
+      const sampleDescription = `Discover the ${product.node.title} - a revolutionary product designed to enhance your lifestyle.
+
+${product.node.description || 'This exceptional item'} combines quality with thoughtful design.
 
 Key Features:
 • Premium quality materials and craftsmanship
@@ -74,7 +117,7 @@ Key Features:
 • Built to last with exceptional durability
 • Perfect for modern lifestyles
 
-Transform your experience with ${product.title}. Order now and enjoy the difference!`;
+Transform your experience with ${product.node.title}. Order now and enjoy the difference!`;
       
       setGeneratedContent(sampleDescription);
       setIsGenerating(false);
@@ -122,8 +165,8 @@ Transform your experience with ${product.title}. Order now and enjoy the differe
                       </div>
                     ) : (
                       products.map((product) => (
-                        <SelectItem key={product.id} value={product.id.toString()}>
-                          {product.title}
+                        <SelectItem key={product.node.id} value={product.node.id}>
+                          {product.node.title}
                         </SelectItem>
                       ))
                     )}
