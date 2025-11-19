@@ -6,7 +6,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
-import ProductDescriptions from "./pages/ProductDescriptions";
+import DesignStudio from "./pages/DesignStudio";
+import TrendDashboard from "./pages/TrendDashboard";
+import DesignLibrary from "./pages/DesignLibrary";
 import RecoveryCampaigns from "./pages/RecoveryCampaigns";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
@@ -31,7 +33,9 @@ const App = () => (
                 <Layout>
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
-                    <Route path="/product-descriptions" element={<ProductDescriptions />} />
+                    <Route path="/design-studio" element={<DesignStudio />} />
+                    <Route path="/trend-dashboard" element={<TrendDashboard />} />
+                    <Route path="/design-library" element={<DesignLibrary />} />
                     <Route path="/recovery-campaigns" element={<RecoveryCampaigns />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="*" element={<NotFound />} />
