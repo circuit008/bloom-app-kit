@@ -46,15 +46,26 @@ const Login = () => {
     e.preventDefault();
     setRecoveryLoading(true);
 
-    const { error } = await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, {
+      redirectTo: `${window.location.origin}/login`,
+    });
+
+    if (error) {
+      toast.error(error.message);
+      setRecoveryLoading(false);
+      return;
+    }
+
+    // Now send OTP for verification
+    const { error: otpError } = await supabase.auth.signInWithOtp({
       email: recoveryEmail,
       options: {
         shouldCreateUser: false,
       }
     });
 
-    if (error) {
-      toast.error(error.message);
+    if (otpError) {
+      toast.error(otpError.message);
     } else {
       toast.success("6-digit code sent to your email!");
       setRecoveryStep("otp");
