@@ -2,3 +2,12 @@ project_id = "brukmvozjyeockedhktr"
 
 [functions.fetch-shopify-products]
 verify_jwt = true
+
+[functions.generate-tshirt-design]
+verify_jwt = false
+
+[functions.upload-design-to-shopify]
+verify_jwt = true
+
+[functions.generate-suggestions]
+verify_jwt = false

@@ -14,6 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
+      design_suggestions: {
+        Row: {
+          created_at: string
+          event_id: string | null
+          id: string
+          style: string
+          suggestion: string
+        }
+        Insert: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          style: string
+          suggestion: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          style?: string
+          suggestion?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "design_suggestions_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events_calendar"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      designs: {
+        Row: {
+          color_scheme: string | null
+          created_at: string
+          event_tag: string | null
+          id: string
+          image_url: string
+          prompt: string
+          shopify_product_id: string | null
+          style: string
+          uploaded_to_shopify: boolean
+          user_id: string
+        }
+        Insert: {
+          color_scheme?: string | null
+          created_at?: string
+          event_tag?: string | null
+          id?: string
+          image_url: string
+          prompt: string
+          shopify_product_id?: string | null
+          style: string
+          uploaded_to_shopify?: boolean
+          user_id: string
+        }
+        Update: {
+          color_scheme?: string | null
+          created_at?: string
+          event_tag?: string | null
+          id?: string
+          image_url?: string
+          prompt?: string
+          shopify_product_id?: string | null
+          style?: string
+          uploaded_to_shopify?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      events_calendar: {
+        Row: {
+          category: string
+          country: string
+          created_at: string
+          description: string | null
+          event_date: string
+          id: string
+          name: string
+          suggested_themes: string[] | null
+        }
+        Insert: {
+          category: string
+          country: string
+          created_at?: string
+          description?: string | null
+          event_date: string
+          id?: string
+          name: string
+          suggested_themes?: string[] | null
+        }
+        Update: {
+          category?: string
+          country?: string
+          created_at?: string
+          description?: string | null
+          event_date?: string
+          id?: string
+          name?: string
+          suggested_themes?: string[] | null
+        }
+        Relationships: []
+      }
       shopify_credentials: {
         Row: {
           api_key: string
