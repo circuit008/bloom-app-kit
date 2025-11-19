@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, FileText, Mail, Settings, Sparkles, LogOut } from "lucide-react";
+import { LayoutDashboard, Palette, TrendingUp, Images, Mail, Settings, Sparkles, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,9 @@ import { toast } from "sonner";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: LayoutDashboard },
-  { name: "Product Descriptions", href: "/product-descriptions", icon: FileText },
+  { name: "Design Studio", href: "/design-studio", icon: Palette },
+  { name: "Trend Dashboard", href: "/trend-dashboard", icon: TrendingUp },
+  { name: "Design Library", href: "/design-library", icon: Images },
   { name: "Recovery Campaigns", href: "/recovery-campaigns", icon: Mail },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
