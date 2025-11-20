@@ -44,6 +44,13 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
     setFabricCanvas(canvas);
 
     return () => {
+      // Properly cleanup all event listeners before disposal
+      canvas.off("selection:created");
+      canvas.off("selection:updated");
+      canvas.off("selection:cleared");
+      // Clear active object before disposing
+      setActiveObject(null);
+      // Dispose canvas
       canvas.dispose();
     };
   }, []);
