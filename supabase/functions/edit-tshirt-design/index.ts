@@ -26,8 +26,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Create enhanced prompt for editing
-    const enhancedPrompt = `Edit this t-shirt design: ${editPrompt}. Style: ${style}. Color scheme: ${colorScheme}. Keep it suitable for t-shirt printing with transparent background.`;
+    // Create enhanced prompt for editing with transparent background
+    const enhancedPrompt = `Edit this t-shirt design: ${editPrompt}. Style: ${style}. Color scheme: ${colorScheme}. IMPORTANT: Maintain a completely transparent background with no background color or texture. Only edit the main design elements. Keep it suitable for t-shirt printing.`;
 
     console.log('Editing image with prompt:', enhancedPrompt);
 
