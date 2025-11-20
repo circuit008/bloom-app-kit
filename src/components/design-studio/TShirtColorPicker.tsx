@@ -23,22 +23,19 @@ const TSHIRT_COLORS = [
 
 export const TShirtColorPicker = ({ selectedColor, onColorChange }: TShirtColorPickerProps) => {
   return (
-    <div className="space-y-3">
-      <Label>T-Shirt Color</Label>
-      <div className="grid grid-cols-6 gap-2">
-        {TSHIRT_COLORS.map((color) => (
-          <button
-            key={color.value}
-            onClick={() => onColorChange(color.value)}
-            className={cn(
-              "w-12 h-12 rounded-md border-2 transition-all hover:scale-110",
-              selectedColor === color.value ? "border-primary ring-2 ring-primary" : "border-border"
-            )}
-            style={{ backgroundColor: color.value }}
-            title={color.name}
-          />
-        ))}
-      </div>
+    <div className="grid grid-cols-4 gap-2">
+      {TSHIRT_COLORS.map((color) => (
+        <button
+          key={color.value}
+          onClick={() => onColorChange(color.value)}
+          className={cn(
+            "w-full aspect-square rounded-md border-2 transition-all hover:scale-105",
+            selectedColor === color.value ? "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background" : "border-border"
+          )}
+          style={{ backgroundColor: color.value }}
+          title={color.name}
+        />
+      ))}
     </div>
   );
 };
