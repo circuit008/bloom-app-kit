@@ -32,15 +32,17 @@ Deno.serve(async (req) => {
 - Style: ${style}
 - Color scheme: ${colorScheme}
 
-CRITICAL REQUIREMENTS:
-1. Maintain completely transparent background (no white, no colors, no textures)
-2. Only modify the design elements as requested
-3. Keep transparent areas around all edges
-4. Preserve the t-shirt printing quality
-5. Ensure clean edges with no background artifacts
-6. Keep the design isolated and print-ready
+ABSOLUTELY CRITICAL REQUIREMENTS - FOLLOW EXACTLY:
+1. Keep 100% TRANSPARENT background (alpha channel = 0) - NO BACKGROUND AT ALL
+2. Only modify the design elements as requested in the edit
+3. NO white, NO colors, NO patterns, NO textures in the background
+4. Think PNG cutout - only the design exists, rest is transparent
+5. The edited design should float on transparency
+6. Maintain sharp, clean edges with perfect transparency
+7. Keep the design print-ready for t-shirts
+8. Output as PNG with alpha transparency
 
-Return as PNG with transparent background.`;
+IMPORTANT: The background MUST remain completely transparent. If you add any background, this will FAIL.`;
 
     console.log('Editing image with prompt:', enhancedPrompt);
 
