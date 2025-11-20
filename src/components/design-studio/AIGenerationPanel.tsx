@@ -85,28 +85,29 @@ export const AIGenerationPanel = ({ onGenerate, initialPrompt = "" }: AIGenerati
   };
 
   return (
-    <div className="space-y-4 p-4 bg-secondary/20 rounded-lg">
+    <div className="space-y-4">
       <div className="flex items-center gap-2">
         <Sparkles className="w-5 h-5 text-primary" />
-        <h3 className="font-semibold">AI Design Generator</h3>
+        <h3 className="font-semibold text-sm">AI Design Generator</h3>
       </div>
 
       <div>
-        <Label htmlFor="prompt">Design Prompt</Label>
+        <Label htmlFor="prompt" className="text-xs">Design Prompt</Label>
         <Input
           id="prompt"
           placeholder="e.g., funny cow wearing Santa hat"
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
-          className="mt-2"
+          className="mt-1.5 text-sm"
+          onKeyDown={(e) => e.key === 'Enter' && handleGenerate()}
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <div>
-          <Label htmlFor="style">Style</Label>
+          <Label htmlFor="style" className="text-xs">Style</Label>
           <Select value={style} onValueChange={setStyle}>
-            <SelectTrigger id="style" className="mt-2">
+            <SelectTrigger id="style" className="mt-1.5 h-9 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -122,9 +123,9 @@ export const AIGenerationPanel = ({ onGenerate, initialPrompt = "" }: AIGenerati
         </div>
 
         <div>
-          <Label htmlFor="color">Color Scheme</Label>
+          <Label htmlFor="color" className="text-xs">Color Scheme</Label>
           <Select value={colorScheme} onValueChange={setColorScheme}>
-            <SelectTrigger id="color" className="mt-2">
+            <SelectTrigger id="color" className="mt-1.5 h-9 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -143,7 +144,6 @@ export const AIGenerationPanel = ({ onGenerate, initialPrompt = "" }: AIGenerati
         onClick={handleGenerate} 
         disabled={isGenerating || !prompt.trim()}
         className="w-full"
-        size="lg"
       >
         {isGenerating ? (
           <>
@@ -153,7 +153,7 @@ export const AIGenerationPanel = ({ onGenerate, initialPrompt = "" }: AIGenerati
         ) : (
           <>
             <Sparkles className="w-4 h-4 mr-2" />
-            Generate & Add to Canvas
+            Generate Design
           </>
         )}
       </Button>
@@ -161,19 +161,20 @@ export const AIGenerationPanel = ({ onGenerate, initialPrompt = "" }: AIGenerati
       {lastGeneratedImage && (
         <div className="pt-4 mt-4 border-t border-border">
           <div className="flex items-center gap-2 mb-3">
-            <Wand2 className="w-5 h-5 text-primary" />
-            <h4 className="font-semibold">Edit Last Design</h4>
+            <Wand2 className="w-4 h-4 text-primary" />
+            <h4 className="font-semibold text-sm">Edit Design with AI</h4>
           </div>
           
           <div className="space-y-3">
             <div>
-              <Label htmlFor="edit-prompt">Edit Instructions</Label>
+              <Label htmlFor="edit-prompt" className="text-xs">Edit Command</Label>
               <Input
                 id="edit-prompt"
-                placeholder="e.g., make it more colorful, add stars around it"
+                placeholder="e.g., make it more colorful, add stars"
                 value={editPrompt}
                 onChange={(e) => setEditPrompt(e.target.value)}
-                className="mt-2"
+                onKeyDown={(e) => e.key === 'Enter' && editPrompt.trim() && handleEditImage()}
+                className="mt-1.5 text-sm"
               />
             </div>
 
@@ -182,23 +183,23 @@ export const AIGenerationPanel = ({ onGenerate, initialPrompt = "" }: AIGenerati
                 onClick={handleEditImage}
                 disabled={isGenerating || !editPrompt.trim()}
                 className="flex-1"
-                variant="secondary"
+                size="sm"
               >
                 {isGenerating ? (
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                 ) : (
                   <Wand2 className="w-4 h-4 mr-2" />
                 )}
-                Apply Edits
+                Apply
               </Button>
 
               <Button 
                 onClick={handleGenerate}
                 disabled={isGenerating}
                 variant="outline"
+                size="sm"
               >
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Regenerate
+                <RefreshCw className="w-4 h-4" />
               </Button>
             </div>
           </div>
