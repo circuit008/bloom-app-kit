@@ -19,7 +19,20 @@ serve(async (req) => {
     }
 
     // Build enhanced prompt with style and color preferences - emphasize transparent background
-    const enhancedPrompt = `Create a t-shirt design graphic with ${style} style${colorScheme ? ` using ${colorScheme} colors` : ''}. Design: ${prompt}. CRITICAL: The design MUST have a completely transparent background with NO background color, texture, or pattern. Only the main design elements should be visible. Suitable for t-shirt printing. High quality, centered composition.`;
+    const enhancedPrompt = `Create a t-shirt graphic design with these specifications:
+- Theme: ${prompt}
+- Style: ${style}
+- Color scheme: ${colorScheme}
+
+CRITICAL REQUIREMENTS:
+1. Background MUST be completely transparent (PNG with alpha channel, no white/colors/textures)
+2. Only design elements visible, no background artifacts
+3. Design isolated with transparent areas around all edges
+4. Professional t-shirt printing quality
+5. High contrast, bold colors for design elements
+6. Clean edges, no background remnants
+
+Generate as PNG with full transparency.`;
 
     console.log("Generating design with prompt:", enhancedPrompt);
 
