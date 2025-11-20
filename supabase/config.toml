@@ -6,6 +6,9 @@ verify_jwt = true
 [functions.generate-tshirt-design]
 verify_jwt = false
 
+[functions.edit-tshirt-design]
+verify_jwt = false
+
 [functions.upload-design-to-shopify]
 verify_jwt = true
 
