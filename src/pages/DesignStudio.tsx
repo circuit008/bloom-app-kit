@@ -88,82 +88,69 @@ const DesignStudio = () => {
   };
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Professional T-Shirt Design Studio</h1>
-        <p className="text-muted-foreground">Create custom designs with AI generation and professional editing tools</p>
+    <div className="h-screen flex flex-col overflow-hidden bg-background">
+      {/* Header */}
+      <div className="border-b border-border px-6 py-4 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Design Studio</h1>
+          <p className="text-sm text-muted-foreground">Create professional t-shirt designs</p>
+        </div>
+        <div className="flex gap-2">
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving || !exportedDesign || !!savedDesignId}
+            variant="outline"
+          >
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4 mr-2" />
+            )}
+            {savedDesignId ? "Saved" : "Save"}
+          </Button>
+          <Button 
+            onClick={handleUploadToShopify}
+            disabled={isUploading || !savedDesignId}
+          >
+            {isUploading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <Upload className="w-4 h-4 mr-2" />
+            )}
+            Upload to Shopify
+          </Button>
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Panel - AI & Color */}
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>T-Shirt Settings</CardTitle>
-              <CardDescription>Choose your t-shirt color</CardDescription>
-            </CardHeader>
-            <CardContent>
+      {/* Main Content - 3 Column Layout */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Sidebar - AI Tools & Color */}
+        <div className="w-80 border-r border-border overflow-y-auto">
+          <div className="p-4 space-y-4">
+            <div className="space-y-3">
+              <h3 className="font-semibold text-sm">T-Shirt Color</h3>
               <TShirtColorPicker 
                 selectedColor={tshirtColor}
                 onColorChange={setTshirtColor}
               />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="pt-6">
+            </div>
+            
+            <div className="border-t border-border pt-4">
               <AIGenerationPanel 
                 onGenerate={setAiGeneratedImage}
                 initialPrompt={location.state?.prompt || ""}
               />
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
-        {/* Center - Canvas Editor */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Design Canvas</CardTitle>
-              <CardDescription>Add text, images, shapes and customize your design</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <CanvasEditor 
-                tshirtColor={tshirtColor}
-                aiGeneratedImage={aiGeneratedImage}
-                onExport={setExportedDesign}
-              />
-
-              <div className="flex gap-2 mt-6">
-                <Button 
-                  onClick={handleSave} 
-                  disabled={isSaving || !exportedDesign || !!savedDesignId}
-                  variant="outline"
-                  className="flex-1"
-                >
-                  {isSaving ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Save className="w-4 h-4 mr-2" />
-                  )}
-                  {savedDesignId ? "Saved" : "Save to Library"}
-                </Button>
-
-                <Button 
-                  onClick={handleUploadToShopify}
-                  disabled={isUploading || !savedDesignId}
-                  className="flex-1"
-                >
-                  {isUploading ? (
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  ) : (
-                    <Upload className="w-4 h-4 mr-2" />
-                  )}
-                  Upload to Shopify
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        {/* Center - Canvas */}
+        <div className="flex-1 flex items-center justify-center bg-muted/30 overflow-hidden">
+          <CanvasEditor 
+            tshirtColor={tshirtColor}
+            aiGeneratedImage={aiGeneratedImage}
+            onExport={setExportedDesign}
+          />
         </div>
       </div>
     </div>

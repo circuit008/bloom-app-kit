@@ -18,8 +18,8 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Build enhanced prompt with style and color preferences
-    const enhancedPrompt = `Create a t-shirt design with ${style} style${colorScheme ? ` using ${colorScheme} colors` : ''}. Design: ${prompt}. Make it suitable for printing on a t-shirt with transparent background. High quality, centered composition.`;
+    // Build enhanced prompt with style and color preferences - emphasize transparent background
+    const enhancedPrompt = `Create a t-shirt design graphic with ${style} style${colorScheme ? ` using ${colorScheme} colors` : ''}. Design: ${prompt}. CRITICAL: The design MUST have a completely transparent background with NO background color, texture, or pattern. Only the main design elements should be visible. Suitable for t-shirt printing. High quality, centered composition.`;
 
     console.log("Generating design with prompt:", enhancedPrompt);
 

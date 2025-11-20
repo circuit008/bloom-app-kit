@@ -166,71 +166,60 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
   };
 
   return (
-    <div className="space-y-4">
-      {/* Toolbar */}
-      <div className="flex flex-wrap gap-2 p-4 bg-secondary/20 rounded-lg">
-        <Button onClick={addText} size="sm" variant="outline">
-          <Type className="w-4 h-4 mr-2" />
-          Add Text
+    <div className="flex flex-col h-full">
+      {/* Compact Toolbar */}
+      <div className="absolute top-4 left-4 z-10 flex gap-2 bg-card/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border">
+        <Button onClick={addText} size="sm" variant="ghost" title="Add Text">
+          <Type className="w-4 h-4" />
         </Button>
-        <Button onClick={addImage} size="sm" variant="outline">
-          <ImageIcon className="w-4 h-4 mr-2" />
-          Upload Image
+        <Button onClick={addImage} size="sm" variant="ghost" title="Upload Image">
+          <ImageIcon className="w-4 h-4" />
         </Button>
-        <Button onClick={() => addShape("circle")} size="sm" variant="outline">
-          <CircleIcon className="w-4 h-4 mr-2" />
-          Circle
+        <Button onClick={() => addShape("circle")} size="sm" variant="ghost" title="Add Circle">
+          <CircleIcon className="w-4 h-4" />
         </Button>
-        <Button onClick={() => addShape("rect")} size="sm" variant="outline">
-          <Square className="w-4 h-4 mr-2" />
-          Rectangle
+        <Button onClick={() => addShape("rect")} size="sm" variant="ghost" title="Add Rectangle">
+          <Square className="w-4 h-4" />
         </Button>
         {activeObject && (
           <>
-            <Button onClick={deleteSelected} size="sm" variant="destructive">
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete
+            <div className="w-px bg-border" />
+            <Button onClick={bringToFront} size="sm" variant="ghost" title="Bring to Front">
+              <Layers className="w-4 h-4" />
             </Button>
-            <Button onClick={bringToFront} size="sm" variant="outline">
-              <Layers className="w-4 h-4 mr-2" />
-              Front
+            <Button onClick={sendToBack} size="sm" variant="ghost" title="Send to Back">
+              <Layers className="w-4 h-4 rotate-180" />
             </Button>
-            <Button onClick={sendToBack} size="sm" variant="outline">
-              <Layers className="w-4 h-4 mr-2" />
-              Back
+            <Button onClick={deleteSelected} size="sm" variant="ghost" title="Delete">
+              <Trash2 className="w-4 h-4 text-destructive" />
             </Button>
           </>
         )}
-        <Button onClick={exportDesign} size="sm" className="ml-auto">
-          <Download className="w-4 h-4 mr-2" />
-          Export Design
-        </Button>
       </div>
 
-      {/* Properties Panel */}
+      {/* Properties Panel - Floating */}
       {activeObject && (
-        <div className="p-4 bg-secondary/20 rounded-lg space-y-4">
+        <div className="absolute top-4 right-4 z-10 w-64 bg-card/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-border space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold">Object Properties</h3>
-            <Button onClick={deleteSelected} size="sm" variant="destructive">
-              <Trash2 className="w-4 h-4 mr-2" />
-              Delete
+            <h3 className="font-semibold text-sm">Object Properties</h3>
+            <Button onClick={deleteSelected} size="sm" variant="ghost">
+              <Trash2 className="w-4 h-4 text-destructive" />
             </Button>
           </div>
           
           {activeObject.type === "i-text" && (
             <>
               <div>
-                <Label>Text Color</Label>
+                <Label className="text-xs">Text Color</Label>
                 <Input
                   type="color"
                   value={activeObject.fill}
                   onChange={(e) => updateTextColor(e.target.value)}
-                  className="h-10 mt-2"
+                  className="h-8 mt-1"
                 />
               </div>
               <div>
-                <Label>Font Size: {activeObject.fontSize}px</Label>
+                <Label className="text-xs">Font Size: {activeObject.fontSize}px</Label>
                 <Slider
                   value={[activeObject.fontSize]}
                   onValueChange={(v) => updateFontSize(v[0])}
@@ -244,7 +233,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
           )}
 
           <div>
-            <Label>Scale: {(activeObject.scaleX || 1).toFixed(2)}x</Label>
+            <Label className="text-xs">Scale: {(activeObject.scaleX || 1).toFixed(2)}x</Label>
             <Slider
               value={[activeObject.scaleX || 1]}
               onValueChange={(v) => updateScale(v[0])}
@@ -256,7 +245,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
           </div>
 
           <div>
-            <Label>Rotation: {Math.round(activeObject.angle || 0)}°</Label>
+            <Label className="text-xs">Rotation: {Math.round(activeObject.angle || 0)}°</Label>
             <Slider
               value={[activeObject.angle || 0]}
               onValueChange={(v) => updateRotation(v[0])}
@@ -269,19 +258,28 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
         </div>
       )}
 
+      {/* Export Button - Floating */}
+      <div className="absolute bottom-4 right-4 z-10">
+        <Button onClick={exportDesign} size="lg" className="shadow-lg">
+          <Download className="w-4 h-4 mr-2" />
+          Export Design
+        </Button>
+      </div>
+
       {/* Canvas with T-Shirt Mockup */}
-      <div className="relative rounded-lg overflow-hidden p-8" style={{ backgroundColor: "#f5f5f5" }}>
-        <div className="relative mx-auto" style={{ width: "400px", height: "500px" }}>
-          {/* T-Shirt Mockup Background */}
-          <div 
-            className="absolute inset-0 bg-center bg-no-repeat bg-contain"
-            style={{ 
-              backgroundImage: `url(${tshirtMockup})`,
-              filter: `hue-rotate(${tshirtColor === '#FFFFFF' ? '0deg' : tshirtColor === '#000000' ? '180deg' : '45deg'}) brightness(${tshirtColor === '#000000' ? '0.2' : '1'})`,
-            }}
-          />
+      <div className="flex-1 flex items-center justify-center p-8">
+        <div className="relative" style={{ width: "500px", height: "600px" }}>
+          {/* T-Shirt with Color Overlay */}
+          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 500 600" style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.2))' }}>
+            <path 
+              d="M 150,80 L 125,100 L 125,200 L 150,200 L 150,550 L 350,550 L 350,200 L 375,200 L 375,100 L 350,80 L 320,100 L 280,80 L 220,80 L 180,100 Z" 
+              fill={tshirtColor}
+              stroke="hsl(var(--border))"
+              strokeWidth="2"
+            />
+          </svg>
           {/* Canvas Overlay - Design Area */}
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute" style={{ top: '180px', left: '50%', transform: 'translateX(-50%)' }}>
             <canvas ref={canvasRef} />
           </div>
         </div>
