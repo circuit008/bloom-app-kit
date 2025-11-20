@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, RefreshCw, Wand2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -17,6 +17,8 @@ export const AIGenerationPanel = ({ onGenerate, initialPrompt = "" }: AIGenerati
   const [style, setStyle] = useState("cartoon");
   const [colorScheme, setColorScheme] = useState("vibrant");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [lastGeneratedImage, setLastGeneratedImage] = useState<string | null>(null);
+  const [editPrompt, setEditPrompt] = useState("");
 
   const handleGenerate = async () => {
     if (!prompt.trim()) {
@@ -36,11 +38,47 @@ export const AIGenerationPanel = ({ onGenerate, initialPrompt = "" }: AIGenerati
         return;
       }
 
+      setLastGeneratedImage(data.imageUrl);
       onGenerate(data.imageUrl);
       toast.success("AI design generated! Added to canvas.");
     } catch (error) {
       console.error('Error generating design:', error);
       toast.error("Failed to generate design");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleEditImage = async () => {
+    if (!lastGeneratedImage || !editPrompt.trim()) {
+      toast.error("Please enter editing instructions");
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('edit-tshirt-design', {
+        body: { 
+          imageUrl: lastGeneratedImage,
+          editPrompt,
+          style, 
+          colorScheme 
+        }
+      });
+
+      if (error) throw error;
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setLastGeneratedImage(data.imageUrl);
+      onGenerate(data.imageUrl);
+      setEditPrompt("");
+      toast.success("Design edited successfully!");
+    } catch (error) {
+      console.error('Error editing design:', error);
+      toast.error("Failed to edit design");
     } finally {
       setIsGenerating(false);
     }
@@ -119,6 +157,53 @@ export const AIGenerationPanel = ({ onGenerate, initialPrompt = "" }: AIGenerati
           </>
         )}
       </Button>
+
+      {lastGeneratedImage && (
+        <div className="pt-4 mt-4 border-t border-border">
+          <div className="flex items-center gap-2 mb-3">
+            <Wand2 className="w-5 h-5 text-primary" />
+            <h4 className="font-semibold">Edit Last Design</h4>
+          </div>
+          
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="edit-prompt">Edit Instructions</Label>
+              <Input
+                id="edit-prompt"
+                placeholder="e.g., make it more colorful, add stars around it"
+                value={editPrompt}
+                onChange={(e) => setEditPrompt(e.target.value)}
+                className="mt-2"
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button 
+                onClick={handleEditImage}
+                disabled={isGenerating || !editPrompt.trim()}
+                className="flex-1"
+                variant="secondary"
+              >
+                {isGenerating ? (
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                ) : (
+                  <Wand2 className="w-4 h-4 mr-2" />
+                )}
+                Apply Edits
+              </Button>
+
+              <Button 
+                onClick={handleGenerate}
+                disabled={isGenerating}
+                variant="outline"
+              >
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Regenerate
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
