@@ -12,11 +12,10 @@ import {
   Trash2, 
   Download,
   Layers,
-  Move,
-  ZoomIn,
-  ZoomOut
+  RotateCw
 } from "lucide-react";
 import { toast } from "sonner";
+import tshirtMockup from "@/assets/tshirt-mockup.png";
 
 interface CanvasEditorProps {
   tshirtColor: string;
@@ -48,6 +47,12 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       canvas.dispose();
     };
   }, []);
+
+  const updateRotation = (rotation: number) => {
+    if (!activeObject) return;
+    activeObject.set({ angle: rotation });
+    fabricCanvas?.renderAll();
+  };
 
   useEffect(() => {
     if (fabricCanvas && aiGeneratedImage) {
@@ -198,7 +203,13 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       {/* Properties Panel */}
       {activeObject && (
         <div className="p-4 bg-secondary/20 rounded-lg space-y-4">
-          <h3 className="font-semibold">Object Properties</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold">Object Properties</h3>
+            <Button onClick={deleteSelected} size="sm" variant="destructive">
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete
+            </Button>
+          </div>
           
           {activeObject.type === "i-text" && (
             <>
@@ -236,15 +247,37 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
               className="mt-2"
             />
           </div>
+
+          <div>
+            <Label>Rotation: {Math.round(activeObject.angle || 0)}°</Label>
+            <Slider
+              value={[activeObject.angle || 0]}
+              onValueChange={(v) => updateRotation(v[0])}
+              min={0}
+              max={360}
+              step={1}
+              className="mt-2"
+            />
+          </div>
         </div>
       )}
 
-      {/* Canvas */}
-      <div className="relative rounded-lg overflow-hidden" style={{ backgroundColor: tshirtColor }}>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <canvas ref={canvasRef} className="border border-border/50" />
+      {/* Canvas with T-Shirt Mockup */}
+      <div className="relative rounded-lg overflow-hidden p-8" style={{ backgroundColor: "#f5f5f5" }}>
+        <div className="relative mx-auto" style={{ width: "400px", height: "500px" }}>
+          {/* T-Shirt Mockup Background */}
+          <div 
+            className="absolute inset-0 bg-center bg-no-repeat bg-contain"
+            style={{ 
+              backgroundImage: `url(${tshirtMockup})`,
+              filter: `hue-rotate(${tshirtColor === '#FFFFFF' ? '0deg' : tshirtColor === '#000000' ? '180deg' : '45deg'}) brightness(${tshirtColor === '#000000' ? '0.2' : '1'})`,
+            }}
+          />
+          {/* Canvas Overlay - Design Area */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <canvas ref={canvasRef} />
+          </div>
         </div>
-        <div className="h-[500px]" />
       </div>
     </div>
   );
