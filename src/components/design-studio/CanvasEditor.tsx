@@ -148,9 +148,39 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
 
   const exportDesign = () => {
     if (!fabricCanvas) return;
-    const dataUrl = fabricCanvas.toDataURL({ format: "png", quality: 1, multiplier: 2 });
-    onExport(dataUrl);
-    toast.success("Design exported!");
+    
+    // Create a temporary canvas to capture the entire t-shirt with design
+    const tempCanvas = document.createElement('canvas');
+    const ctx = tempCanvas.getContext('2d');
+    if (!ctx) return;
+    
+    tempCanvas.width = 500;
+    tempCanvas.height = 600;
+    
+    // Draw the t-shirt SVG
+    const svgElement = document.querySelector('.tshirt-svg') as SVGSVGElement;
+    if (svgElement) {
+      const svgData = new XMLSerializer().serializeToString(svgElement);
+      const img = new Image();
+      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+      
+      img.onload = () => {
+        ctx.drawImage(img, 0, 0, 500, 600);
+        
+        // Draw the canvas design on top
+        const designImg = new Image();
+        designImg.onload = () => {
+          ctx.drawImage(designImg, 50, 180, 400, 500);
+          const dataUrl = tempCanvas.toDataURL('png');
+          onExport(dataUrl);
+          toast.success("Design exported with t-shirt!");
+          URL.revokeObjectURL(url);
+        };
+        designImg.src = fabricCanvas.toDataURL({ format: "png", quality: 1, multiplier: 1 });
+      };
+      img.src = url;
+    }
   };
 
   const bringToFront = () => {
@@ -269,15 +299,62 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       {/* Canvas with T-Shirt Mockup */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="relative" style={{ width: "500px", height: "600px" }}>
-          {/* T-Shirt with Color Overlay */}
-          <svg className="absolute inset-0 w-full h-full" viewBox="0 0 500 600" style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.2))' }}>
+          {/* T-Shirt with realistic design */}
+          <svg className="tshirt-svg absolute inset-0 w-full h-full" viewBox="0 0 500 600" style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))' }}>
+            <defs>
+              <linearGradient id="tshirtGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" style={{ stopColor: tshirtColor, stopOpacity: 1 }} />
+                <stop offset="100%" style={{ stopColor: tshirtColor, stopOpacity: 0.85 }} />
+              </linearGradient>
+              <filter id="fabricTexture">
+                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise" />
+                <feDiffuseLighting in="noise" lightingColor="white" surfaceScale="0.5">
+                  <feDistantLight azimuth="45" elevation="60" />
+                </feDiffuseLighting>
+                <feComposite operator="in" in2="SourceGraphic" />
+                <feBlend mode="overlay" in2="SourceGraphic" />
+              </filter>
+            </defs>
+            
+            {/* Main t-shirt body with realistic curves */}
             <path 
-              d="M 150,80 L 125,100 L 125,200 L 150,200 L 150,550 L 350,550 L 350,200 L 375,200 L 375,100 L 350,80 L 320,100 L 280,80 L 220,80 L 180,100 Z" 
-              fill={tshirtColor}
-              stroke="hsl(var(--border))"
-              strokeWidth="2"
+              d="M 250,80 
+                 C 235,78 220,78 205,82
+                 L 180,95 L 165,105 
+                 C 155,112 145,120 135,130
+                 L 125,145 L 125,190
+                 C 125,195 127,198 130,200
+                 L 145,205 L 145,545
+                 C 145,550 148,553 152,555
+                 L 160,558 L 340,558 L 348,555
+                 C 352,553 355,550 355,545
+                 L 355,205 L 370,200
+                 C 373,198 375,195 375,190
+                 L 375,145 L 365,130
+                 C 355,120 345,112 335,105
+                 L 320,95 L 295,82
+                 C 280,78 265,78 250,80 Z" 
+              fill="url(#tshirtGradient)"
+              stroke="rgba(0,0,0,0.1)"
+              strokeWidth="1"
+              filter="url(#fabricTexture)"
             />
+            
+            {/* Collar - V-neck */}
+            <path 
+              d="M 220,82 L 250,120 L 280,82" 
+              fill="none"
+              stroke="rgba(0,0,0,0.15)"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
+            
+            {/* Subtle shadows for depth */}
+            <ellipse cx="250" cy="200" rx="80" ry="15" fill="rgba(0,0,0,0.05)" />
+            <ellipse cx="145" cy="400" rx="10" ry="80" fill="rgba(0,0,0,0.03)" />
+            <ellipse cx="355" cy="400" rx="10" ry="80" fill="rgba(0,0,0,0.03)" />
           </svg>
+          
           {/* Canvas Overlay - Design Area */}
           <div className="absolute" style={{ top: '180px', left: '50%', transform: 'translateX(-50%)' }}>
             <canvas ref={canvasRef} />
