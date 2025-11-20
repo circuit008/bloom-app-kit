@@ -299,64 +299,74 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       {/* Canvas with T-Shirt Mockup */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="relative" style={{ width: "500px", height: "600px" }}>
-          {/* T-Shirt with realistic design */}
-          <svg className="tshirt-svg absolute inset-0 w-full h-full" viewBox="0 0 500 600" style={{ filter: 'drop-shadow(0 10px 30px rgba(0,0,0,0.15))' }}>
-            <defs>
-              <linearGradient id="tshirtGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                <stop offset="0%" style={{ stopColor: tshirtColor, stopOpacity: 1 }} />
-                <stop offset="100%" style={{ stopColor: tshirtColor, stopOpacity: 0.85 }} />
-              </linearGradient>
-              <filter id="fabricTexture">
-                <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" result="noise" />
-                <feDiffuseLighting in="noise" lightingColor="white" surfaceScale="0.5">
-                  <feDistantLight azimuth="45" elevation="60" />
-                </feDiffuseLighting>
-                <feComposite operator="in" in2="SourceGraphic" />
-                <feBlend mode="overlay" in2="SourceGraphic" />
-              </filter>
-            </defs>
-            
-            {/* Main t-shirt body with realistic curves */}
-            <path 
-              d="M 250,80 
-                 C 235,78 220,78 205,82
-                 L 180,95 L 165,105 
-                 C 155,112 145,120 135,130
-                 L 125,145 L 125,190
-                 C 125,195 127,198 130,200
-                 L 145,205 L 145,545
-                 C 145,550 148,553 152,555
-                 L 160,558 L 340,558 L 348,555
-                 C 352,553 355,550 355,545
-                 L 355,205 L 370,200
-                 C 373,198 375,195 375,190
-                 L 375,145 L 365,130
-                 C 355,120 345,112 335,105
-                 L 320,95 L 295,82
-                 C 280,78 265,78 250,80 Z" 
-              fill="url(#tshirtGradient)"
-              stroke="rgba(0,0,0,0.1)"
-              strokeWidth="1"
-              filter="url(#fabricTexture)"
+          {/* Realistic T-Shirt Base */}
+          <div 
+            className="absolute inset-0 w-full h-full"
+            style={{
+              backgroundColor: tshirtColor,
+              clipPath: `polygon(
+                30% 10%, 35% 8%, 40% 7%, 45% 6%, 50% 6%, 55% 6%, 60% 7%, 65% 8%, 70% 10%,
+                75% 12%, 78% 15%, 80% 18%, 80% 22%, 78% 25%, 75% 28%, 73% 30%,
+                73% 85%, 72% 90%, 70% 93%, 68% 95%, 65% 97%, 60% 98%, 55% 99%, 50% 99%,
+                45% 99%, 40% 98%, 35% 97%, 32% 95%, 30% 93%, 28% 90%, 27% 85%,
+                27% 30%, 25% 28%, 22% 25%, 20% 22%, 20% 18%, 22% 15%, 25% 12%
+              )`,
+              boxShadow: `
+                inset -10px -10px 20px rgba(0,0,0,0.1),
+                inset 10px 10px 20px rgba(255,255,255,0.1),
+                0 10px 30px rgba(0,0,0,0.2)
+              `,
+              filter: 'brightness(0.95)',
+            }}
+          >
+            {/* Fabric texture overlay */}
+            <div 
+              className="absolute inset-0 opacity-20"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
+              }}
             />
             
-            {/* Collar - V-neck */}
-            <path 
-              d="M 220,82 L 250,120 L 280,82" 
-              fill="none"
-              stroke="rgba(0,0,0,0.15)"
-              strokeWidth="2"
-              strokeLinecap="round"
+            {/* Collar shadow */}
+            <div 
+              className="absolute"
+              style={{
+                top: '6%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                width: '20%',
+                height: '8%',
+                background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 100%)',
+                clipPath: 'polygon(20% 0%, 50% 60%, 80% 0%)',
+              }}
             />
             
-            {/* Subtle shadows for depth */}
-            <ellipse cx="250" cy="200" rx="80" ry="15" fill="rgba(0,0,0,0.05)" />
-            <ellipse cx="145" cy="400" rx="10" ry="80" fill="rgba(0,0,0,0.03)" />
-            <ellipse cx="355" cy="400" rx="10" ry="80" fill="rgba(0,0,0,0.03)" />
-          </svg>
+            {/* Left side shadow */}
+            <div 
+              className="absolute left-0 top-[15%] bottom-[15%] w-[5%]"
+              style={{
+                background: 'linear-gradient(90deg, rgba(0,0,0,0.1) 0%, transparent 100%)',
+              }}
+            />
+            
+            {/* Right side shadow */}
+            <div 
+              className="absolute right-0 top-[15%] bottom-[15%] w-[5%]"
+              style={{
+                background: 'linear-gradient(-90deg, rgba(0,0,0,0.1) 0%, transparent 100%)',
+              }}
+            />
+          </div>
           
           {/* Canvas Overlay - Design Area */}
-          <div className="absolute" style={{ top: '180px', left: '50%', transform: 'translateX(-50%)' }}>
+          <div 
+            className="absolute mix-blend-multiply" 
+            style={{ 
+              top: '180px', 
+              left: '50%', 
+              transform: 'translateX(-50%)',
+            }}
+          >
             <canvas ref={canvasRef} />
           </div>
         </div>
