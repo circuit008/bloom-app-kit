@@ -32,8 +32,8 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
     if (!canvasRef.current) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 400,
-      height: 500,
+      width: 450,
+      height: 550,
       backgroundColor: "transparent",
     });
 
@@ -173,10 +173,10 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       // Draw the canvas design on top
       const designImg = new Image();
       designImg.onload = () => {
-        ctx.drawImage(designImg, 50, 180, 400, 500);
+        ctx.drawImage(designImg, 25, 180, 450, 550);
         const dataUrl = tempCanvas.toDataURL('image/png', 1);
         onExport(dataUrl);
-        toast.success("Design exported with t-shirt!");
+        toast.success("Design saved successfully!");
       };
       designImg.src = fabricCanvas.toDataURL({ format: "png", quality: 1, multiplier: 1 });
     };
@@ -288,17 +288,9 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
         </div>
       )}
 
-      {/* Export Button - Floating */}
-      <div className="absolute bottom-4 right-4 z-10">
-        <Button onClick={exportDesign} size="lg" className="shadow-lg">
-          <Download className="w-4 h-4 mr-2" />
-          Export Design
-        </Button>
-      </div>
-
       {/* Canvas with T-Shirt Mockup */}
-      <div className="flex-1 flex items-center justify-center p-8">
-        <div className="relative" style={{ width: "500px", height: "600px" }}>
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="relative w-full h-full max-w-[600px] max-h-[720px]" style={{ aspectRatio: "5/6" }}>
           {/* Isolated container for t-shirt and color overlay */}
           <div className="absolute inset-0" style={{ isolation: 'isolate' }}>
             {/* T-Shirt Base Image */}
@@ -330,7 +322,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
           <div 
             className="absolute mix-blend-multiply" 
             style={{ 
-              top: '180px', 
+              top: '30%', 
               left: '50%', 
               transform: 'translateX(-50%)',
             }}
