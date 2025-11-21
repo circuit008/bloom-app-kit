@@ -88,69 +88,84 @@ const DesignStudio = () => {
   };
 
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-background">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="border-b border-border px-6 py-4 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Design Studio</h1>
-          <p className="text-sm text-muted-foreground">Create professional t-shirt designs</p>
+          <h1 className="text-3xl font-bold tracking-tight">Design Studio</h1>
+          <p className="text-muted-foreground mt-1">Create stunning t-shirt designs with AI</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <Button 
             onClick={handleSave} 
             disabled={isSaving || !exportedDesign || !!savedDesignId}
+            size="lg"
             variant="outline"
+            className="gap-2"
           >
             {isSaving ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              <Save className="w-4 h-4 mr-2" />
+              <>
+                <Save className="w-4 h-4" />
+                {savedDesignId ? "Saved" : "Save Design"}
+              </>
             )}
-            {savedDesignId ? "Saved" : "Save"}
           </Button>
           <Button 
-            onClick={handleUploadToShopify}
+            onClick={handleUploadToShopify} 
             disabled={isUploading || !savedDesignId}
+            size="lg"
+            className="gap-2"
           >
             {isUploading ? (
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Uploading...
+              </>
             ) : (
-              <Upload className="w-4 h-4 mr-2" />
+              <>
+                <Upload className="w-4 h-4" />
+                Upload to Shopify
+              </>
             )}
-            Upload to Shopify
           </Button>
         </div>
       </div>
 
-      {/* Main Content - 3 Column Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Sidebar - AI Tools & Color */}
-        <div className="w-80 border-r border-border overflow-y-auto">
-          <div className="p-4 space-y-4">
-            <div className="space-y-3">
-              <h3 className="font-semibold text-sm">T-Shirt Color</h3>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Sidebar - Color & AI */}
+        <div className="lg:col-span-3 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>T-Shirt Color</CardTitle>
+            </CardHeader>
+            <CardContent>
               <TShirtColorPicker 
                 selectedColor={tshirtColor}
                 onColorChange={setTshirtColor}
               />
-            </div>
-            
-            <div className="border-t border-border pt-4">
-              <AIGenerationPanel 
-                onGenerate={setAiGeneratedImage}
-                initialPrompt={location.state?.prompt || ""}
-              />
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+          
+          <AIGenerationPanel 
+            onGenerate={setAiGeneratedImage}
+            initialPrompt={location.state?.prompt || ""}
+          />
         </div>
 
-        {/* Center - Canvas */}
-        <div className="flex-1 flex items-center justify-center bg-muted/30 overflow-hidden">
-          <CanvasEditor 
-            tshirtColor={tshirtColor}
-            aiGeneratedImage={aiGeneratedImage}
-            onExport={setExportedDesign}
-          />
+        {/* Center - Canvas Editor */}
+        <div className="lg:col-span-9">
+          <Card className="h-full">
+            <CardContent className="p-6">
+              <CanvasEditor
+                tshirtColor={tshirtColor}
+                aiGeneratedImage={aiGeneratedImage}
+                onExport={setExportedDesign}
+              />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

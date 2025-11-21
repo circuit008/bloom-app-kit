@@ -104,10 +104,10 @@ const TrendDashboard = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Trend Dashboard</h1>
-        <p className="text-muted-foreground">Discover upcoming events and trending design ideas</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Trend Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Discover upcoming events and trending design ideas</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
