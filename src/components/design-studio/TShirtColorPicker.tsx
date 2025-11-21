@@ -23,14 +23,14 @@ const TSHIRT_COLORS = [
 
 export const TShirtColorPicker = ({ selectedColor, onColorChange }: TShirtColorPickerProps) => {
   return (
-    <div className="grid grid-cols-4 gap-2">
+    <div className="grid grid-cols-6 gap-1.5">
       {TSHIRT_COLORS.map((color) => (
         <button
           key={color.value}
           onClick={() => onColorChange(color.value)}
           className={cn(
-            "w-full aspect-square rounded-md border-2 transition-all hover:scale-105",
-            selectedColor === color.value ? "border-primary ring-2 ring-primary ring-offset-2 ring-offset-background" : "border-border"
+            "w-8 h-8 rounded-md border-2 transition-all hover:scale-105",
+            selectedColor === color.value ? "border-primary ring-2 ring-primary ring-offset-1" : "border-border"
           )}
           style={{ backgroundColor: color.value }}
           title={color.name}
