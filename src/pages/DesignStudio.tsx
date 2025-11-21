@@ -88,9 +88,9 @@ const DesignStudio = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="h-[calc(100vh-4rem)] flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between p-6 border-b bg-card">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Design Studio</h1>
           <p className="text-muted-foreground mt-1">Create stunning t-shirt designs with AI</p>
@@ -133,32 +133,12 @@ const DesignStudio = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Sidebar - Color & AI */}
-        <div className="lg:col-span-3 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>T-Shirt Color</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <TShirtColorPicker 
-                selectedColor={tshirtColor}
-                onColorChange={setTshirtColor}
-              />
-            </CardContent>
-          </Card>
-          
-          <AIGenerationPanel 
-            onGenerate={setAiGeneratedImage}
-            initialPrompt={location.state?.prompt || ""}
-          />
-        </div>
-
-        {/* Center - Canvas Editor */}
-        <div className="lg:col-span-9">
+      {/* Main Content - Canvas Left, Controls Right */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Side - Canvas */}
+        <div className="flex-1 p-6 bg-muted/20">
           <Card className="h-full">
-            <CardContent className="p-6">
+            <CardContent className="p-6 h-full">
               <CanvasEditor
                 tshirtColor={tshirtColor}
                 aiGeneratedImage={aiGeneratedImage}
@@ -166,6 +146,28 @@ const DesignStudio = () => {
               />
             </CardContent>
           </Card>
+        </div>
+
+        {/* Right Side - Controls */}
+        <div className="w-80 border-l bg-card overflow-y-auto">
+          <div className="p-6 space-y-6">
+            {/* Color Picker */}
+            <div>
+              <h3 className="font-semibold mb-3">T-Shirt Color</h3>
+              <TShirtColorPicker 
+                selectedColor={tshirtColor}
+                onColorChange={setTshirtColor}
+              />
+            </div>
+            
+            {/* AI Generation */}
+            <div className="pt-6 border-t">
+              <AIGenerationPanel 
+                onGenerate={setAiGeneratedImage}
+                initialPrompt={location.state?.prompt || ""}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
