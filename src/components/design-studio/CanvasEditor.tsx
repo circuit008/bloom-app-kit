@@ -157,17 +157,17 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
     tempCanvas.width = 500;
     tempCanvas.height = 600;
     
-    // Draw the t-shirt base image
+    // First fill with the t-shirt color
+    ctx.fillStyle = tshirtColor;
+    ctx.fillRect(0, 0, 500, 600);
+    
+    // Load and apply the t-shirt mask
     const tshirtImg = new Image();
     tshirtImg.crossOrigin = "anonymous";
     tshirtImg.onload = () => {
-      // Draw t-shirt base
+      // Use the t-shirt image as a mask
+      ctx.globalCompositeOperation = 'destination-in';
       ctx.drawImage(tshirtImg, 0, 0, 500, 600);
-      
-      // Apply color overlay
-      ctx.globalCompositeOperation = 'multiply';
-      ctx.fillStyle = tshirtColor;
-      ctx.fillRect(0, 0, 500, 600);
       ctx.globalCompositeOperation = 'source-over';
       
       // Draw the canvas design on top
@@ -299,22 +299,19 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       {/* Canvas with T-Shirt Mockup */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="relative" style={{ width: "500px", height: "600px" }}>
-          {/* T-Shirt Base Image */}
-          <img 
-            src={tshirtBase} 
-            alt="T-shirt base" 
-            className="absolute inset-0 w-full h-full object-contain"
-            style={{
-              filter: `brightness(1) hue-rotate(0deg) saturate(1)`,
-            }}
-          />
-          
-          {/* Color Overlay for T-shirt Color Picker */}
+          {/* T-Shirt Base Image with Dynamic Color */}
           <div 
-            className="absolute inset-0 w-full h-full mix-blend-multiply pointer-events-none"
+            className="absolute inset-0 w-full h-full"
             style={{
               backgroundColor: tshirtColor,
-              clipPath: 'inset(8% 10% 15% 10%)',
+              WebkitMaskImage: `url(${tshirtBase})`,
+              WebkitMaskSize: 'contain',
+              WebkitMaskPosition: 'center',
+              WebkitMaskRepeat: 'no-repeat',
+              maskImage: `url(${tshirtBase})`,
+              maskSize: 'contain',
+              maskPosition: 'center',
+              maskRepeat: 'no-repeat',
             }}
           />
           
