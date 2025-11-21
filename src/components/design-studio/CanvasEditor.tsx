@@ -299,29 +299,32 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       {/* Canvas with T-Shirt Mockup */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="relative" style={{ width: "500px", height: "600px" }}>
-          {/* T-Shirt Base Image */}
-          <img 
-            src={tshirtBase} 
-            alt="T-shirt base" 
-            className="absolute inset-0 w-full h-full object-contain pointer-events-none"
-          />
-          
-          {/* Color Overlay */}
-          <div 
-            className="absolute inset-0 w-full h-full pointer-events-none"
-            style={{
-              backgroundColor: tshirtColor,
-              mixBlendMode: 'multiply',
-              WebkitMaskImage: `url(${tshirtBase})`,
-              WebkitMaskSize: 'contain',
-              WebkitMaskPosition: 'center',
-              WebkitMaskRepeat: 'no-repeat',
-              maskImage: `url(${tshirtBase})`,
-              maskSize: 'contain',
-              maskPosition: 'center',
-              maskRepeat: 'no-repeat',
-            }}
-          />
+          {/* Isolated container for t-shirt and color overlay */}
+          <div className="absolute inset-0" style={{ isolation: 'isolate' }}>
+            {/* T-Shirt Base Image */}
+            <img 
+              src={tshirtBase} 
+              alt="T-shirt base" 
+              className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+            />
+            
+            {/* Color Overlay - only affects t-shirt pixels */}
+            <div 
+              className="absolute inset-0 w-full h-full pointer-events-none"
+              style={{
+                backgroundColor: tshirtColor,
+                mixBlendMode: 'multiply',
+                WebkitMaskImage: `url(${tshirtBase})`,
+                WebkitMaskSize: 'contain',
+                WebkitMaskPosition: 'center',
+                WebkitMaskRepeat: 'no-repeat',
+                maskImage: `url(${tshirtBase})`,
+                maskSize: 'contain',
+                maskPosition: 'center',
+                maskRepeat: 'no-repeat',
+              }}
+            />
+          </div>
           
           {/* Canvas Overlay - Design Area */}
           <div 
