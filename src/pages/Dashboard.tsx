@@ -24,21 +24,23 @@ const Dashboard = () => {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-4xl font-bold text-foreground">Dashboard</h1>
-        <p className="mt-2 text-muted-foreground">Welcome back! Here's your store performance overview.</p>
+        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <p className="mt-1 text-muted-foreground">Welcome back! Here's your store performance overview.</p>
       </div>
 
       {/* Metrics Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {metricsData.map((metric) => (
-          <Card key={metric.name} className="border-border bg-gradient-card transition-all hover:shadow-glow">
+          <Card key={metric.name} className="border-border hover:shadow-md transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">{metric.name}</CardTitle>
-              <metric.icon className={`h-5 w-5 ${metric.color}`} />
+              <div className="p-2 rounded-lg bg-primary/10">
+                <metric.icon className={`h-4 w-4 ${metric.color}`} />
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-foreground">{metric.value}</div>
-              <p className="text-xs text-primary mt-1">{metric.change} from last week</p>
+              <div className="text-2xl font-bold text-foreground">{metric.value}</div>
+              <p className="text-xs text-accent font-medium mt-1">{metric.change} from last week</p>
             </CardContent>
           </Card>
         ))}

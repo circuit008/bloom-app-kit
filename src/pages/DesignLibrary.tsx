@@ -115,10 +115,10 @@ const DesignLibrary = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-2">Design Library</h1>
-        <p className="text-muted-foreground">Manage your AI-generated t-shirt designs</p>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Design Library</h1>
+        <p className="text-muted-foreground mt-1">Manage your AI-generated t-shirt designs</p>
       </div>
 
       {designs.length === 0 ? (
