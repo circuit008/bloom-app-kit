@@ -15,7 +15,7 @@ import {
   RotateCw
 } from "lucide-react";
 import { toast } from "sonner";
-import tshirtMockup from "@/assets/tshirt-mockup.png";
+import tshirtBase from "@/assets/tshirt-base.png";
 
 interface CanvasEditorProps {
   tshirtColor: string;
@@ -157,30 +157,30 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
     tempCanvas.width = 500;
     tempCanvas.height = 600;
     
-    // Draw the t-shirt SVG
-    const svgElement = document.querySelector('.tshirt-svg') as SVGSVGElement;
-    if (svgElement) {
-      const svgData = new XMLSerializer().serializeToString(svgElement);
-      const img = new Image();
-      const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-      const url = URL.createObjectURL(svgBlob);
+    // Draw the t-shirt base image
+    const tshirtImg = new Image();
+    tshirtImg.crossOrigin = "anonymous";
+    tshirtImg.onload = () => {
+      // Draw t-shirt base
+      ctx.drawImage(tshirtImg, 0, 0, 500, 600);
       
-      img.onload = () => {
-        ctx.drawImage(img, 0, 0, 500, 600);
-        
-        // Draw the canvas design on top
-        const designImg = new Image();
-        designImg.onload = () => {
-          ctx.drawImage(designImg, 50, 180, 400, 500);
-          const dataUrl = tempCanvas.toDataURL('png');
-          onExport(dataUrl);
-          toast.success("Design exported with t-shirt!");
-          URL.revokeObjectURL(url);
-        };
-        designImg.src = fabricCanvas.toDataURL({ format: "png", quality: 1, multiplier: 1 });
+      // Apply color overlay
+      ctx.globalCompositeOperation = 'multiply';
+      ctx.fillStyle = tshirtColor;
+      ctx.fillRect(0, 0, 500, 600);
+      ctx.globalCompositeOperation = 'source-over';
+      
+      // Draw the canvas design on top
+      const designImg = new Image();
+      designImg.onload = () => {
+        ctx.drawImage(designImg, 50, 180, 400, 500);
+        const dataUrl = tempCanvas.toDataURL('image/png', 1);
+        onExport(dataUrl);
+        toast.success("Design exported with t-shirt!");
       };
-      img.src = url;
-    }
+      designImg.src = fabricCanvas.toDataURL({ format: "png", quality: 1, multiplier: 1 });
+    };
+    tshirtImg.src = tshirtBase;
   };
 
   const bringToFront = () => {
@@ -299,64 +299,24 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       {/* Canvas with T-Shirt Mockup */}
       <div className="flex-1 flex items-center justify-center p-8">
         <div className="relative" style={{ width: "500px", height: "600px" }}>
-          {/* Realistic T-Shirt Base */}
+          {/* T-Shirt Base Image */}
+          <img 
+            src={tshirtBase} 
+            alt="T-shirt base" 
+            className="absolute inset-0 w-full h-full object-contain"
+            style={{
+              filter: `brightness(1) hue-rotate(0deg) saturate(1)`,
+            }}
+          />
+          
+          {/* Color Overlay for T-shirt Color Picker */}
           <div 
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0 w-full h-full mix-blend-multiply pointer-events-none"
             style={{
               backgroundColor: tshirtColor,
-              clipPath: `polygon(
-                30% 10%, 35% 8%, 40% 7%, 45% 6%, 50% 6%, 55% 6%, 60% 7%, 65% 8%, 70% 10%,
-                75% 12%, 78% 15%, 80% 18%, 80% 22%, 78% 25%, 75% 28%, 73% 30%,
-                73% 85%, 72% 90%, 70% 93%, 68% 95%, 65% 97%, 60% 98%, 55% 99%, 50% 99%,
-                45% 99%, 40% 98%, 35% 97%, 32% 95%, 30% 93%, 28% 90%, 27% 85%,
-                27% 30%, 25% 28%, 22% 25%, 20% 22%, 20% 18%, 22% 15%, 25% 12%
-              )`,
-              boxShadow: `
-                inset -10px -10px 20px rgba(0,0,0,0.1),
-                inset 10px 10px 20px rgba(255,255,255,0.1),
-                0 10px 30px rgba(0,0,0,0.2)
-              `,
-              filter: 'brightness(0.95)',
+              clipPath: 'inset(8% 10% 15% 10%)',
             }}
-          >
-            {/* Fabric texture overlay */}
-            <div 
-              className="absolute inset-0 opacity-20"
-              style={{
-                backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E")`,
-              }}
-            />
-            
-            {/* Collar shadow */}
-            <div 
-              className="absolute"
-              style={{
-                top: '6%',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                width: '20%',
-                height: '8%',
-                background: 'linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 100%)',
-                clipPath: 'polygon(20% 0%, 50% 60%, 80% 0%)',
-              }}
-            />
-            
-            {/* Left side shadow */}
-            <div 
-              className="absolute left-0 top-[15%] bottom-[15%] w-[5%]"
-              style={{
-                background: 'linear-gradient(90deg, rgba(0,0,0,0.1) 0%, transparent 100%)',
-              }}
-            />
-            
-            {/* Right side shadow */}
-            <div 
-              className="absolute right-0 top-[15%] bottom-[15%] w-[5%]"
-              style={{
-                background: 'linear-gradient(-90deg, rgba(0,0,0,0.1) 0%, transparent 100%)',
-              }}
-            />
-          </div>
+          />
           
           {/* Canvas Overlay - Design Area */}
           <div 
