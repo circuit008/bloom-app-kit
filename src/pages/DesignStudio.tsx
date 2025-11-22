@@ -19,6 +19,17 @@ const DesignStudio = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [savedDesignId, setSavedDesignId] = useState<string | null>(null);
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const [imageLoadTrigger, setImageLoadTrigger] = useState(0);
+
+  // Auto-hide header after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setHeaderVisible(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, [headerVisible]);
 
   const handleSave = async () => {
     if (!exportedDesign) {
@@ -91,13 +102,20 @@ const DesignStudio = () => {
 
   const handleLibraryImageSelect = (imageUrl: string) => {
     setAiGeneratedImage(imageUrl);
+    setImageLoadTrigger(prev => prev + 1);
     toast.success("Image loaded from library!");
   };
 
   return (
     <div className="flex flex-col h-screen">
-      {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b bg-card flex-shrink-0">
+      {/* Header - Auto-hide after 5s, show on hover */}
+      <div 
+        className={`flex items-center justify-between p-6 border-b bg-card flex-shrink-0 transition-transform duration-300 ${
+          headerVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+        onMouseEnter={() => setHeaderVisible(true)}
+        style={{ position: 'relative', zIndex: 50 }}
+      >
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Design Studio</h1>
           <p className="text-muted-foreground mt-1">Create stunning t-shirt designs with AI</p>
@@ -140,6 +158,12 @@ const DesignStudio = () => {
         </div>
       </div>
 
+      {/* Hover area to show header */}
+      <div 
+        className="absolute top-0 left-0 right-0 h-4 z-40"
+        onMouseEnter={() => setHeaderVisible(true)}
+      />
+
       {/* Main Content - Canvas Left, Controls Right */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Side - Canvas */}
@@ -147,6 +171,7 @@ const DesignStudio = () => {
           <CanvasEditor
             tshirtColor={tshirtColor}
             aiGeneratedImage={aiGeneratedImage}
+            imageLoadTrigger={imageLoadTrigger}
             onExport={setExportedDesign}
           />
         </div>

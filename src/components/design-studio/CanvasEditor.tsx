@@ -23,10 +23,11 @@ import tshirtBase from "@/assets/tshirt-base.png";
 interface CanvasEditorProps {
   tshirtColor: string;
   aiGeneratedImage?: string;
+  imageLoadTrigger?: number;
   onExport: (dataUrl: string) => void;
 }
 
-export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: CanvasEditorProps) => {
+export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, imageLoadTrigger, onExport }: CanvasEditorProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
@@ -121,18 +122,25 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
 
   useEffect(() => {
     if (fabricCanvas && aiGeneratedImage) {
-      FabricImage.fromURL(aiGeneratedImage).then((img) => {
+      FabricImage.fromURL(aiGeneratedImage, { crossOrigin: 'anonymous' }).then((img) => {
         img.scale(0.5);
         img.set({
           left: 100,
           top: 150,
+          hasControls: true,
+          hasBorders: true,
+          lockUniScaling: false,
         });
         fabricCanvas.add(img);
+        fabricCanvas.setActiveObject(img);
         fabricCanvas.renderAll();
-        toast.success("AI design added to canvas!");
+        toast.success("Image added to canvas!");
+      }).catch((err) => {
+        console.error("Error loading image:", err);
+        toast.error("Failed to load image to canvas");
       });
     }
-  }, [aiGeneratedImage, fabricCanvas]);
+  }, [aiGeneratedImage, imageLoadTrigger, fabricCanvas]);
 
   const addText = () => {
     if (!fabricCanvas) return;
