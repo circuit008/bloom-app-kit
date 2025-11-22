@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Palette, Wand2, Package, TrendingUp, Settings, LogOut, Menu, X } from "lucide-react";
+import { Home, Palette, Wand2, Package, TrendingUp, Settings, LogOut, Menu, X, Info, Mail } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,6 +13,8 @@ const navigation = [
   { name: "AI Tools", href: "/ai-tools", icon: Wand2 },
   { name: "Products", href: "/products", icon: Package },
   { name: "Analytics", href: "/analytics", icon: TrendingUp },
+  { name: "About", href: "/about", icon: Info },
+  { name: "Contact", href: "/contact", icon: Mail },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
