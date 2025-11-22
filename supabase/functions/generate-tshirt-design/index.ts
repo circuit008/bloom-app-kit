@@ -19,22 +19,33 @@ serve(async (req) => {
     }
 
     // Build enhanced prompt with style and color preferences - emphasize transparent background
-    const enhancedPrompt = `Create a professional t-shirt graphic design with these specifications:
+    const enhancedPrompt = `Generate a t-shirt design with a REAL transparent background.
+
+DESIGN SPECIFICATIONS:
 - Theme: ${prompt}
 - Style: ${style}
 - Color scheme: ${colorScheme}
 
-ABSOLUTELY CRITICAL REQUIREMENTS - FOLLOW EXACTLY:
-1. Generate ONLY the graphic design element - NO T-SHIRT, NO BACKGROUND WHATSOEVER
-2. The background MUST be 100% TRANSPARENT (alpha channel = 0)
-3. NO white background, NO colored background, NO patterns, NO textures
-4. Think of this as a sticker or decal - only the design exists, everything else is transparent
-5. The design should float on transparency like a PNG cutout
-6. High contrast, bold colors that pop on any t-shirt color
-7. Clean, sharp edges with perfect transparency around all elements
-8. Output as PNG with alpha transparency channel
+CRITICAL TRANSPARENCY REQUIREMENTS - NO EXCEPTIONS:
+1. Background MUST be TRUE ALPHA TRANSPARENCY (alpha = 0)
+2. Do NOT create any checkerboard pattern or fake transparency squares
+3. NO background textures, NO white squares, NO grey squares, NO patterns whatsoever
+4. The background must be completely invisible, not simulated
+5. Only the design graphic should exist - nothing else
 
-IMPORTANT: If you add any background color or pattern, this will FAIL. Only the design itself should exist.`;
+TECHNICAL REQUIREMENTS:
+6. Clean, sharp edges with perfect alpha transparency
+7. Print-ready PNG format
+8. High resolution: 4500x5400 pixels
+9. Design elements only - NO t-shirt mockup, NO background layer
+10. Think of this as a vinyl decal cutout - pure graphic floating on nothing
+
+QUALITY STANDARDS:
+- High contrast, vibrant colors that pop on any t-shirt color
+- Professional print-ready output
+- Sharp, crisp edges without artifacts
+
+REMEMBER: True transparency means NOTHING visible in the background - not grey, not white, not checkerboard - pure alpha channel transparency only.`;
 
     console.log("Generating design with prompt:", enhancedPrompt);
 
