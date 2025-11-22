@@ -255,8 +255,8 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
 
   return (
     <div className="flex flex-col h-full">
-      {/* Zoom Controls */}
-      <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2 bg-card/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border">
+      {/* Zoom Controls - Left Side */}
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2 bg-card/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border">
         <div className="text-xs font-medium text-center mb-1">{Math.round(zoom * 100)}%</div>
         <Button onClick={handleZoomIn} size="sm" variant="ghost" title="Zoom In (Scroll Up)">
           <ZoomIn className="w-4 h-4" />
@@ -270,7 +270,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       </div>
 
       {/* Compact Toolbar */}
-      <div className="absolute top-4 left-4 z-10 flex gap-2 bg-card/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border">
+      <div className="absolute top-4 right-4 z-10 flex gap-2 bg-card/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border">
         <Button onClick={addText} size="sm" variant="ghost" title="Add Text">
           <Type className="w-4 h-4" />
         </Button>
@@ -282,6 +282,10 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
         </Button>
         <Button onClick={() => addShape("rect")} size="sm" variant="ghost" title="Add Rectangle">
           <Square className="w-4 h-4" />
+        </Button>
+        <div className="w-px bg-border" />
+        <Button onClick={exportDesign} size="sm" variant="default" title="Export Design">
+          <Download className="w-4 h-4" />
         </Button>
         {activeObject && (
           <>
