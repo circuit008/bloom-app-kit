@@ -3,8 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Sparkles, Copy, Download, Upload, Wand2, Search, Loader2 } from "lucide-react";
+import { Sparkles, Copy, Download, Upload, Wand2, Search, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { removeBackground, loadImage } from "@/utils/backgroundRemoval";
@@ -27,6 +28,11 @@ export default function AITools() {
   const [enhancedResult, setEnhancedResult] = useState<string | null>(null);
   const [bgRemoveImage, setBgRemoveImage] = useState<string | null>(null);
   const [bgRemovedResult, setBgRemovedResult] = useState<string | null>(null);
+  
+  // Save dialog state
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [saveTitle, setSaveTitle] = useState("");
+  const [saveImageData, setSaveImageData] = useState<{ url: string; type: string } | null>(null);
 
   const handleGenerateDescription = async () => {
     if (!productInput.trim()) {
@@ -184,6 +190,42 @@ export default function AITools() {
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard!");
+  };
+
+  const handleSaveToLibrary = async () => {
+    if (!saveImageData || !saveTitle.trim()) {
+      toast.error("Please enter a title");
+      return;
+    }
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Not authenticated');
+
+      const { error } = await supabase
+        .from('saved_images')
+        .insert({
+          user_id: user.id,
+          title: saveTitle,
+          image_url: saveImageData.url,
+          image_type: saveImageData.type,
+        });
+
+      if (error) throw error;
+
+      toast.success("Image saved to library!");
+      setSaveDialogOpen(false);
+      setSaveTitle("");
+      setSaveImageData(null);
+    } catch (error) {
+      console.error('Error saving image:', error);
+      toast.error("Failed to save image");
+    }
+  };
+
+  const openSaveDialog = (url: string, type: string) => {
+    setSaveImageData({ url, type });
+    setSaveDialogOpen(true);
   };
 
   return (
@@ -408,13 +450,23 @@ export default function AITools() {
                     Try Another Image
                   </Button>
                   {enhancedResult && (
-                    <Button 
-                      onClick={() => downloadImage(enhancedResult, 'enhanced-image.png')}
-                      className="flex-1"
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Download
-                    </Button>
+                    <>
+                      <Button 
+                        onClick={() => openSaveDialog(enhancedResult, 'enhanced')}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        <Save className="mr-2 h-4 w-4" />
+                        Save
+                      </Button>
+                      <Button 
+                        onClick={() => downloadImage(enhancedResult, 'enhanced-image.png')}
+                        className="flex-1"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Download
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
@@ -500,13 +552,23 @@ export default function AITools() {
                     Try Another Image
                   </Button>
                   {bgRemovedResult && (
-                    <Button 
-                      onClick={() => downloadImage(bgRemovedResult, 'no-background.png')}
-                      className="flex-1"
-                    >
-                      <Download className="mr-2 h-4 w-4" />
-                      Download PNG
-                    </Button>
+                    <>
+                      <Button 
+                        onClick={() => openSaveDialog(bgRemovedResult, 'background_removed')}
+                        variant="outline"
+                        className="flex-1"
+                      >
+                        <Save className="mr-2 h-4 w-4" />
+                        Save
+                      </Button>
+                      <Button 
+                        onClick={() => downloadImage(bgRemovedResult, 'no-background.png')}
+                        className="flex-1"
+                      >
+                        <Download className="mr-2 h-4 w-4" />
+                        Download PNG
+                      </Button>
+                    </>
                   )}
                 </div>
               </div>
@@ -580,6 +642,54 @@ export default function AITools() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Save Dialog */}
+      {saveDialogOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-md p-6">
+            <h3 className="text-lg font-semibold mb-4">Save to Library</h3>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="title">Image Title</Label>
+                <Input
+                  id="title"
+                  value={saveTitle}
+                  onChange={(e) => setSaveTitle(e.target.value)}
+                  placeholder="Enter a descriptive title"
+                  className="mt-1"
+                />
+              </div>
+              {saveImageData && (
+                <img
+                  src={saveImageData.url}
+                  alt="Preview"
+                  className="w-full h-32 object-cover rounded-lg"
+                />
+              )}
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSaveDialogOpen(false);
+                    setSaveTitle("");
+                    setSaveImageData(null);
+                  }}
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSaveToLibrary}
+                  disabled={!saveTitle.trim()}
+                  className="flex-1"
+                >
+                  Save
+                </Button>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
