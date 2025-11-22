@@ -122,8 +122,12 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, imageLoadTrigger, 
 
   useEffect(() => {
     if (fabricCanvas && aiGeneratedImage) {
-      FabricImage.fromURL(aiGeneratedImage, { crossOrigin: 'anonymous' }).then((img) => {
-        img.scale(0.5);
+      // Don't use crossOrigin for blob URLs
+      const isBlobUrl = aiGeneratedImage.startsWith('blob:');
+      const loadOptions = isBlobUrl ? undefined : { crossOrigin: 'anonymous' as const };
+      
+      FabricImage.fromURL(aiGeneratedImage, loadOptions).then((img) => {
+        img.scale(0.25); // Reduced by 50%
         img.set({
           left: 100,
           top: 150,
