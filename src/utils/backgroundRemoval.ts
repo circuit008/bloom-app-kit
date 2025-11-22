@@ -34,7 +34,8 @@ function resizeImageIfNeeded(canvas: HTMLCanvasElement, ctx: CanvasRenderingCont
 export const removeBackground = async (imageElement: HTMLImageElement, onProgress?: (status: string) => void): Promise<Blob> => {
   try {
     onProgress?.('Initializing AI model...');
-    const segmenter = await pipeline('image-segmentation', 'Xenova/segformer-b0-finetuned-ade-512-512', {
+    // Use RMBG model which is specifically designed for background removal
+    const segmenter = await pipeline('image-segmentation', 'briaai/RMBG-1.4', {
       device: 'webgpu',
     });
     
@@ -47,7 +48,7 @@ export const removeBackground = async (imageElement: HTMLImageElement, onProgres
     const wasResized = resizeImageIfNeeded(canvas, ctx, imageElement);
     console.log(`Image ${wasResized ? 'was' : 'was not'} resized. Final dimensions: ${canvas.width}x${canvas.height}`);
     
-    const imageData = canvas.toDataURL('image/jpeg', 0.8);
+    const imageData = canvas.toDataURL('image/jpeg', 0.95);
     
     onProgress?.('Analyzing image with AI...');
     const result = await segmenter(imageData);
@@ -69,9 +70,12 @@ export const removeBackground = async (imageElement: HTMLImageElement, onProgres
     const outputImageData = outputCtx.getImageData(0, 0, outputCanvas.width, outputCanvas.height);
     const data = outputImageData.data;
     
-    // Apply inverted mask to alpha channel
-    for (let i = 0; i < result[0].mask.data.length; i++) {
-      const alpha = Math.round((1 - result[0].mask.data[i]) * 255);
+    // Apply mask with better edge handling
+    const maskData = result[0].mask.data;
+    for (let i = 0; i < maskData.length; i++) {
+      // Use the mask value directly for better results
+      const maskValue = maskData[i];
+      const alpha = Math.round(maskValue * 255);
       data[i * 4 + 3] = alpha;
     }
     
