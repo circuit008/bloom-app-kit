@@ -268,7 +268,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, imageLoadTrigger, 
   return (
     <div className="flex flex-col h-full">
       {/* Zoom Controls - Vertical on Left Side */}
-      <div className="absolute left-4 bottom-24 z-10 flex flex-col gap-1 bg-background/95 backdrop-blur-sm rounded-lg shadow-lg p-1 border">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-1 bg-background/95 backdrop-blur-sm rounded-lg shadow-lg p-1 border">
         <Button
           variant="ghost"
           size="icon"
@@ -336,67 +336,6 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, imageLoadTrigger, 
         )}
       </div>
 
-      {/* Properties Panel - Floating */}
-      {activeObject && (
-        <div className="absolute top-4 right-4 z-10 w-64 bg-card/95 backdrop-blur-sm p-4 rounded-lg shadow-lg border border-border space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-sm">Object Properties</h3>
-            <Button onClick={deleteSelected} size="sm" variant="ghost">
-              <Trash2 className="w-4 h-4 text-destructive" />
-            </Button>
-          </div>
-          
-          {activeObject.type === "i-text" && (
-            <>
-              <div>
-                <Label className="text-xs">Text Color</Label>
-                <Input
-                  type="color"
-                  value={activeObject.fill}
-                  onChange={(e) => updateTextColor(e.target.value)}
-                  className="h-8 mt-1"
-                />
-              </div>
-              <div>
-                <Label className="text-xs">Font Size: {activeObject.fontSize}px</Label>
-                <Slider
-                  value={[activeObject.fontSize]}
-                  onValueChange={(v) => updateFontSize(v[0])}
-                  min={10}
-                  max={100}
-                  step={1}
-                  className="mt-2"
-                />
-              </div>
-            </>
-          )}
-
-          <div>
-            <Label className="text-xs">Scale: {(activeObject.scaleX || 1).toFixed(2)}x</Label>
-            <Slider
-              value={[activeObject.scaleX || 1]}
-              onValueChange={(v) => updateScale(v[0])}
-              min={0.1}
-              max={3}
-              step={0.1}
-              className="mt-2"
-            />
-          </div>
-
-          <div>
-            <Label className="text-xs">Rotation: {Math.round(activeObject.angle || 0)}°</Label>
-            <Slider
-              value={[activeObject.angle || 0]}
-              onValueChange={(v) => updateRotation(v[0])}
-              min={0}
-              max={360}
-              step={1}
-              className="mt-2"
-            />
-          </div>
-        </div>
-      )}
-
       {/* Canvas with T-Shirt Mockup */}
       <div 
         ref={containerRef}
@@ -458,6 +397,69 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, imageLoadTrigger, 
           </div>
         </div>
       </div>
+
+      {/* Properties Panel - Horizontal Below Canvas */}
+      {activeObject && (
+        <div className="flex-shrink-0 bg-card border-t p-4">
+          <div className="flex items-center gap-6 justify-center max-w-6xl mx-auto">
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-sm whitespace-nowrap">Object Properties</h3>
+              <Button onClick={deleteSelected} size="sm" variant="ghost">
+                <Trash2 className="w-4 h-4 text-destructive" />
+              </Button>
+            </div>
+            
+            {activeObject.type === "i-text" && (
+              <>
+                <div className="flex items-center gap-2">
+                  <Label className="text-xs whitespace-nowrap">Text Color</Label>
+                  <Input
+                    type="color"
+                    value={activeObject.fill}
+                    onChange={(e) => updateTextColor(e.target.value)}
+                    className="h-8 w-16"
+                  />
+                </div>
+                <div className="flex items-center gap-2 min-w-[200px]">
+                  <Label className="text-xs whitespace-nowrap">Font Size: {activeObject.fontSize}px</Label>
+                  <Slider
+                    value={[activeObject.fontSize]}
+                    onValueChange={(v) => updateFontSize(v[0])}
+                    min={10}
+                    max={100}
+                    step={1}
+                    className="w-32"
+                  />
+                </div>
+              </>
+            )}
+
+            <div className="flex items-center gap-2 min-w-[200px]">
+              <Label className="text-xs whitespace-nowrap">Scale: {(activeObject.scaleX || 1).toFixed(2)}x</Label>
+              <Slider
+                value={[activeObject.scaleX || 1]}
+                onValueChange={(v) => updateScale(v[0])}
+                min={0.1}
+                max={3}
+                step={0.1}
+                className="w-32"
+              />
+            </div>
+
+            <div className="flex items-center gap-2 min-w-[200px]">
+              <Label className="text-xs whitespace-nowrap">Rotation: {Math.round(activeObject.angle || 0)}°</Label>
+              <Slider
+                value={[activeObject.angle || 0]}
+                onValueChange={(v) => updateRotation(v[0])}
+                min={0}
+                max={360}
+                step={1}
+                className="w-32"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
