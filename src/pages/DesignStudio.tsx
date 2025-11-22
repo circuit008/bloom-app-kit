@@ -97,9 +97,9 @@ const DesignStudio = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex flex-col h-screen pt-16">
       {/* Header */}
-      <div className="flex items-center justify-between p-6 border-b bg-card flex-shrink-0">
+      <div className="flex items-center justify-between p-6 border-b bg-card flex-shrink-0 fixed top-0 left-0 right-0 z-20">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Design Studio</h1>
           <p className="text-muted-foreground mt-1">Create stunning t-shirt designs with AI</p>

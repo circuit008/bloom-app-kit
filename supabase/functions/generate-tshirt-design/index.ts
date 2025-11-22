@@ -18,34 +18,40 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Build enhanced prompt with style and color preferences - emphasize transparent background
-    const enhancedPrompt = `Generate a t-shirt design with a REAL transparent background.
+    // Build enhanced prompt with style and color preferences - emphasize REAL transparent background
+    const enhancedPrompt = `Generate a t-shirt design with REAL TRANSPARENT BACKGROUND ONLY.
 
 DESIGN SPECIFICATIONS:
 - Theme: ${prompt}
 - Style: ${style}
 - Color scheme: ${colorScheme}
 
-CRITICAL TRANSPARENCY REQUIREMENTS - NO EXCEPTIONS:
-1. Background MUST be TRUE ALPHA TRANSPARENCY (alpha = 0)
-2. Do NOT create any checkerboard pattern or fake transparency squares
-3. NO background textures, NO white squares, NO grey squares, NO patterns whatsoever
-4. The background must be completely invisible, not simulated
-5. Only the design graphic should exist - nothing else
+CRITICAL TRANSPARENCY REQUIREMENTS:
+⚠️ REAL TRANSPARENT BACKGROUND ONLY — not simulated.
+⚠️ Remove all background pixels completely.
+⚠️ Zero patterns. Zero checkerboard. Zero white. Zero grey.
+⚠️ Final image must contain an empty alpha background layer only.
 
 TECHNICAL REQUIREMENTS:
-6. Clean, sharp edges with perfect alpha transparency
-7. Print-ready PNG format
+1. TRUE alpha transparency (alpha = 0) for all background pixels
+2. NO checkerboard pattern simulation
+3. NO background textures of any kind
+4. NO white, grey, or colored background
+5. Design elements floating on pure transparency
+6. Clean, sharp anti-aliased edges
+7. Print-ready PNG with alpha channel
 8. High resolution: 4500x5400 pixels
-9. Design elements only - NO t-shirt mockup, NO background layer
-10. Think of this as a vinyl decal cutout - pure graphic floating on nothing
+9. Think vinyl decal cutout - graphic only, nothing behind it
 
 QUALITY STANDARDS:
-- High contrast, vibrant colors that pop on any t-shirt color
-- Professional print-ready output
-- Sharp, crisp edges without artifacts
+- Vibrant colors that pop on any t-shirt
+- Professional print quality
+- Sharp edges without artifacts
+- High contrast design elements
 
-REMEMBER: True transparency means NOTHING visible in the background - not grey, not white, not checkerboard - pure alpha channel transparency only.`;
+OUTPUT VALIDATION:
+If you were to open this in Photoshop, the background layer should show as a transparent checkerboard (indicating true alpha).
+The PNG file must have an alpha channel with 0% opacity in all non-design areas.`;
 
     console.log("Generating design with prompt:", enhancedPrompt);
 
