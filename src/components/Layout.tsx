@@ -1,17 +1,18 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { LayoutDashboard, Palette, TrendingUp, Images, Mail, Settings, Sparkles, LogOut, Menu, X } from "lucide-react";
+import { Home, Palette, Wand2, Package, TrendingUp, Settings, LogOut, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useState } from "react";
+import pixelpodLogo from "@/assets/pixelpod-logo.png";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard },
+  { name: "Home", href: "/", icon: Home },
   { name: "Design Studio", href: "/design-studio", icon: Palette },
-  { name: "Trend Dashboard", href: "/trend-dashboard", icon: TrendingUp },
-  { name: "Design Library", href: "/design-library", icon: Images },
-  { name: "Recovery Campaigns", href: "/recovery-campaigns", icon: Mail },
+  { name: "AI Tools", href: "/ai-tools", icon: Wand2 },
+  { name: "Products", href: "/products", icon: Package },
+  { name: "Analytics", href: "/analytics", icon: TrendingUp },
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
@@ -32,13 +33,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-                <Sparkles className="h-5 w-5 text-primary-foreground" />
-              </div>
+            <Link to="/" className="flex items-center gap-3">
+              <img src={pixelpodLogo} alt="PixelPOD" className="h-10 w-10" />
               <div className="flex flex-col">
-                <span className="text-base font-bold text-foreground">ShopBoost AI</span>
-                <span className="text-xs text-muted-foreground hidden sm:block">T-Shirt Design Platform</span>
+                <span className="text-lg font-bold bg-gradient-primary bg-clip-text text-transparent">PixelPOD</span>
+                <span className="text-xs text-muted-foreground hidden sm:block">Print-on-Demand Studio</span>
               </div>
             </Link>
             
@@ -66,12 +65,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="hidden sm:flex items-center gap-2 mr-2 px-3 py-1.5 rounded-md bg-secondary">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <span className="text-sm font-medium text-foreground">1,247</span>
-              <span className="text-xs text-muted-foreground">credits</span>
-            </div>
-            
             <Button
               variant="ghost"
               size="sm"
