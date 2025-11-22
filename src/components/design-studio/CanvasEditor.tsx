@@ -255,16 +255,36 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
 
   return (
     <div className="flex flex-col h-full">
-      {/* Zoom Controls - Left Side, Lower Position */}
-      <div className="absolute left-4 bottom-8 z-10 flex flex-col gap-1 bg-card/95 backdrop-blur-sm p-2 rounded-lg shadow-lg border border-border">
-        <div className="text-[10px] font-medium text-center mb-0.5">{Math.round(zoom * 100)}%</div>
-        <Button onClick={handleZoomIn} size="sm" variant="ghost" title="Zoom In (Scroll Up)" className="h-7 w-7 p-0">
-          <ZoomIn className="w-3 h-3" />
-        </Button>
-        <Button onClick={handleZoomOut} size="sm" variant="ghost" title="Zoom Out (Scroll Down)" className="h-7 w-7 p-0">
+      {/* Zoom Controls - Bottom Left Corner of Canvas */}
+      <div className="absolute left-2 bottom-2 z-10 flex gap-1 bg-background/95 backdrop-blur-sm rounded-lg shadow-lg p-1 border">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleZoomOut}
+          className="w-6 h-6 p-0"
+          title="Zoom Out"
+        >
           <ZoomOut className="w-3 h-3" />
         </Button>
-        <Button onClick={handleResetZoom} size="sm" variant="ghost" title="Reset Zoom" className="h-7 w-7 p-0">
+        <div className="text-xs px-2 py-1 font-medium flex items-center">
+          {Math.round(zoom * 100)}%
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleZoomIn}
+          className="w-6 h-6 p-0"
+          title="Zoom In"
+        >
+          <ZoomIn className="w-3 h-3" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={handleResetZoom}
+          className="w-6 h-6 p-0"
+          title="Reset Zoom"
+        >
           <Maximize2 className="w-3 h-3" />
         </Button>
       </div>

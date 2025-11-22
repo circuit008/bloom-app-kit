@@ -10,6 +10,8 @@ import DesignStudio from "./pages/DesignStudio";
 import AITools from "./pages/AITools";
 import Products from "./pages/Products";
 import Analytics from "./pages/Analytics";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -37,6 +39,8 @@ const App = () => (
                     <Route path="/ai-tools" element={<AITools />} />
                     <Route path="/products" element={<Products />} />
                     <Route path="/analytics" element={<Analytics />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/contact" element={<Contact />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>

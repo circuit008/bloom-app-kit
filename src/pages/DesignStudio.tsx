@@ -95,9 +95,9 @@ const DesignStudio = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col">
+    <div className="flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-card flex-shrink-0">
+      <div className="flex items-center justify-between p-4 border-b bg-card flex-shrink-0 mb-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Design Studio</h1>
           <p className="text-muted-foreground mt-1">Create stunning t-shirt designs with AI</p>
@@ -141,11 +141,11 @@ const DesignStudio = () => {
       </div>
 
       {/* Main Content - Canvas Left, Controls Right */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex flex-col lg:flex-row gap-4">
         {/* Left Side - Canvas */}
         <div className="flex-1 p-6 bg-muted/20">
-          <Card className="h-full">
-            <CardContent className="p-6 h-full">
+          <Card>
+            <CardContent className="p-6">
               <CanvasEditor
                 tshirtColor={tshirtColor}
                 aiGeneratedImage={aiGeneratedImage}
@@ -156,8 +156,8 @@ const DesignStudio = () => {
         </div>
 
         {/* Right Side - Controls */}
-        <div className="w-80 border-l bg-card overflow-y-auto flex-shrink-0">
-          <Tabs defaultValue="customize" className="h-full">
+        <div className="lg:w-80 w-full border-l bg-card overflow-y-auto flex-shrink-0">
+          <Tabs defaultValue="customize">
             <TabsList className="w-full grid grid-cols-2 sticky top-0 z-10 bg-card">
               <TabsTrigger value="customize">Customize</TabsTrigger>
               <TabsTrigger value="library">
