@@ -12,7 +12,10 @@ import {
   Trash2, 
   Download,
   Layers,
-  RotateCw
+  RotateCw,
+  ZoomIn,
+  ZoomOut,
+  Maximize2
 } from "lucide-react";
 import { toast } from "sonner";
 import tshirtBase from "@/assets/tshirt-base.png";
@@ -25,15 +28,20 @@ interface CanvasEditorProps {
 
 export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: CanvasEditorProps) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [fabricCanvas, setFabricCanvas] = useState<FabricCanvas | null>(null);
   const [activeObject, setActiveObject] = useState<any>(null);
+  const [zoom, setZoom] = useState(1);
+  const [isPanning, setIsPanning] = useState(false);
+  const [panStart, setPanStart] = useState({ x: 0, y: 0 });
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     if (!canvasRef.current) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 420,
-      height: 520,
+      width: 350,
+      height: 430,
       backgroundColor: "transparent",
     });
 
@@ -54,6 +62,56 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       canvas.dispose();
     };
   }, []);
+
+  // Mouse wheel zoom
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      const delta = e.deltaY * -0.001;
+      const newZoom = Math.min(Math.max(0.5, zoom + delta), 3);
+      setZoom(newZoom);
+    };
+
+    container.addEventListener('wheel', handleWheel, { passive: false });
+    return () => container.removeEventListener('wheel', handleWheel);
+  }, [zoom]);
+
+  // Pan functionality
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.button === 1 || (e.button === 0 && e.ctrlKey)) { // Middle click or Ctrl+Left click
+      setIsPanning(true);
+      setPanStart({ x: e.clientX - panOffset.x, y: e.clientY - panOffset.y });
+    }
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (isPanning) {
+      setPanOffset({
+        x: e.clientX - panStart.x,
+        y: e.clientY - panStart.y
+      });
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsPanning(false);
+  };
+
+  const handleZoomIn = () => {
+    setZoom(prev => Math.min(prev + 0.25, 3));
+  };
+
+  const handleZoomOut = () => {
+    setZoom(prev => Math.max(prev - 0.25, 0.5));
+  };
+
+  const handleResetZoom = () => {
+    setZoom(1);
+    setPanOffset({ x: 0, y: 0 });
+  };
 
   const updateRotation = (rotation: number) => {
     if (!activeObject) return;
@@ -173,7 +231,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       // Draw the canvas design on top
       const designImg = new Image();
       designImg.onload = () => {
-        ctx.drawImage(designImg, 37, 180, 420, 520);
+        ctx.drawImage(designImg, 37, 180, 350, 430);
         const dataUrl = tempCanvas.toDataURL('image/png', 1);
         onExport(dataUrl);
         toast.success("Design saved successfully!");
@@ -197,6 +255,20 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
 
   return (
     <div className="flex flex-col h-full">
+      {/* Zoom Controls */}
+      <div className="absolute bottom-4 right-4 z-10 flex flex-col gap-2 bg-card/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border">
+        <div className="text-xs font-medium text-center mb-1">{Math.round(zoom * 100)}%</div>
+        <Button onClick={handleZoomIn} size="sm" variant="ghost" title="Zoom In (Scroll Up)">
+          <ZoomIn className="w-4 h-4" />
+        </Button>
+        <Button onClick={handleZoomOut} size="sm" variant="ghost" title="Zoom Out (Scroll Down)">
+          <ZoomOut className="w-4 h-4" />
+        </Button>
+        <Button onClick={handleResetZoom} size="sm" variant="ghost" title="Reset Zoom">
+          <Maximize2 className="w-4 h-4" />
+        </Button>
+      </div>
+
       {/* Compact Toolbar */}
       <div className="absolute top-4 left-4 z-10 flex gap-2 bg-card/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border">
         <Button onClick={addText} size="sm" variant="ghost" title="Add Text">
@@ -289,8 +361,24 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       )}
 
       {/* Canvas with T-Shirt Mockup */}
-      <div className="flex-1 flex items-center justify-center p-4 overflow-auto">
-        <div className="relative w-full max-w-[550px]" style={{ aspectRatio: "5/6", minHeight: "660px" }}>
+      <div 
+        ref={containerRef}
+        className="flex-1 flex items-center justify-center p-4 overflow-hidden cursor-move"
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+      >
+        <div 
+          className="relative" 
+          style={{ 
+            width: "450px",
+            aspectRatio: "5/6",
+            transform: `scale(${zoom}) translate(${panOffset.x / zoom}px, ${panOffset.y / zoom}px)`,
+            transformOrigin: "center center",
+            transition: isPanning ? 'none' : 'transform 0.1s ease-out'
+          }}
+        >
           {/* Isolated container for t-shirt and color overlay */}
           <div className="absolute inset-0" style={{ isolation: 'isolate' }}>
             {/* T-Shirt Base Image */}
@@ -298,6 +386,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
               src={tshirtBase} 
               alt="T-shirt base" 
               className="absolute inset-0 w-full h-full object-contain pointer-events-none"
+              draggable={false}
             />
             
             {/* Color Overlay - only affects t-shirt pixels */}
@@ -325,6 +414,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
               top: '30%', 
               left: '50%', 
               transform: 'translateX(-50%)',
+              pointerEvents: isPanning ? 'none' : 'auto'
             }}
           >
             <canvas ref={canvasRef} />
