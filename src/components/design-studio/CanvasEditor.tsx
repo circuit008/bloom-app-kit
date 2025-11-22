@@ -40,8 +40,8 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
     if (!canvasRef.current) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 350,
-      height: 430,
+      width: 262,
+      height: 322,
       backgroundColor: "transparent",
     });
 
@@ -231,7 +231,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       // Draw the canvas design on top
       const designImg = new Image();
       designImg.onload = () => {
-        ctx.drawImage(designImg, 37, 180, 350, 430);
+        ctx.drawImage(designImg, 57, 195, 262, 322);
         const dataUrl = tempCanvas.toDataURL('image/png', 1);
         onExport(dataUrl);
         toast.success("Design saved successfully!");
@@ -255,17 +255,17 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
 
   return (
     <div className="flex flex-col h-full">
-      {/* Zoom Controls - Left Side */}
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex flex-col gap-2 bg-card/95 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-border">
-        <div className="text-xs font-medium text-center mb-1">{Math.round(zoom * 100)}%</div>
-        <Button onClick={handleZoomIn} size="sm" variant="ghost" title="Zoom In (Scroll Up)">
-          <ZoomIn className="w-4 h-4" />
+      {/* Zoom Controls - Left Side, Lower Position */}
+      <div className="absolute left-4 bottom-8 z-10 flex flex-col gap-1 bg-card/95 backdrop-blur-sm p-2 rounded-lg shadow-lg border border-border">
+        <div className="text-[10px] font-medium text-center mb-0.5">{Math.round(zoom * 100)}%</div>
+        <Button onClick={handleZoomIn} size="sm" variant="ghost" title="Zoom In (Scroll Up)" className="h-7 w-7 p-0">
+          <ZoomIn className="w-3 h-3" />
         </Button>
-        <Button onClick={handleZoomOut} size="sm" variant="ghost" title="Zoom Out (Scroll Down)">
-          <ZoomOut className="w-4 h-4" />
+        <Button onClick={handleZoomOut} size="sm" variant="ghost" title="Zoom Out (Scroll Down)" className="h-7 w-7 p-0">
+          <ZoomOut className="w-3 h-3" />
         </Button>
-        <Button onClick={handleResetZoom} size="sm" variant="ghost" title="Reset Zoom">
-          <Maximize2 className="w-4 h-4" />
+        <Button onClick={handleResetZoom} size="sm" variant="ghost" title="Reset Zoom" className="h-7 w-7 p-0">
+          <Maximize2 className="w-3 h-3" />
         </Button>
       </div>
 
@@ -376,7 +376,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
         <div 
           className="relative" 
           style={{ 
-            width: "450px",
+            width: "337px",
             aspectRatio: "5/6",
             transform: `scale(${zoom}) translate(${panOffset.x / zoom}px, ${panOffset.y / zoom}px)`,
             transformOrigin: "center center",

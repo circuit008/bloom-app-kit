@@ -118,6 +118,39 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_images: {
+        Row: {
+          created_at: string | null
+          id: string
+          image_type: string
+          image_url: string
+          original_url: string | null
+          title: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          image_type: string
+          image_url: string
+          original_url?: string | null
+          title: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          image_type?: string
+          image_url?: string
+          original_url?: string | null
+          title?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       shopify_credentials: {
         Row: {
           api_key: string
