@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Sparkles, Copy, Download, Upload, Wand2, Search } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function AITools() {
   const [productInput, setProductInput] = useState("");
@@ -21,18 +22,26 @@ export default function AITools() {
     }
     
     setIsGenerating(true);
-    // Simulate AI generation
-    setTimeout(() => {
-      setGeneratedDescription(
-        `Elevate your style with this premium t-shirt featuring ${productInput}. ` +
-        `Crafted from 100% soft cotton for ultimate comfort and durability. ` +
-        `Perfect for casual outings, gift-giving, or everyday wear. ` +
-        `Available in multiple sizes and colors to match your unique personality. ` +
-        `Machine washable and designed to maintain its vibrant print after countless washes.`
-      );
-      setIsGenerating(false);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-description', {
+        body: { productDetails: productInput }
+      });
+
+      if (error) throw error;
+      
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setGeneratedDescription(data.description);
       toast.success("Description generated!");
-    }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Failed to generate description");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleGenerateSEO = async () => {
@@ -42,15 +51,26 @@ export default function AITools() {
     }
     
     setIsGenerating(true);
-    setTimeout(() => {
-      setGeneratedSEO(
-        `**Title:** ${seoInput} T-Shirt | Premium Quality Print | Unique Design\n\n` +
-        `**Tags:** ${seoInput}, custom t-shirt, graphic tee, printed shirt, cotton tee, gift idea, casual wear\n\n` +
-        `**Meta Description:** Shop our exclusive ${seoInput} t-shirt collection. Premium quality, vibrant prints, comfortable fit. Free shipping on orders over $50.`
-      );
-      setIsGenerating(false);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-seo', {
+        body: { keywords: seoInput }
+      });
+
+      if (error) throw error;
+      
+      if (data.error) {
+        toast.error(data.error);
+        return;
+      }
+
+      setGeneratedSEO(data.seoContent);
       toast.success("SEO content generated!");
-    }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+      toast.error("Failed to generate SEO content");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const copyToClipboard = (text: string) => {
