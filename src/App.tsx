@@ -5,11 +5,11 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import Dashboard from "./pages/Dashboard";
+import Home from "./pages/Home";
 import DesignStudio from "./pages/DesignStudio";
-import TrendDashboard from "./pages/TrendDashboard";
-import DesignLibrary from "./pages/DesignLibrary";
-import RecoveryCampaigns from "./pages/RecoveryCampaigns";
+import AITools from "./pages/AITools";
+import Products from "./pages/Products";
+import Analytics from "./pages/Analytics";
 import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -32,11 +32,11 @@ const App = () => (
               <ProtectedRoute>
                 <Layout>
                   <Routes>
-                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/" element={<Home />} />
                     <Route path="/design-studio" element={<DesignStudio />} />
-                    <Route path="/trend-dashboard" element={<TrendDashboard />} />
-                    <Route path="/design-library" element={<DesignLibrary />} />
-                    <Route path="/recovery-campaigns" element={<RecoveryCampaigns />} />
+                    <Route path="/ai-tools" element={<AITools />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/analytics" element={<Analytics />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
