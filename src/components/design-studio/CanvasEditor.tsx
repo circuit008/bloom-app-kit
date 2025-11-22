@@ -32,8 +32,8 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
     if (!canvasRef.current) return;
 
     const canvas = new FabricCanvas(canvasRef.current, {
-      width: 380,
-      height: 470,
+      width: 500,
+      height: 620,
       backgroundColor: "transparent",
     });
 
@@ -173,7 +173,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
       // Draw the canvas design on top
       const designImg = new Image();
       designImg.onload = () => {
-        ctx.drawImage(designImg, 45, 190, 380, 470);
+        ctx.drawImage(designImg, 37, 180, 500, 620);
         const dataUrl = tempCanvas.toDataURL('image/png', 1);
         onExport(dataUrl);
         toast.success("Design saved successfully!");
@@ -290,7 +290,7 @@ export const CanvasEditor = ({ tshirtColor, aiGeneratedImage, onExport }: Canvas
 
       {/* Canvas with T-Shirt Mockup */}
       <div className="flex-1 flex items-center justify-center p-4">
-        <div className="relative w-full h-full max-w-[500px] max-h-[600px]" style={{ aspectRatio: "5/6" }}>
+        <div className="relative w-full h-full max-w-[650px] max-h-[780px]" style={{ aspectRatio: "5/6" }}>
           {/* Isolated container for t-shirt and color overlay */}
           <div className="absolute inset-0" style={{ isolation: 'isolate' }}>
             {/* T-Shirt Base Image */}
