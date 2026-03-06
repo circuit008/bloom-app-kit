@@ -36,6 +36,9 @@ const Login = () => {
     if (result?.error) {
       toast.error(result.error.message || "Google login failed");
       setGoogleLoading(false);
+    } else if (!result?.redirected) {
+      toast.success("Logged in successfully!");
+      navigate("/");
     }
   };
 
