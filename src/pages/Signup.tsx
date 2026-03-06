@@ -26,6 +26,9 @@ const Signup = () => {
     if (result?.error) {
       toast.error(result.error.message || "Google signup failed");
       setGoogleLoading(false);
+    } else if (!result?.redirected) {
+      toast.success("Signed up successfully!");
+      navigate("/");
     }
   };
 
