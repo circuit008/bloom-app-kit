@@ -149,7 +149,7 @@ export default function Scan() {
           </CardHeader>
           <CardContent className="space-y-6">
             <DesignUpload file={file} preview={preview} onFileChange={handleFileChange} />
-            <KeywordInput keywords={keywords} onKeywordsChange={setKeywords} />
+            <KeywordInput keywords={keywords} onKeywordsChange={setKeywords} inputRef={keywordInputRef} />
 
             <div className="pt-2">
               <Button
