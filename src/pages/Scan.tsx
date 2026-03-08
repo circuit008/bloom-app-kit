@@ -9,8 +9,20 @@ import { DesignUpload } from "@/components/scan/DesignUpload";
 import { KeywordInput } from "@/components/scan/KeywordInput";
 import { ScanProgress } from "@/components/scan/ScanProgress";
 import { IPResultsCard, type IPCheckResult, type IPMatch } from "@/components/scan/IPResultsCard";
+import { AccessibilityCheck, type AccessibilityResult } from "@/components/scan/AccessibilityCheck";
+import { QualityCheck, type QualityResult } from "@/components/scan/QualityCheck";
+import { CombinedResults } from "@/components/scan/CombinedResults";
 
-type Phase = "upload" | "checking" | "results";
+type Phase = "upload" | "checking" | "ip-results" | "accessibility" | "quality" | "combined";
+
+const stepLabels: Record<Phase, { step: number; label: string }> = {
+  upload: { step: 1, label: "IP Check" },
+  checking: { step: 1, label: "IP Check" },
+  "ip-results": { step: 1, label: "IP Check" },
+  accessibility: { step: 2, label: "Accessibility" },
+  quality: { step: 3, label: "Quality" },
+  combined: { step: 4, label: "Results" },
+};
 
 export default function Scan() {
   const navigate = useNavigate();
@@ -18,7 +30,9 @@ export default function Scan() {
   const [preview, setPreview] = useState<string | null>(null);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [phase, setPhase] = useState<Phase>("upload");
-  const [result, setResult] = useState<IPCheckResult | null>(null);
+  const [ipResult, setIpResult] = useState<IPCheckResult | null>(null);
+  const [accessibilityResult, setAccessibilityResult] = useState<AccessibilityResult | null>(null);
+  const [qualityResult, setQualityResult] = useState<QualityResult | null>(null);
   const keywordInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = useCallback((f: File | null, p: string | null) => {
@@ -34,7 +48,6 @@ export default function Scan() {
         const updated = [...keywords, val];
         setKeywords(updated);
         keywordInputRef.current.value = "";
-        // Use updated list for the check
         return runIPCheckWithKeywords(updated);
       }
     }
@@ -50,7 +63,6 @@ export default function Scan() {
     setPhase("checking");
 
     try {
-      // Fetch trademark database
       const { data: trademarks, error } = await supabase
         .from("trademark_database")
         .select("*");
@@ -63,18 +75,13 @@ export default function Scan() {
         return;
       }
 
-      // Compare keywords against trademarks (case-insensitive)
       const matches: IPMatch[] = [];
 
       for (const kw of kws) {
         const kwLower = kw.toLowerCase();
         for (const tm of trademarks) {
           const termLower = tm.term.toLowerCase();
-          if (
-            kwLower.includes(termLower) ||
-            termLower.includes(kwLower)
-          ) {
-            // Avoid duplicate matches for same term
+          if (kwLower.includes(termLower) || termLower.includes(kwLower)) {
             if (!matches.find((m) => m.term === tm.term && m.matchedKeyword === kw)) {
               matches.push({
                 term: tm.term,
@@ -88,7 +95,6 @@ export default function Scan() {
         }
       }
 
-      // Calculate score: 100 - (matched_terms × 20), min 0
       const score = Math.max(0, 100 - matches.length * 20);
 
       let riskLabel: string;
@@ -104,8 +110,8 @@ export default function Scan() {
         riskEmoji = "🔴";
       }
 
-      setResult({ score, matches, riskLabel, riskEmoji });
-      setPhase("results");
+      setIpResult({ score, matches, riskLabel, riskEmoji });
+      setPhase("ip-results");
     } catch (err: any) {
       console.error("IP Check error:", err);
       toast.error("Failed to run IP check. " + (err.message || ""));
@@ -113,10 +119,41 @@ export default function Scan() {
     }
   };
 
-  const handleBack = () => {
+  const handleIPBack = () => {
     setPhase("upload");
-    setResult(null);
+    setIpResult(null);
   };
+
+  const handleIPContinue = () => {
+    if (!preview) {
+      toast.error("Please upload an image to continue with accessibility check.");
+      setPhase("upload");
+      return;
+    }
+    setPhase("accessibility");
+  };
+
+  const handleAccessibilityComplete = (result: AccessibilityResult) => {
+    setAccessibilityResult(result);
+    setPhase("quality");
+  };
+
+  const handleQualityComplete = (result: QualityResult) => {
+    setQualityResult(result);
+    setPhase("combined");
+  };
+
+  const handleRestart = () => {
+    setFile(null);
+    setPreview(null);
+    setKeywords([]);
+    setIpResult(null);
+    setAccessibilityResult(null);
+    setQualityResult(null);
+    setPhase("upload");
+  };
+
+  const currentStepInfo = stepLabels[phase];
 
   return (
     <div className="container max-w-3xl py-8 space-y-6">
@@ -133,12 +170,12 @@ export default function Scan() {
 
       {/* Progress */}
       <ScanProgress
-        currentStep={1}
+        currentStep={currentStepInfo.step}
         totalSteps={4}
-        stepLabel="IP Check"
+        stepLabel={currentStepInfo.label}
       />
 
-      {/* Upload phase */}
+      {/* Step 1: Upload phase */}
       {phase === "upload" && (
         <Card>
           <CardHeader>
@@ -152,10 +189,7 @@ export default function Scan() {
             <KeywordInput keywords={keywords} onKeywordsChange={setKeywords} inputRef={keywordInputRef} />
 
             <div className="pt-2">
-              <Button
-                onClick={runIPCheck}
-                className="w-full sm:w-auto"
-              >
+              <Button onClick={runIPCheck} className="w-full sm:w-auto">
                 Run IP Check
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -164,7 +198,7 @@ export default function Scan() {
         </Card>
       )}
 
-      {/* Checking phase */}
+      {/* Step 1: Checking */}
       {phase === "checking" && (
         <Card>
           <CardContent className="py-16 flex flex-col items-center gap-4">
@@ -179,9 +213,45 @@ export default function Scan() {
         </Card>
       )}
 
-      {/* Results phase */}
-      {phase === "results" && result && (
-        <IPResultsCard result={result} onBack={handleBack} />
+      {/* Step 1: IP Results (with continue button) */}
+      {phase === "ip-results" && ipResult && (
+        <div className="space-y-4">
+          <IPResultsCard result={ipResult} onBack={handleIPBack} />
+          <div className="flex justify-end">
+            <Button onClick={handleIPContinue}>
+              Continue to Accessibility Check
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 2: Accessibility */}
+      {phase === "accessibility" && preview && (
+        <AccessibilityCheck
+          imageUrl={preview}
+          onComplete={handleAccessibilityComplete}
+          onBack={() => setPhase("ip-results")}
+        />
+      )}
+
+      {/* Step 3: Quality */}
+      {phase === "quality" && preview && (
+        <QualityCheck
+          imageUrl={preview}
+          onComplete={handleQualityComplete}
+          onBack={() => setPhase("accessibility")}
+        />
+      )}
+
+      {/* Step 4: Combined Results */}
+      {phase === "combined" && ipResult && accessibilityResult && qualityResult && (
+        <CombinedResults
+          ipResult={ipResult}
+          accessibilityResult={accessibilityResult}
+          qualityResult={qualityResult}
+          onRestart={handleRestart}
+        />
       )}
     </div>
   );
