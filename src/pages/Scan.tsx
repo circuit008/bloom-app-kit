@@ -11,9 +11,10 @@ import { ScanProgress } from "@/components/scan/ScanProgress";
 import { IPResultsCard, type IPCheckResult, type IPMatch } from "@/components/scan/IPResultsCard";
 import { AccessibilityCheck, type AccessibilityResult } from "@/components/scan/AccessibilityCheck";
 import { QualityCheck, type QualityResult } from "@/components/scan/QualityCheck";
-import { CombinedResults } from "@/components/scan/CombinedResults";
+import { TransparencyCheck, type TransparencyResult } from "@/components/scan/TransparencyCheck";
+import { FinalResults } from "@/components/scan/FinalResults";
 
-type Phase = "upload" | "checking" | "ip-results" | "accessibility" | "quality" | "combined";
+type Phase = "upload" | "checking" | "ip-results" | "accessibility" | "quality" | "transparency" | "final";
 
 const stepLabels: Record<Phase, { step: number; label: string }> = {
   upload: { step: 1, label: "IP Check" },
@@ -21,7 +22,8 @@ const stepLabels: Record<Phase, { step: number; label: string }> = {
   "ip-results": { step: 1, label: "IP Check" },
   accessibility: { step: 2, label: "Accessibility" },
   quality: { step: 3, label: "Quality" },
-  combined: { step: 4, label: "Results" },
+  transparency: { step: 4, label: "Transparency" },
+  final: { step: 4, label: "Results" },
 };
 
 function getConfidence(source: string | null): "high" | "medium" | "low" {
@@ -34,7 +36,7 @@ function getConfidence(source: string | null): "high" | "medium" | "low" {
 function getScoreDeduction(confidence: "high" | "medium" | "low"): number {
   if (confidence === "high") return 25;
   if (confidence === "medium") return 15;
-  return 5; // low confidence = pending user reports
+  return 5;
 }
 
 export default function Scan() {
@@ -46,6 +48,7 @@ export default function Scan() {
   const [ipResult, setIpResult] = useState<IPCheckResult | null>(null);
   const [accessibilityResult, setAccessibilityResult] = useState<AccessibilityResult | null>(null);
   const [qualityResult, setQualityResult] = useState<QualityResult | null>(null);
+  const [transparencyResult, setTransparencyResult] = useState<TransparencyResult | null>(null);
   const keywordInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = useCallback((f: File | null, p: string | null) => {
@@ -87,7 +90,6 @@ export default function Scan() {
         return;
       }
 
-      // Compute DB stats
       const uniqueSources = new Set(trademarks.map((t) => t.source || "manual"));
       const lastUpdated = trademarks.reduce<string | null>((latest, t) => {
         const d = t.last_verified || t.created_at;
@@ -122,7 +124,6 @@ export default function Scan() {
         }
       }
 
-      // Score: weighted by confidence
       const totalDeduction = matches.reduce((sum, m) => sum + getScoreDeduction(m.confidence), 0);
       const score = Math.max(0, 100 - totalDeduction);
 
@@ -179,7 +180,12 @@ export default function Scan() {
 
   const handleQualityComplete = (result: QualityResult) => {
     setQualityResult(result);
-    setPhase("combined");
+    setPhase("transparency");
+  };
+
+  const handleTransparencyComplete = (result: TransparencyResult) => {
+    setTransparencyResult(result);
+    setPhase("final");
   };
 
   const handleRestart = () => {
@@ -189,6 +195,7 @@ export default function Scan() {
     setIpResult(null);
     setAccessibilityResult(null);
     setQualityResult(null);
+    setTransparencyResult(null);
     setPhase("upload");
   };
 
@@ -275,11 +282,20 @@ export default function Scan() {
         />
       )}
 
-      {phase === "combined" && ipResult && accessibilityResult && qualityResult && (
-        <CombinedResults
+      {phase === "transparency" && (
+        <TransparencyCheck
+          onComplete={handleTransparencyComplete}
+          onBack={() => setPhase("quality")}
+        />
+      )}
+
+      {phase === "final" && ipResult && accessibilityResult && qualityResult && transparencyResult && (
+        <FinalResults
           ipResult={ipResult}
           accessibilityResult={accessibilityResult}
           qualityResult={qualityResult}
+          transparencyResult={transparencyResult}
+          keywords={keywords}
           onRestart={handleRestart}
         />
       )}
