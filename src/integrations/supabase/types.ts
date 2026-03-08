@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      accessibility_rules: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          min_contrast_ratio: number
+          rule_name: string
+          wcag_level: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          min_contrast_ratio?: number
+          rule_name: string
+          wcag_level?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          min_contrast_ratio?: number
+          rule_name?: string
+          wcag_level?: string
+        }
+        Relationships: []
+      }
       design_suggestions: {
         Row: {
           created_at: string
@@ -115,6 +145,36 @@ export type Database = {
           id?: string
           name?: string
           suggested_themes?: string[] | null
+        }
+        Relationships: []
+      }
+      print_requirements: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          min_height_px: number
+          min_width_px: number
+          product_type: string
+          recommended_dpi: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          min_height_px: number
+          min_width_px: number
+          product_type: string
+          recommended_dpi?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          min_height_px?: number
+          min_width_px?: number
+          product_type?: string
+          recommended_dpi?: number
         }
         Relationships: []
       }
