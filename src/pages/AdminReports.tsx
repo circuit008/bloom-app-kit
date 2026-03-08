@@ -330,7 +330,62 @@ export default function AdminReports() {
         </div>
       </div>
 
-      {/* Database Stats */}
+      {/* Analytics Dashboard */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: "Scans Today", value: analytics.scansToday, icon: BarChart3, color: "text-primary" },
+          { label: "Scans This Week", value: analytics.scansWeek, icon: TrendingUp, color: "text-success" },
+          { label: "Ad Impressions", value: analytics.totalAdImpressions, icon: Eye, color: "text-warning" },
+          { label: "Affiliate Clicks", value: analytics.affiliateClicks, icon: MousePointer, color: "text-primary" },
+        ].map((s) => (
+          <Card key={s.label}>
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                <s.icon className={`h-5 w-5 ${s.color}`} />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{s.label}</p>
+                <p className="text-2xl font-bold">{s.value}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Top Flagged Terms */}
+      {analytics.topFlaggedTerms.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Top Scanned Keywords</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {analytics.topFlaggedTerms.map((t) => (
+                <Badge key={t.term} variant="outline" className="text-sm">
+                  {t.term} <span className="ml-1 text-muted-foreground">({t.count})</span>
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* CTR */}
+      {analytics.totalAdImpressions > 0 && analytics.affiliateClicks > 0 && (
+        <Card>
+          <CardContent className="pt-6 flex items-center gap-6">
+            <div>
+              <p className="text-sm text-muted-foreground">Affiliate CTR</p>
+              <p className="text-2xl font-bold">{((analytics.affiliateClicks / analytics.totalAdImpressions) * 100).toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Scans This Month</p>
+              <p className="text-2xl font-bold">{analytics.scansMonth}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="border-primary/30">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
