@@ -178,6 +178,33 @@ export type Database = {
         }
         Relationships: []
       }
+      trademark_database: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          risk_level: string
+          term: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          risk_level?: string
+          term: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          risk_level?: string
+          term?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
