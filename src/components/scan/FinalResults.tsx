@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { AdBanner } from "@/components/shared/AdBanner";
 import type { IPCheckResult } from "./IPResultsCard";
 import type { AccessibilityResult } from "./AccessibilityCheck";
 import type { QualityResult } from "./QualityCheck";
