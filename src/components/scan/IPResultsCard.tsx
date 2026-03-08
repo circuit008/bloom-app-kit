@@ -37,14 +37,16 @@ interface IPResultsCardProps {
 }
 
 function getScoreColor(score: number) {
-  if (score >= 80) return "text-success";
-  if (score >= 50) return "text-warning";
+  if (score >= 90) return "text-success";
+  if (score >= 70) return "text-warning";
+  if (score >= 50) return "text-orange-500";
   return "text-destructive";
 }
 
 function getScoreBg(score: number) {
-  if (score >= 80) return "bg-success/10";
-  if (score >= 50) return "bg-warning/10";
+  if (score >= 90) return "bg-success/10";
+  if (score >= 70) return "bg-warning/10";
+  if (score >= 50) return "bg-orange-500/10";
   return "bg-destructive/10";
 }
 
