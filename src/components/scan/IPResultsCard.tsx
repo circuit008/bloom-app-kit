@@ -1,4 +1,4 @@
-import { Shield, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { Shield, AlertTriangle, CheckCircle, XCircle, Globe, Clock, Flag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -11,6 +11,12 @@ export interface IPMatch {
   category: string;
   riskLevel: string;
   description: string | null;
+  source: string | null;
+  region: string | null;
+  ownerName: string | null;
+  registrationNumber: string | null;
+  lastVerified: string | null;
+  confidence: "high" | "medium" | "low";
 }
 
 export interface IPCheckResult {
@@ -18,6 +24,11 @@ export interface IPCheckResult {
   matches: IPMatch[];
   riskLabel: string;
   riskEmoji: string;
+  dbStats: {
+    total: number;
+    sources: number;
+    lastUpdated: string | null;
+  };
 }
 
 interface IPResultsCardProps {
@@ -43,6 +54,49 @@ function getRiskBadgeVariant(risk: string): "default" | "secondary" | "destructi
   return "outline";
 }
 
+const regionFlags: Record<string, string> = {
+  EU: "🇪🇺",
+  US: "🇺🇸",
+  CA: "🇨🇦",
+  global: "🌐",
+};
+
+const confidenceConfig: Record<string, { emoji: string; label: string; color: string }> = {
+  high: { emoji: "🟢", label: "High Confidence", color: "text-success" },
+  medium: { emoji: "🟡", label: "Medium Confidence", color: "text-warning" },
+  low: { emoji: "🟠", label: "Low Confidence", color: "text-orange-400" },
+};
+
+function SourceBadge({ source, region }: { source: string | null; region: string | null }) {
+  const flag = regionFlags[region || "global"] || "🌐";
+  const label = source || "Manual";
+  return (
+    <Badge variant="outline" className="text-xs gap-1">
+      <span>{flag}</span>
+      {label}
+    </Badge>
+  );
+}
+
+function ConfidenceBadge({ confidence }: { confidence: "high" | "medium" | "low" }) {
+  const cfg = confidenceConfig[confidence];
+  return (
+    <span className={cn("text-xs flex items-center gap-1", cfg.color)}>
+      {cfg.emoji} {cfg.label}
+    </span>
+  );
+}
+
+function formatTimeAgo(dateStr: string | null) {
+  if (!dateStr) return null;
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  if (hours < 1) return "Less than 1 hour ago";
+  if (hours < 24) return `${hours} hour${hours !== 1 ? "s" : ""} ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days !== 1 ? "s" : ""} ago`;
+}
+
 export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
   return (
     <Card>
@@ -53,6 +107,20 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* DB Stats banner */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border bg-muted/50 px-4 py-2.5 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <Globe className="h-3.5 w-3.5" />
+            Protected by <strong className="text-foreground">{result.dbStats.total.toLocaleString()}+</strong> trademarks from <strong className="text-foreground">{result.dbStats.sources}</strong> sources
+          </span>
+          {result.dbStats.lastUpdated && (
+            <span className="flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
+              Last updated: {formatTimeAgo(result.dbStats.lastUpdated)}
+            </span>
+          )}
+        </div>
+
         {/* Score display */}
         <div className="flex items-center gap-6">
           <div
@@ -94,7 +162,7 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
                   className="flex items-start gap-3 rounded-lg border bg-card p-3"
                 >
                   <XCircle className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 space-y-1.5">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium">"{m.matchedKeyword}"</span>
                       <span className="text-xs text-muted-foreground">matches</span>
@@ -104,9 +172,29 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
                       <Badge variant="outline" className="text-xs">
                         {m.category}
                       </Badge>
+                      <SourceBadge source={m.source} region={m.region} />
                     </div>
+
+                    {/* Owner & registration */}
+                    {(m.ownerName || m.registrationNumber) && (
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                        {m.ownerName && <span>Owner: <strong className="text-foreground">{m.ownerName}</strong></span>}
+                        {m.registrationNumber && <span>Reg#: {m.registrationNumber}</span>}
+                      </div>
+                    )}
+
+                    {/* Confidence + verified */}
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <ConfidenceBadge confidence={m.confidence} />
+                      {m.lastVerified && (
+                        <span className="text-xs text-muted-foreground">
+                          Verified: {formatTimeAgo(m.lastVerified)}
+                        </span>
+                      )}
+                    </div>
+
                     {m.description && (
-                      <p className="text-xs text-muted-foreground mt-1">{m.description}</p>
+                      <p className="text-xs text-muted-foreground">{m.description}</p>
                     )}
                   </div>
                 </div>
