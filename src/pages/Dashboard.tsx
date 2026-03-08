@@ -51,7 +51,7 @@ export default function Dashboard() {
               Upload a design image to check for compliance issues
             </p>
           </div>
-          <Button className="mt-2">
+          <Button className="mt-2" onClick={() => navigate("/scan")}>
             Upload Design
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
