@@ -2,6 +2,7 @@ import { Shield, Upload, BarChart3, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const stats = [
   { label: "Total Scans", value: "0", icon: BarChart3, color: "text-primary" },
@@ -12,6 +13,7 @@ const stats = [
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="container py-8 space-y-8">
@@ -49,7 +51,7 @@ export default function Dashboard() {
               Upload a design image to check for compliance issues
             </p>
           </div>
-          <Button className="mt-2">
+          <Button className="mt-2" onClick={() => navigate("/scan")}>
             Upload Design
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
