@@ -14,6 +14,7 @@ import Scan from "./pages/Scan";
 import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import AdminReports from "./pages/AdminReports";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <ScanHistory />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/reports"
+                  element={
+                    <ProtectedRoute>
+                      <AdminReports />
                     </ProtectedRoute>
                   }
                 />
