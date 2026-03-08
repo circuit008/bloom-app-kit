@@ -1,73 +1,35 @@
-# Welcome to your Lovable project
+# 🛡️ POD Guard - Pre-Launch Compliance Suite
 
-## Project info
+A comprehensive validation platform for Print-on-Demand sellers to check designs for IP risks, accessibility compliance, print quality, and supply chain transparency.
 
-**URL**: https://lovable.dev/projects/3d4e4834-6bd7-4e12-a6c2-9087ca0c54d2
+## 🌟 Features
 
-## How can I edit this code?
+| Feature | Description | Revenue Stream |
+|---------|-------------|----------------|
+| **IP Copyright Check** | Scans design keywords against trademark database | Affiliate (legal services) |
+| **Accessibility Compliance** | WCAG contrast ratio & colorblind simulation | Ads (legal/edu) |
+| **Print Quality Validator** | Resolution, DPI, color profile checks | Affiliate (printers) |
+| **Supply Chain Transparency** | Eco-certified printer recommendations | Affiliate commissions |
 
-There are several ways of editing your application.
+## 💰 Revenue Model
 
-**Use Lovable**
+1. **Affiliate Commissions** (10-20% per printer referral)
+2. **Display Ads** (Google AdSense on results pages)
+3. **Lead Generation** (Sell qualified leads to printers)
+4. **Premium Reports** ($9.99 one-time PDF export)
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/3d4e4834-6bd7-4e12-a6c2-9087ca0c54d2) and start prompting.
+## 🏗️ Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Frontend:** React, Vite, Tailwind CSS, Shadcn UI
+- **Backend:** Supabase (Auth, Database, Storage)
+- **Image Processing:** HTML5 Canvas API (Client-Side)
+- **Deployment:** Localhost + GitHub
 
-**Use your preferred IDE**
+## 🚀 Local Setup
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+git clone https://github.com/YOUR_USERNAME/pod-guard-compliance.git
+cd pod-guard-compliance
+npm install
+cp .env.example .env  # Add your Supabase credentials
 npm run dev
-```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/3d4e4834-6bd7-4e12-a6c2-9087ca0c54d2) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
