@@ -123,6 +123,11 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
           </div>
         )}
 
+        {/* Report */}
+        <div className="pt-2">
+          <ReportTrademarkModal />
+        </div>
+
         {/* Actions */}
         <div className="flex gap-3 pt-2">
           <Button variant="outline" onClick={onBack}>
