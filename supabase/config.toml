@@ -26,3 +26,12 @@ verify_jwt = false
 
 [functions.generate-bundle-ideas]
 verify_jwt = false
+
+[functions.sync-euipo]
+verify_jwt = false
+
+[functions.sync-uspto]
+verify_jwt = false
+
+[functions.sync-cipo]
+verify_jwt = false
