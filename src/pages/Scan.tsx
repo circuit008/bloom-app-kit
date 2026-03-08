@@ -27,7 +27,22 @@ export default function Scan() {
   }, []);
 
   const runIPCheck = async () => {
-    if (keywords.length === 0) {
+    // Flush any text still in the keyword input
+    if (keywordInputRef.current) {
+      const val = keywordInputRef.current.value.trim().replace(/,$/, "");
+      if (val && !keywords.includes(val)) {
+        const updated = [...keywords, val];
+        setKeywords(updated);
+        keywordInputRef.current.value = "";
+        // Use updated list for the check
+        return runIPCheckWithKeywords(updated);
+      }
+    }
+    return runIPCheckWithKeywords(keywords);
+  };
+
+  const runIPCheckWithKeywords = async (kws: string[]) => {
+    if (kws.length === 0) {
       toast.error("Please add at least one keyword to check.");
       return;
     }
