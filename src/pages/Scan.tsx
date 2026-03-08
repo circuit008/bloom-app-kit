@@ -24,6 +24,19 @@ const stepLabels: Record<Phase, { step: number; label: string }> = {
   combined: { step: 4, label: "Results" },
 };
 
+function getConfidence(source: string | null): "high" | "medium" | "low" {
+  const official = ["USPTO", "EUIPO", "CIPO"];
+  if (source && official.includes(source)) return "high";
+  if (source === "manual" || !source) return "medium";
+  return "low";
+}
+
+function getScoreDeduction(confidence: "high" | "medium" | "low"): number {
+  if (confidence === "high") return 25;
+  if (confidence === "medium") return 15;
+  return 5; // low confidence = pending user reports
+}
+
 export default function Scan() {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
@@ -41,7 +54,6 @@ export default function Scan() {
   }, []);
 
   const runIPCheck = async () => {
-    // Flush any text still in the keyword input
     if (keywordInputRef.current) {
       const val = keywordInputRef.current.value.trim().replace(/,$/, "");
       if (val && !keywords.includes(val)) {
@@ -75,6 +87,14 @@ export default function Scan() {
         return;
       }
 
+      // Compute DB stats
+      const uniqueSources = new Set(trademarks.map((t) => t.source || "manual"));
+      const lastUpdated = trademarks.reduce<string | null>((latest, t) => {
+        const d = t.last_verified || t.created_at;
+        if (!latest) return d;
+        return d > latest ? d : latest;
+      }, null);
+
       const matches: IPMatch[] = [];
 
       for (const kw of kws) {
@@ -83,19 +103,28 @@ export default function Scan() {
           const termLower = tm.term.toLowerCase();
           if (kwLower.includes(termLower) || termLower.includes(kwLower)) {
             if (!matches.find((m) => m.term === tm.term && m.matchedKeyword === kw)) {
+              const confidence = getConfidence(tm.source);
               matches.push({
                 term: tm.term,
                 matchedKeyword: kw,
                 category: tm.category,
                 riskLevel: tm.risk_level,
                 description: tm.description,
+                source: tm.source,
+                region: tm.region,
+                ownerName: tm.owner_name,
+                registrationNumber: tm.registration_number,
+                lastVerified: tm.last_verified,
+                confidence,
               });
             }
           }
         }
       }
 
-      const score = Math.max(0, 100 - matches.length * 20);
+      // Score: weighted by confidence
+      const totalDeduction = matches.reduce((sum, m) => sum + getScoreDeduction(m.confidence), 0);
+      const score = Math.max(0, 100 - totalDeduction);
 
       let riskLabel: string;
       let riskEmoji: string;
@@ -110,7 +139,17 @@ export default function Scan() {
         riskEmoji = "🔴";
       }
 
-      setIpResult({ score, matches, riskLabel, riskEmoji });
+      setIpResult({
+        score,
+        matches,
+        riskLabel,
+        riskEmoji,
+        dbStats: {
+          total: trademarks.length,
+          sources: uniqueSources.size,
+          lastUpdated,
+        },
+      });
       setPhase("ip-results");
     } catch (err: any) {
       console.error("IP Check error:", err);
@@ -157,7 +196,6 @@ export default function Scan() {
 
   return (
     <div className="container max-w-3xl py-8 space-y-6">
-      {/* Header */}
       <div className="flex items-center gap-3">
         <Button variant="ghost" size="icon" onClick={() => navigate("/dashboard")}>
           <ArrowLeft className="h-4 w-4" />
@@ -168,14 +206,12 @@ export default function Scan() {
         </div>
       </div>
 
-      {/* Progress */}
       <ScanProgress
         currentStep={currentStepInfo.step}
         totalSteps={4}
         stepLabel={currentStepInfo.label}
       />
 
-      {/* Step 1: Upload phase */}
       {phase === "upload" && (
         <Card>
           <CardHeader>
@@ -187,7 +223,6 @@ export default function Scan() {
           <CardContent className="space-y-6">
             <DesignUpload file={file} preview={preview} onFileChange={handleFileChange} />
             <KeywordInput keywords={keywords} onKeywordsChange={setKeywords} inputRef={keywordInputRef} />
-
             <div className="pt-2">
               <Button onClick={runIPCheck} className="w-full sm:w-auto">
                 Run IP Check
@@ -198,7 +233,6 @@ export default function Scan() {
         </Card>
       )}
 
-      {/* Step 1: Checking */}
       {phase === "checking" && (
         <Card>
           <CardContent className="py-16 flex flex-col items-center gap-4">
@@ -213,7 +247,6 @@ export default function Scan() {
         </Card>
       )}
 
-      {/* Step 1: IP Results (with continue button) */}
       {phase === "ip-results" && ipResult && (
         <div className="space-y-4">
           <IPResultsCard result={ipResult} onBack={handleIPBack} />
@@ -226,7 +259,6 @@ export default function Scan() {
         </div>
       )}
 
-      {/* Step 2: Accessibility */}
       {phase === "accessibility" && preview && (
         <AccessibilityCheck
           imageUrl={preview}
@@ -235,7 +267,6 @@ export default function Scan() {
         />
       )}
 
-      {/* Step 3: Quality */}
       {phase === "quality" && preview && (
         <QualityCheck
           imageUrl={preview}
@@ -244,7 +275,6 @@ export default function Scan() {
         />
       )}
 
-      {/* Step 4: Combined Results */}
       {phase === "combined" && ipResult && accessibilityResult && qualityResult && (
         <CombinedResults
           ipResult={ipResult}
