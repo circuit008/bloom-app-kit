@@ -154,17 +154,11 @@ export default function Scan() {
             <div className="pt-2">
               <Button
                 onClick={runIPCheck}
-                disabled={keywords.length === 0}
                 className="w-full sm:w-auto"
               >
                 Run IP Check
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              {keywords.length === 0 && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  Add at least one keyword to begin the check
-                </p>
-              )}
             </div>
           </CardContent>
         </Card>
