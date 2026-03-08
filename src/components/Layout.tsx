@@ -178,7 +178,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       </header>
 
       {/* Main content */}
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
+
+      {/* Footer */}
+      <Footer />
 
       {/* Auth Modal */}
       <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
