@@ -5,17 +5,22 @@ import { X } from "lucide-react";
 interface KeywordInputProps {
   keywords: string[];
   onKeywordsChange: (keywords: string[]) => void;
+  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
-export function KeywordInput({ keywords, onKeywordsChange }: KeywordInputProps) {
+export function KeywordInput({ keywords, onKeywordsChange, inputRef }: KeywordInputProps) {
+  const addFromInput = (input: HTMLInputElement) => {
+    const val = input.value.trim().replace(/,$/, "");
+    if (val && !keywords.includes(val)) {
+      onKeywordsChange([...keywords, val]);
+    }
+    input.value = "";
+  };
+
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" || e.key === ",") {
       e.preventDefault();
-      const val = (e.target as HTMLInputElement).value.trim().replace(/,$/,"");
-      if (val && !keywords.includes(val)) {
-        onKeywordsChange([...keywords, val]);
-      }
-      (e.target as HTMLInputElement).value = "";
+      addFromInput(e.target as HTMLInputElement);
     }
   };
 
@@ -31,6 +36,10 @@ export function KeywordInput({ keywords, onKeywordsChange }: KeywordInputProps) 
     }
   };
 
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    addFromInput(e.target);
+  };
+
   const removeKeyword = (kw: string) => {
     onKeywordsChange(keywords.filter((k) => k !== kw));
   };
@@ -39,9 +48,11 @@ export function KeywordInput({ keywords, onKeywordsChange }: KeywordInputProps) 
     <div className="space-y-3">
       <label className="text-sm font-medium">Design Keywords / Text</label>
       <Input
+        ref={inputRef}
         placeholder="Type keywords and press Enter or comma to add..."
         onKeyDown={handleInputKeyDown}
         onPaste={handlePaste}
+        onBlur={handleBlur}
       />
       <p className="text-xs text-muted-foreground">
         Enter text, brand names, or phrases used in your design (comma separated)
