@@ -14,6 +14,7 @@ import Scan from "./pages/Scan";
 import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
+import AdminReports from "./pages/AdminReports";
 
 const queryClient = new QueryClient();
 
