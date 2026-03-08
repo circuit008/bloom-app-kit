@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle, RefreshCw, Globe, Clock, KeyRound, MapPin, Database, Timer } from "lucide-react";
+import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle, RefreshCw, Globe, Clock, KeyRound, MapPin, Database, Timer, BarChart3, TrendingUp, Eye, MousePointer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
