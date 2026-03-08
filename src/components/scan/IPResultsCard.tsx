@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { ReportTrademarkModal } from "./ReportTrademarkModal";
 
 export interface IPMatch {
   term: string;
@@ -121,6 +122,11 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
             </div>
           </div>
         )}
+
+        {/* Report */}
+        <div className="pt-2">
+          <ReportTrademarkModal />
+        </div>
 
         {/* Actions */}
         <div className="flex gap-3 pt-2">

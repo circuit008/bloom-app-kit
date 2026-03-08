@@ -1,8 +1,9 @@
-import { Shield, Upload, BarChart3, Clock, ArrowRight } from "lucide-react";
+import { Shield, Upload, BarChart3, Clock, ArrowRight, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { MyReports } from "@/components/scan/MyReports";
 
 const stats = [
   { label: "Total Scans", value: "0", icon: BarChart3, color: "text-primary" },
@@ -40,6 +41,23 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {user?.email?.includes("admin") && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="pt-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <ShieldCheck className="h-5 w-5 text-primary" />
+              <div>
+                <p className="font-semibold">Admin Dashboard</p>
+                <p className="text-sm text-muted-foreground">Review community trademark reports</p>
+              </div>
+            </div>
+            <Button variant="outline" onClick={() => navigate("/admin/reports")}>
+              View Reports <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="border-dashed">
         <CardContent className="py-12 flex flex-col items-center text-center gap-4">
           <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
@@ -57,6 +75,8 @@ export default function Dashboard() {
           </Button>
         </CardContent>
       </Card>
+
+      <MyReports />
     </div>
   );
 }
