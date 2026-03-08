@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle, RefreshCw, Globe, Clock, KeyRound, MapPin, Database, Timer } from "lucide-react";
+import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle, RefreshCw, Globe, Clock, KeyRound, MapPin, Database, Timer, BarChart3, TrendingUp, Eye, MousePointer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +48,15 @@ interface SourceBreakdown {
   other: number;
 }
 
+interface AnalyticsData {
+  scansToday: number;
+  scansWeek: number;
+  scansMonth: number;
+  totalAdImpressions: number;
+  topFlaggedTerms: { term: string; count: number }[];
+  affiliateClicks: number;
+}
+
 function statusBadge(status: string) {
   if (status === "verified") return <Badge className="bg-success/20 text-success border-success/30">Verified</Badge>;
   if (status === "rejected") return <Badge variant="destructive">Rejected</Badge>;
@@ -84,6 +93,10 @@ export default function AdminReports() {
   const [totalTrademarks, setTotalTrademarks] = useState(0);
   const [sourceBreakdown, setSourceBreakdown] = useState<SourceBreakdown>({ manual: 0, EUIPO: 0, USPTO: 0, CIPO: 0, other: 0 });
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
+  const [analytics, setAnalytics] = useState<AnalyticsData>({
+    scansToday: 0, scansWeek: 0, scansMonth: 0,
+    totalAdImpressions: 0, topFlaggedTerms: [], affiliateClicks: 0,
+  });
 
   const isAdmin = user?.email?.includes("admin");
 
@@ -92,7 +105,43 @@ export default function AdminReports() {
     fetchReports();
     fetchSyncLogs();
     fetchTrademarkStats();
+    fetchAnalytics();
   }, [isAdmin]);
+
+  const fetchAnalytics = async () => {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const weekStart = new Date(now.getTime() - 7 * 86400000).toISOString();
+    const monthStart = new Date(now.getTime() - 30 * 86400000).toISOString();
+
+    const [scansRes, adRes, profilesRes] = await Promise.all([
+      supabase.from("scan_results").select("created_at, keywords"),
+      supabase.from("ad_impressions").select("id"),
+      supabase.from("user_profiles").select("affiliate_clicks"),
+    ]);
+
+    const scans = scansRes.data || [];
+    const scansToday = scans.filter((s: any) => s.created_at >= todayStart).length;
+    const scansWeek = scans.filter((s: any) => s.created_at >= weekStart).length;
+    const scansMonth = scans.filter((s: any) => s.created_at >= monthStart).length;
+
+    // Top flagged terms from keywords
+    const termCounts: Record<string, number> = {};
+    scans.forEach((s: any) => {
+      (s.keywords || []).forEach((k: string) => {
+        termCounts[k] = (termCounts[k] || 0) + 1;
+      });
+    });
+    const topFlaggedTerms = Object.entries(termCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([term, count]) => ({ term, count }));
+
+    const totalAdImpressions = adRes.data?.length || 0;
+    const affiliateClicks = (profilesRes.data || []).reduce((sum: number, p: any) => sum + (p.affiliate_clicks || 0), 0);
+
+    setAnalytics({ scansToday, scansWeek, scansMonth, totalAdImpressions, topFlaggedTerms, affiliateClicks });
+  };
 
   const fetchTrademarkStats = async () => {
     const { data, error } = await supabase
@@ -281,7 +330,62 @@ export default function AdminReports() {
         </div>
       </div>
 
-      {/* Database Stats */}
+      {/* Analytics Dashboard */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: "Scans Today", value: analytics.scansToday, icon: BarChart3, color: "text-primary" },
+          { label: "Scans This Week", value: analytics.scansWeek, icon: TrendingUp, color: "text-success" },
+          { label: "Ad Impressions", value: analytics.totalAdImpressions, icon: Eye, color: "text-warning" },
+          { label: "Affiliate Clicks", value: analytics.affiliateClicks, icon: MousePointer, color: "text-primary" },
+        ].map((s) => (
+          <Card key={s.label}>
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                <s.icon className={`h-5 w-5 ${s.color}`} />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{s.label}</p>
+                <p className="text-2xl font-bold">{s.value}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Top Flagged Terms */}
+      {analytics.topFlaggedTerms.length > 0 && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base">Top Scanned Keywords</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {analytics.topFlaggedTerms.map((t) => (
+                <Badge key={t.term} variant="outline" className="text-sm">
+                  {t.term} <span className="ml-1 text-muted-foreground">({t.count})</span>
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* CTR */}
+      {analytics.totalAdImpressions > 0 && analytics.affiliateClicks > 0 && (
+        <Card>
+          <CardContent className="pt-6 flex items-center gap-6">
+            <div>
+              <p className="text-sm text-muted-foreground">Affiliate CTR</p>
+              <p className="text-2xl font-bold">{((analytics.affiliateClicks / analytics.totalAdImpressions) * 100).toFixed(1)}%</p>
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Scans This Month</p>
+              <p className="text-2xl font-bold">{analytics.scansMonth}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card className="border-primary/30">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2">
