@@ -44,6 +44,30 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_impressions: {
+        Row: {
+          created_at: string
+          id: string
+          page: string
+          placement: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          page: string
+          placement: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          page?: string
+          placement?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       api_sync_logs: {
         Row: {
           created_at: string
@@ -423,6 +447,42 @@ export type Database = {
           notes?: string | null
           reported_term?: string
           status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_profiles: {
+        Row: {
+          affiliate_clicks: number
+          affiliate_earnings: number
+          created_at: string
+          display_name: string | null
+          id: string
+          subscription_status: string
+          total_scans: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          affiliate_clicks?: number
+          affiliate_earnings?: number
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          subscription_status?: string
+          total_scans?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          affiliate_clicks?: number
+          affiliate_earnings?: number
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          subscription_status?: string
+          total_scans?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
