@@ -2,6 +2,7 @@ import { Shield, Upload, BarChart3, Clock, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const stats = [
   { label: "Total Scans", value: "0", icon: BarChart3, color: "text-primary" },
