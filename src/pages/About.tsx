@@ -1,59 +1,53 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Palette, Sparkles, Zap, Users } from "lucide-react";
-import { PageHeader } from "@/components/shared/PageHeader";
-import { FeatureCard } from "@/components/shared/FeatureCard";
-import { Info } from "lucide-react";
+import { Shield, Target, Users, Zap } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
-const features = [
-  { icon: Palette, title: "Design Studio", description: "Create stunning t-shirt designs with our intuitive canvas editor and AI-powered design generation." },
-  { icon: Sparkles, title: "AI Tools", description: "Remove backgrounds, enhance images, and generate SEO-optimized content with our AI-powered tools." },
-  { icon: Zap, title: "Seamless Integration", description: "Upload your designs directly to Shopify with just one click. No manual work required." },
-  { icon: Users, title: "Built for Creators", description: "We understand the challenges of running a print-on-demand business and built PixelPOD to solve them." },
-];
-
-const benefits = [
-  { label: "Free AI Tools", desc: "Access powerful AI features without expensive subscriptions" },
-  { label: "No Design Experience Needed", desc: "Create professional designs with intuitive tools" },
-  { label: "Direct Shopify Integration", desc: "Streamline your workflow from design to sale" },
-  { label: "Save & Organize", desc: "Build your design library and reuse your best work" },
+const values = [
+  {
+    icon: Shield,
+    title: "Trust & Safety",
+    description: "We help POD sellers protect their businesses from costly IP disputes and takedowns.",
+  },
+  {
+    icon: Target,
+    title: "Accuracy",
+    description: "Our scanning engine is continuously improved to reduce false positives and catch real issues.",
+  },
+  {
+    icon: Users,
+    title: "Community",
+    description: "Built by POD sellers, for POD sellers. We understand the challenges of this industry.",
+  },
+  {
+    icon: Zap,
+    title: "Speed",
+    description: "Get compliance results in seconds, not hours. Launch your products with confidence.",
+  },
 ];
 
 export default function About() {
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
-      <PageHeader icon={Info} title="About PixelPOD" description="Your AI-powered print-on-demand design studio" />
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="font-display">Our Mission</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3 text-muted-foreground leading-relaxed">
-          <p>PixelPOD is revolutionizing the print-on-demand industry by combining cutting-edge AI technology with intuitive design tools.</p>
-          <p>Our platform eliminates the technical barriers of design, allowing you to focus on what matters most — your creativity and business growth.</p>
-        </CardContent>
-      </Card>
-
-      <div className="grid md:grid-cols-2 gap-4">
-        {features.map((f, i) => (
-          <FeatureCard key={i} {...f} />
-        ))}
+    <div className="container py-16 space-y-16">
+      <div className="max-w-2xl mx-auto text-center space-y-4">
+        <h1 className="text-4xl font-bold">About POD Guard</h1>
+        <p className="text-lg text-muted-foreground">
+          We're on a mission to help print-on-demand sellers launch compliant,
+          high-quality products — without the legal headaches.
+        </p>
       </div>
 
-      <Card className="border-primary/20 bg-primary/5">
-        <CardHeader>
-          <CardTitle className="font-display">Why Choose PixelPOD?</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {benefits.map((b, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <div className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
-              <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">{b.label}:</strong> {b.desc}
-              </p>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <div className="grid sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+        {values.map((v) => (
+          <Card key={v.title}>
+            <CardContent className="pt-6 space-y-3">
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <v.icon className="h-5 w-5 text-primary" />
+              </div>
+              <h3 className="text-lg font-semibold">{v.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{v.description}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 }

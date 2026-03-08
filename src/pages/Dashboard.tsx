@@ -1,129 +1,60 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { TrendingUp, DollarSign, ShoppingCart, Users } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Shield, Upload, BarChart3, Clock, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/hooks/useAuth";
 
-const metricsData = [
-  { name: "Products Enhanced", value: "247", change: "+12%", icon: ShoppingCart, color: "text-primary" },
-  { name: "Revenue Impact", value: "$12,458", change: "+23%", icon: DollarSign, color: "text-accent" },
-  { name: "Conversion Rate", value: "3.8%", change: "+0.4%", icon: TrendingUp, color: "text-primary" },
-  { name: "Active Campaigns", value: "8", change: "+2", icon: Users, color: "text-accent" },
+const stats = [
+  { label: "Total Scans", value: "0", icon: BarChart3, color: "text-primary" },
+  { label: "Issues Found", value: "0", icon: Shield, color: "text-destructive" },
+  { label: "Designs Passed", value: "0", icon: Shield, color: "text-success" },
+  { label: "Last Scan", value: "Never", icon: Clock, color: "text-warning" },
 ];
 
-const chartData = [
-  { name: "Mon", value: 400 },
-  { name: "Tue", value: 300 },
-  { name: "Wed", value: 600 },
-  { name: "Thu", value: 800 },
-  { name: "Fri", value: 700 },
-  { name: "Sat", value: 900 },
-  { name: "Sun", value: 1000 },
-];
+export default function Dashboard() {
+  const { user } = useAuth();
 
-const Dashboard = () => {
   return (
-    <div className="space-y-8">
-      {/* Header */}
+    <div className="container py-8 space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        <p className="mt-1 text-muted-foreground">Welcome back! Here's your store performance overview.</p>
+        <h1 className="text-3xl font-bold">
+          Welcome back, <span className="text-primary">{user?.email?.split("@")[0]}</span>
+        </h1>
+        <p className="text-muted-foreground mt-1">Here's an overview of your design compliance.</p>
       </div>
 
-      {/* Metrics Grid */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {metricsData.map((metric) => (
-          <Card key={metric.name} className="border-border hover:shadow-md transition-shadow">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">{metric.name}</CardTitle>
-              <div className="p-2 rounded-lg bg-primary/10">
-                <metric.icon className={`h-4 w-4 ${metric.color}`} />
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((s) => (
+          <Card key={s.label}>
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                <s.icon className={`h-5 w-5 ${s.color}`} />
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{metric.value}</div>
-              <p className="text-xs text-accent font-medium mt-1">{metric.change} from last week</p>
+              <div>
+                <p className="text-sm text-muted-foreground">{s.label}</p>
+                <p className="text-2xl font-bold">{s.value}</p>
+              </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Charts */}
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">AI Content Generated</CardTitle>
-            <CardDescription className="text-muted-foreground">Last 7 days</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
-                <YAxis stroke="hsl(var(--muted-foreground))" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Line type="monotone" dataKey="value" stroke="hsl(var(--primary))" strokeWidth={3} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle className="text-foreground">Campaign Performance</CardTitle>
-            <CardDescription className="text-muted-foreground">Recovery rate by day</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" />
-                <YAxis stroke="hsl(var(--muted-foreground))" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "var(--radius)",
-                  }}
-                />
-                <Bar dataKey="value" fill="hsl(var(--accent))" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Activity */}
-      <Card className="border-border bg-card">
-        <CardHeader>
-          <CardTitle className="text-foreground">Recent Activity</CardTitle>
-          <CardDescription className="text-muted-foreground">Your latest AI-powered enhancements</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {[
-              { action: "Generated product description", product: "Wireless Headphones Pro", time: "2 hours ago" },
-              { action: "Sent recovery campaign", product: "5 abandoned carts", time: "4 hours ago" },
-              { action: "Optimized product title", product: "Smart Watch Series X", time: "6 hours ago" },
-              { action: "Created email template", product: "Flash Sale Campaign", time: "1 day ago" },
-            ].map((activity, index) => (
-              <div key={index} className="flex items-center justify-between border-b border-border pb-4 last:border-0 last:pb-0">
-                <div>
-                  <p className="font-medium text-foreground">{activity.action}</p>
-                  <p className="text-sm text-muted-foreground">{activity.product}</p>
-                </div>
-                <span className="text-xs text-muted-foreground">{activity.time}</span>
-              </div>
-            ))}
+      <Card className="border-dashed">
+        <CardContent className="py-12 flex flex-col items-center text-center gap-4">
+          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
+            <Upload className="h-7 w-7 text-primary" />
           </div>
+          <div>
+            <h3 className="text-lg font-semibold">Start a New Scan</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Upload a design image to check for compliance issues
+            </p>
+          </div>
+          <Button className="mt-2">
+            Upload Design
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </CardContent>
       </Card>
     </div>
   );
-};
-
-export default Dashboard;
+}
