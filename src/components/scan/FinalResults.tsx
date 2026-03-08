@@ -195,35 +195,52 @@ export function FinalResults({ ipResult, accessibilityResult, qualityResult, tra
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {transparencyResult.certifiedPrinters.slice(0, 3).map((p) => (
-                  <div key={p.id} className="flex items-center justify-between border rounded-lg p-3">
-                    <div>
-                      <p className="font-medium text-sm">{p.name}</p>
-                      <div className="flex gap-1 mt-1">
-                        {p.certifications.slice(0, 3).map((c) => (
-                          <Badge key={c} variant="outline" className="text-xs">{c}</Badge>
-                        ))}
+                <p className="text-xs text-muted-foreground italic">💡 We may earn a commission from partner links at no cost to you.</p>
+                {transparencyResult.certifiedPrinters.slice(0, 3).map((p) => {
+                  const affiliateUrl = p.affiliate_url
+                    ? `${p.affiliate_url}${p.affiliate_url.includes("?") ? "&" : "?"}source=podguard`
+                    : null;
+
+                  const handleClick = async () => {
+                    const { data: { user } } = await supabase.auth.getUser();
+                    if (user) {
+                      const { data: prof } = await supabase.from("user_profiles").select("affiliate_clicks, affiliate_earnings").eq("user_id", user.id).maybeSingle();
+                      if (prof) {
+                        await supabase.from("user_profiles").update({
+                          affiliate_clicks: (prof.affiliate_clicks || 0) + 1,
+                          affiliate_earnings: Number(prof.affiliate_earnings || 0) + 0.15,
+                        }).eq("user_id", user.id);
+                      }
+                    }
+                  };
+
+                  return (
+                    <div key={p.id} className="flex items-center justify-between border rounded-lg p-3">
+                      <div>
+                        <p className="font-medium text-sm">{p.name}</p>
+                        <div className="flex gap-1 mt-1">
+                          {p.certifications.slice(0, 3).map((c) => (
+                            <Badge key={c} variant="outline" className="text-xs">{c}</Badge>
+                          ))}
+                        </div>
                       </div>
+                      {affiliateUrl && (
+                        <a href={affiliateUrl} target="_blank" rel="noopener noreferrer" onClick={handleClick}>
+                          <Button size="sm" variant="outline">
+                            Visit <ExternalLink className="h-3 w-3 ml-1" />
+                          </Button>
+                        </a>
+                      )}
                     </div>
-                    {p.affiliate_url && (
-                      <a href={p.affiliate_url} target="_blank" rel="noopener noreferrer">
-                        <Button size="sm" variant="outline">
-                          Visit <ExternalLink className="h-3 w-3 ml-1" />
-                        </Button>
-                      </a>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           )}
 
-          {/* Ad Placeholder */}
-          <div className="border-2 border-dashed rounded-lg p-4 flex items-center justify-center text-muted-foreground text-sm print:hidden" style={{ minHeight: 250, maxWidth: 300 }}>
-            <div className="text-center">
-              <p className="font-medium">Ad Space</p>
-              <p className="text-xs">300 × 250 Banner</p>
-            </div>
+          {/* Ad Placement */}
+          <div className="flex justify-center">
+            <AdBanner placement="results" page="final-results" />
           </div>
         </>
       )}
