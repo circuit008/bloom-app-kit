@@ -145,6 +145,45 @@ export type Database = {
         }
         Relationships: []
       }
+      eco_printers: {
+        Row: {
+          affiliate_url: string | null
+          certifications: string[] | null
+          created_at: string
+          description: string | null
+          id: string
+          min_order: number | null
+          name: string
+          rating: number | null
+          region: string
+          website_url: string | null
+        }
+        Insert: {
+          affiliate_url?: string | null
+          certifications?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          min_order?: number | null
+          name: string
+          rating?: number | null
+          region?: string
+          website_url?: string | null
+        }
+        Update: {
+          affiliate_url?: string | null
+          certifications?: string[] | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          min_order?: number | null
+          name?: string
+          rating?: number | null
+          region?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       events_calendar: {
         Row: {
           category: string
@@ -237,6 +276,48 @@ export type Database = {
           original_url?: string | null
           title?: string
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      scan_results: {
+        Row: {
+          accessibility_score: number
+          created_at: string
+          id: string
+          image_url: string | null
+          ip_score: number
+          keywords: string[] | null
+          overall_score: number
+          passed: boolean
+          quality_score: number
+          transparency_score: number
+          user_id: string
+        }
+        Insert: {
+          accessibility_score?: number
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          ip_score?: number
+          keywords?: string[] | null
+          overall_score?: number
+          passed?: boolean
+          quality_score?: number
+          transparency_score?: number
+          user_id: string
+        }
+        Update: {
+          accessibility_score?: number
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          ip_score?: number
+          keywords?: string[] | null
+          overall_score?: number
+          passed?: boolean
+          quality_score?: number
+          transparency_score?: number
           user_id?: string
         }
         Relationships: []
