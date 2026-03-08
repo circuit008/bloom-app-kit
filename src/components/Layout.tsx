@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Moon, Sun, LogOut, User, ChevronDown, Shield } from "lucide-react";
+import { Footer } from "./Footer";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
@@ -71,6 +72,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               size="icon"
               onClick={toggleTheme}
               className="h-9 w-9"
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
@@ -121,8 +123,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden h-9 w-9"
+              className="md:hidden h-11 w-11"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -174,7 +178,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       </header>
 
       {/* Main content */}
-      <main>{children}</main>
+      <main id="main-content">{children}</main>
+
+      {/* Footer */}
+      <Footer />
 
       {/* Auth Modal */}
       <AuthModal open={authModalOpen} onOpenChange={setAuthModalOpen} />
