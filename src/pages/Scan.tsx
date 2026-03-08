@@ -19,6 +19,7 @@ export default function Scan() {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [phase, setPhase] = useState<Phase>("upload");
   const [result, setResult] = useState<IPCheckResult | null>(null);
+  const keywordInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = useCallback((f: File | null, p: string | null) => {
     setFile(f);
