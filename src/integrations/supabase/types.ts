@@ -265,6 +265,39 @@ export type Database = {
         }
         Relationships: []
       }
+      trademark_reports: {
+        Row: {
+          category: string
+          created_at: string
+          evidence_url: string | null
+          id: string
+          notes: string | null
+          reported_term: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          notes?: string | null
+          reported_term: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          evidence_url?: string | null
+          id?: string
+          notes?: string | null
+          reported_term?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
