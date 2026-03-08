@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle, RefreshCw, Globe, Clock, KeyRound, MapPin } from "lucide-react";
+import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle, RefreshCw, Globe, Clock, KeyRound, MapPin, Database, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -37,6 +40,14 @@ interface SyncLog {
   created_at: string;
 }
 
+interface SourceBreakdown {
+  manual: number;
+  EUIPO: number;
+  USPTO: number;
+  CIPO: number;
+  other: number;
+}
+
 function statusBadge(status: string) {
   if (status === "verified") return <Badge className="bg-success/20 text-success border-success/30">Verified</Badge>;
   if (status === "rejected") return <Badge variant="destructive">Rejected</Badge>;
@@ -54,8 +65,9 @@ function sourceBadge(source: string) {
     EUIPO: "bg-blue-500/20 text-blue-400 border-blue-500/30",
     USPTO: "bg-red-500/20 text-red-400 border-red-500/30",
     CIPO: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    manual: "bg-muted text-muted-foreground border-muted",
   };
-  return <Badge className={colors[source] || ""}>{source}</Badge>;
+  return <Badge className={colors[source] || "bg-muted text-muted-foreground"}>{source}</Badge>;
 }
 
 export default function AdminReports() {
@@ -69,6 +81,9 @@ export default function AdminReports() {
   const [syncingUspto, setSyncingUspto] = useState(false);
   const [syncingCipo, setSyncingCipo] = useState(false);
   const [usptoApiKey, setUsptoApiKey] = useState("");
+  const [totalTrademarks, setTotalTrademarks] = useState(0);
+  const [sourceBreakdown, setSourceBreakdown] = useState<SourceBreakdown>({ manual: 0, EUIPO: 0, USPTO: 0, CIPO: 0, other: 0 });
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
 
   const isAdmin = user?.email?.includes("admin");
 
@@ -76,7 +91,29 @@ export default function AdminReports() {
     if (!isAdmin) return;
     fetchReports();
     fetchSyncLogs();
+    fetchTrademarkStats();
   }, [isAdmin]);
+
+  const fetchTrademarkStats = async () => {
+    const { data, error } = await supabase
+      .from("trademark_database")
+      .select("source");
+
+    if (error || !data) return;
+
+    setTotalTrademarks(data.length);
+
+    const breakdown: SourceBreakdown = { manual: 0, EUIPO: 0, USPTO: 0, CIPO: 0, other: 0 };
+    for (const row of data) {
+      const src = row.source || "manual";
+      if (src === "manual" || src === "EUIPO" || src === "USPTO" || src === "CIPO") {
+        breakdown[src]++;
+      } else {
+        breakdown.other++;
+      }
+    }
+    setSourceBreakdown(breakdown);
+  };
 
   const fetchReports = async () => {
     const { data, error } = await supabase
@@ -98,6 +135,11 @@ export default function AdminReports() {
     if (data) setSyncLogs(data as SyncLog[]);
   };
 
+  const handleSyncComplete = () => {
+    fetchSyncLogs();
+    fetchTrademarkStats();
+  };
+
   const syncFromEUIPO = async () => {
     setSyncingEuipo(true);
     try {
@@ -110,11 +152,11 @@ export default function AdminReports() {
       } else {
         toast.error("Sync completed but returned no results.");
       }
-      fetchSyncLogs();
+      handleSyncComplete();
     } catch (err: any) {
       console.error("EUIPO sync error:", err);
       toast.error("Failed to sync from EUIPO. " + (err.message || ""));
-      fetchSyncLogs();
+      handleSyncComplete();
     } finally {
       setSyncingEuipo(false);
     }
@@ -136,11 +178,11 @@ export default function AdminReports() {
       } else {
         toast.error("Sync completed but returned no results.");
       }
-      fetchSyncLogs();
+      handleSyncComplete();
     } catch (err: any) {
       console.error("USPTO sync error:", err);
       toast.error("Failed to sync from USPTO. " + (err.message || ""));
-      fetchSyncLogs();
+      handleSyncComplete();
     } finally {
       setSyncingUspto(false);
     }
@@ -158,11 +200,11 @@ export default function AdminReports() {
       } else {
         toast.error("Sync completed but returned no results.");
       }
-      fetchSyncLogs();
+      handleSyncComplete();
     } catch (err: any) {
       console.error("CIPO sync error:", err);
       toast.error("Failed to sync from CIPO. " + (err.message || ""));
-      fetchSyncLogs();
+      handleSyncComplete();
     } finally {
       setSyncingCipo(false);
     }
@@ -193,6 +235,7 @@ export default function AdminReports() {
           toast.error("Status updated but failed to add to trademark database.");
         } else {
           toast.success(`"${report.reported_term}" verified and added to trademark database!`);
+          fetchTrademarkStats();
         }
       } else {
         toast.success(`Report rejected.`);
@@ -218,6 +261,14 @@ export default function AdminReports() {
 
   const anySyncing = syncingEuipo || syncingUspto || syncingCipo;
 
+  const sourceEntries: { label: string; key: keyof SourceBreakdown; color: string }[] = [
+    { label: "Manual", key: "manual", color: "bg-muted-foreground" },
+    { label: "EUIPO", key: "EUIPO", color: "bg-blue-500" },
+    { label: "USPTO", key: "USPTO", color: "bg-red-500" },
+    { label: "CIPO", key: "CIPO", color: "bg-amber-500" },
+    { label: "Other", key: "other", color: "bg-secondary" },
+  ];
+
   return (
     <div className="container max-w-4xl py-8 space-y-6">
       <div className="flex items-center gap-3">
@@ -229,6 +280,43 @@ export default function AdminReports() {
           <p className="text-sm text-muted-foreground">Review reports and sync external trademark databases</p>
         </div>
       </div>
+
+      {/* Database Stats */}
+      <Card className="border-primary/30">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2">
+            <Database className="h-5 w-5 text-primary" />
+            Total Trademarks in Database
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="text-4xl font-bold text-primary">{totalTrademarks.toLocaleString()}</div>
+
+          {/* Source breakdown bar */}
+          {totalTrademarks > 0 && (
+            <div className="space-y-2">
+              <div className="flex h-3 rounded-full overflow-hidden">
+                {sourceEntries.map(({ key, color }) => {
+                  const pct = (sourceBreakdown[key] / totalTrademarks) * 100;
+                  return pct > 0 ? (
+                    <div key={key} className={`${color} transition-all`} style={{ width: `${pct}%` }} />
+                  ) : null;
+                })}
+              </div>
+              <div className="flex flex-wrap gap-x-4 gap-y-1">
+                {sourceEntries.map(({ label, key, color }) => (
+                  sourceBreakdown[key] > 0 && (
+                    <div key={key} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span className={`inline-block h-2.5 w-2.5 rounded-full ${color}`} />
+                      {label}: <span className="font-medium text-foreground">{sourceBreakdown[key]}</span>
+                    </div>
+                  )
+                ))}
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Trademark Sync Section */}
       <div className="grid gap-4 md:grid-cols-3">
@@ -258,7 +346,7 @@ export default function AdminReports() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <p className="text-xs text-muted-foreground">US trademarks. Requires an API key from developer.uspto.gov.</p>
+            <p className="text-xs text-muted-foreground">US trademarks. Requires API key from developer.uspto.gov.</p>
             <div className="flex items-center gap-1">
               <KeyRound className="h-3 w-3 text-muted-foreground shrink-0" />
               <Input
@@ -293,6 +381,29 @@ export default function AdminReports() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Auto-Sync Toggle */}
+      <Card>
+        <CardContent className="flex items-center justify-between py-4">
+          <div className="flex items-center gap-3">
+            <Timer className="h-4 w-4 text-muted-foreground" />
+            <div>
+              <Label htmlFor="auto-sync" className="text-sm font-medium">Enable daily auto-sync</Label>
+              <p className="text-xs text-muted-foreground">Requires backend functions (advanced). Currently manual-only.</p>
+            </div>
+          </div>
+          <Switch
+            id="auto-sync"
+            checked={autoSyncEnabled}
+            onCheckedChange={(checked) => {
+              setAutoSyncEnabled(checked);
+              if (checked) {
+                toast.info("Auto-sync is a demo toggle. Backend cron jobs need to be configured separately.");
+              }
+            }}
+          />
+        </CardContent>
+      </Card>
 
       {/* Sync History */}
       {syncLogs.length > 0 && (
