@@ -1,109 +1,149 @@
+import { Shield, Search, Eye, CheckCircle, FileText, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ArrowRight, Sparkles, Zap, TrendingUp, Package, Palette, Upload } from "lucide-react";
-import { Link } from "react-router-dom";
-import { FeatureCard } from "@/components/shared/FeatureCard";
-import pixelpodLogo from "@/assets/pixelpod-logo.png";
+import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
+import { AuthModal } from "@/components/AuthModal";
 
 const features = [
-  { icon: Sparkles, title: "AI Design Generation", description: "Generate unique t-shirt designs using cutting-edge AI models" },
-  { icon: Palette, title: "Design Studio", description: "Professional canvas editor for customizing and refining your designs" },
-  { icon: Upload, title: "Instant Upload", description: "One-click upload to Shopify with optimized product listings" },
-  { icon: TrendingUp, title: "Trend Analytics", description: "Stay ahead with real-time market trends and insights" },
-  { icon: Package, title: "POD Integration", description: "Seamless Printful/Printify integration for automated fulfillment" },
-  { icon: Zap, title: "SEO Optimization", description: "AI-powered product descriptions and SEO-ready content" },
-];
-
-const steps = [
-  { step: "01", title: "Ideate & Generate", desc: "Use AI to create unique designs" },
-  { step: "02", title: "Edit & Refine", desc: "Perfect your design in our studio" },
-  { step: "03", title: "Optimize & Upload", desc: "AI-powered SEO and instant sync" },
-  { step: "04", title: "Market & Sell", desc: "Launch with proven templates" },
-  { step: "05", title: "Fulfill Orders", desc: "Automatic POD printing & shipping" },
-  { step: "06", title: "Analyze & Scale", desc: "Track trends and grow your business" },
+  {
+    icon: Search,
+    title: "IP Check",
+    description: "Detect potential intellectual property conflicts including trademarks, copyrighted characters, and brand logos before listing.",
+    color: "text-primary",
+    bg: "bg-primary/10",
+  },
+  {
+    icon: Eye,
+    title: "Accessibility",
+    description: "Validate color contrast ratios, readability, and visual accessibility to ensure your designs reach every customer.",
+    color: "text-success",
+    bg: "bg-success/10",
+  },
+  {
+    icon: CheckCircle,
+    title: "Quality",
+    description: "Check resolution, DPI requirements, bleed areas, and print-readiness to avoid costly reprints and returns.",
+    color: "text-warning",
+    bg: "bg-warning/10",
+  },
+  {
+    icon: FileText,
+    title: "Transparency",
+    description: "Ensure listing compliance with platform guidelines, accurate descriptions, and proper content disclosures.",
+    color: "text-destructive",
+    bg: "bg-destructive/10",
+  },
 ];
 
 export default function Home() {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [authOpen, setAuthOpen] = useState(false);
+
+  const handleCTA = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      setAuthOpen(true);
+    }
+  };
+
   return (
-    <div className="space-y-20 pb-12">
+    <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative pt-12 lg:pt-20 text-center max-w-4xl mx-auto">
-        <div className="mb-6 animate-float">
-          <img src={pixelpodLogo} alt="PixelPOD" className="h-20 w-20 mx-auto rounded-2xl shadow-glow" />
-        </div>
-        <h1 className="font-display text-5xl lg:text-7xl mb-5 text-gradient leading-tight">
-          PixelPOD
-        </h1>
-        <p className="text-xl lg:text-2xl text-muted-foreground mb-4 max-w-2xl mx-auto">
-          Transform Ideas into Profit with AI-Powered Print-on-Demand
-        </p>
-        <p className="text-base text-muted-foreground mb-10 max-w-3xl mx-auto leading-relaxed">
-          Design, optimize, and sell custom t-shirts with our intelligent platform. 
-          From AI generation to Shopify integration — your complete creative workflow.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild size="lg" className="text-base px-8 shadow-glow">
-            <Link to="/design-studio">
-              Start Designing <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-          <Button asChild size="lg" variant="outline" className="text-base px-8">
-            <Link to="/ai-tools">Explore AI Tools</Link>
-          </Button>
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-success/5" />
+        <div className="container relative py-24 md:py-36 flex flex-col items-center text-center gap-6">
+          <div className="inline-flex items-center gap-2 rounded-full border bg-background px-4 py-1.5 text-sm font-medium text-muted-foreground animate-fade-in">
+            <Shield className="h-4 w-4 text-primary" />
+            POD Compliance Validation Platform
+          </div>
+
+          <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight max-w-3xl leading-[1.1] animate-slide-up">
+            Validate Your POD Designs{" "}
+            <span className="text-primary">Before Selling</span>
+          </h1>
+
+          <p className="text-lg md:text-xl text-muted-foreground max-w-2xl animate-slide-up" style={{ animationDelay: "0.1s" }}>
+            Scan your print-on-demand designs for IP issues, accessibility problems,
+            quality defects, and listing compliance — all in one place.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center gap-3 mt-4 animate-slide-up" style={{ animationDelay: "0.2s" }}>
+            <Button size="lg" className="text-base px-8 h-12" onClick={handleCTA}>
+              Start Free Scan
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+            <Button size="lg" variant="outline" className="text-base px-8 h-12" onClick={() => navigate("/about")}>
+              Learn More
+            </Button>
+          </div>
+
+          <p className="text-xs text-muted-foreground mt-2 animate-fade-in" style={{ animationDelay: "0.3s" }}>
+            No credit card required · 5 free scans per month
+          </p>
         </div>
       </section>
 
       {/* Features */}
-      <section>
+      <section className="container py-20">
         <div className="text-center mb-12">
-          <h2 className="font-display text-3xl lg:text-4xl mb-3">Everything You Need</h2>
-          <p className="text-muted-foreground text-lg">A complete toolkit for modern POD entrepreneurs</p>
+          <h2 className="text-3xl md:text-4xl font-bold">
+            Four pillars of{" "}
+            <span className="text-primary">compliance</span>
+          </h2>
+          <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
+            Comprehensive validation covering every aspect of POD design compliance.
+          </p>
         </div>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((f, i) => (
-            <FeatureCard key={i} {...f} />
+            <Card
+              key={f.title}
+              className="border bg-card hover:shadow-md transition-shadow animate-slide-up"
+              style={{ animationDelay: `${i * 0.1}s` }}
+            >
+              <CardContent className="pt-6 pb-6 space-y-4">
+                <div className={`inline-flex items-center justify-center h-12 w-12 rounded-lg ${f.bg}`}>
+                  <f.icon className={`h-6 w-6 ${f.color}`} />
+                </div>
+                <h3 className="text-lg font-semibold">{f.title}</h3>
+                <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </section>
 
-      {/* Workflow */}
-      <section>
-        <div className="text-center mb-12">
-          <h2 className="font-display text-3xl lg:text-4xl mb-3">Your Complete Workflow</h2>
-          <p className="text-muted-foreground text-lg">From concept to customer in 6 steps</p>
-        </div>
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {steps.map((item, i) => (
-            <div key={i} className="text-center animate-slide-up" style={{ animationDelay: `${i * 80}ms` }}>
-              <div className="w-14 h-14 rounded-2xl bg-gradient-primary text-primary-foreground flex items-center justify-center text-xl font-display font-bold mx-auto mb-4 shadow-glow">
-                {item.step}
-              </div>
-              <h3 className="font-display text-base font-semibold mb-1">{item.title}</h3>
-              <p className="text-sm text-muted-foreground">{item.desc}</p>
-            </div>
-          ))}
+      {/* CTA section */}
+      <section className="border-t bg-muted/50">
+        <div className="container py-16 flex flex-col items-center text-center gap-4">
+          <h2 className="text-2xl md:text-3xl font-bold">Ready to protect your business?</h2>
+          <p className="text-muted-foreground max-w-lg">
+            Join thousands of POD sellers who validate their designs before listing.
+          </p>
+          <Button size="lg" className="mt-2" onClick={handleCTA}>
+            Start Free Scan
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       </section>
 
-      {/* CTA */}
-      <section>
-        <Card className="p-10 lg:p-14 text-center bg-gradient-primary border-0 shadow-glow overflow-hidden relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary-foreground/5 to-transparent" />
-          <div className="relative z-10">
-            <h2 className="font-display text-3xl lg:text-4xl text-primary-foreground mb-3">
-              Ready to Launch Your POD Empire?
-            </h2>
-            <p className="text-primary-foreground/80 text-lg mb-8 max-w-lg mx-auto">
-              Join thousands of creators making profits with PixelPOD
-            </p>
-            <Button asChild size="lg" variant="secondary" className="text-base px-8 font-semibold">
-              <Link to="/design-studio">
-                Get Started Free <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+      {/* Footer */}
+      <footer className="border-t">
+        <div className="container py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Shield className="h-4 w-4 text-primary" />
+            <span className="font-semibold text-foreground">POD Guard</span>
           </div>
-        </Card>
-      </section>
+          <p>© {new Date().getFullYear()} POD Guard. All rights reserved.</p>
+        </div>
+      </footer>
+
+      <AuthModal open={authOpen} onOpenChange={setAuthOpen} />
     </div>
   );
 }

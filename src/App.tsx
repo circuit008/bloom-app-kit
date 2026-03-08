@@ -5,16 +5,13 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { AuthProvider } from "./hooks/useAuth";
+import { ThemeProvider } from "./hooks/useTheme";
 import Home from "./pages/Home";
-import DesignStudio from "./pages/DesignStudio";
-import AITools from "./pages/AITools";
-import Products from "./pages/Products";
-import Analytics from "./pages/Analytics";
+import Dashboard from "./pages/Dashboard";
+import ScanHistory from "./pages/ScanHistory";
+import Pricing from "./pages/Pricing";
 import About from "./pages/About";
-import Contact from "./pages/Contact";
-import Settings from "./pages/Settings";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,34 +19,38 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route
-            path="/*"
-            element={
-              <ProtectedRoute>
-                <Layout>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/design-studio" element={<DesignStudio />} />
-                    <Route path="/ai-tools" element={<AITools />} />
-                    <Route path="/products" element={<Products />} />
-                    <Route path="/analytics" element={<Analytics />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
-      </BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Layout>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/scan-history"
+                  element={
+                    <ProtectedRoute>
+                      <ScanHistory />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route path="/pricing" element={<Pricing />} />
+                <Route path="/about" element={<About />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Layout>
+          </BrowserRouter>
+        </AuthProvider>
+      </ThemeProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
