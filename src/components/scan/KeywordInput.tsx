@@ -5,6 +5,7 @@ import { X } from "lucide-react";
 interface KeywordInputProps {
   keywords: string[];
   onKeywordsChange: (keywords: string[]) => void;
+  inputRef?: React.RefObject<HTMLInputElement>;
 }
 
 export function KeywordInput({ keywords, onKeywordsChange }: KeywordInputProps) {
