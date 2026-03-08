@@ -112,6 +112,25 @@
     font-family: 'Inter', system-ui, sans-serif;
     @apply font-bold tracking-tight;
   }
+
+  /* Focus indicators for keyboard navigation */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring rounded-sm;
+  }
+
+  /* Touch-friendly minimum targets */
+  @media (pointer: coarse) {
+    button, a, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Print styles */
+  @media print {
+    body { background: white; color: black; }
+    .print\\:hidden { display: none !important; }
+  }
 }
 
 @layer utilities {
