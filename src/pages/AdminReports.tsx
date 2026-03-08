@@ -48,6 +48,15 @@ interface SourceBreakdown {
   other: number;
 }
 
+interface AnalyticsData {
+  scansToday: number;
+  scansWeek: number;
+  scansMonth: number;
+  totalAdImpressions: number;
+  topFlaggedTerms: { term: string; count: number }[];
+  affiliateClicks: number;
+}
+
 function statusBadge(status: string) {
   if (status === "verified") return <Badge className="bg-success/20 text-success border-success/30">Verified</Badge>;
   if (status === "rejected") return <Badge variant="destructive">Rejected</Badge>;
