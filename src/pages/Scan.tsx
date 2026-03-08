@@ -33,10 +33,10 @@ function getConfidence(source: string | null): "high" | "medium" | "low" {
   return "low";
 }
 
-function getScoreDeduction(confidence: "high" | "medium" | "low"): number {
-  if (confidence === "high") return 25;
-  if (confidence === "medium") return 15;
-  return 5;
+function getRiskDeduction(riskLevel: string): number {
+  if (riskLevel === "high") return 50;
+  if (riskLevel === "medium") return 30;
+  return 10;
 }
 
 export default function Scan() {
@@ -124,20 +124,24 @@ export default function Scan() {
         }
       }
 
-      const totalDeduction = matches.reduce((sum, m) => sum + getScoreDeduction(m.confidence), 0);
+      const hasHighRisk = matches.some((m) => m.riskLevel === "high");
+      const totalDeduction = matches.reduce((sum, m) => sum + getRiskDeduction(m.riskLevel), 0);
       const score = Math.max(0, 100 - totalDeduction);
 
       let riskLabel: string;
       let riskEmoji: string;
-      if (score >= 80) {
-        riskLabel = "Safe";
-        riskEmoji = "🟢";
-      } else if (score >= 50) {
-        riskLabel = "Caution";
+      if (hasHighRisk || score < 50) {
+        riskLabel = "CRITICAL - Do Not Use";
+        riskEmoji = "🔴";
+      } else if (score < 70) {
+        riskLabel = "High Risk - Not Recommended";
+        riskEmoji = "🟠";
+      } else if (score < 90) {
+        riskLabel = "Caution - Review Required";
         riskEmoji = "🟡";
       } else {
-        riskLabel = "High Risk";
-        riskEmoji = "🔴";
+        riskLabel = "Safe to Use";
+        riskEmoji = "🟢";
       }
 
       setIpResult({

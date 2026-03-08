@@ -37,14 +37,16 @@ interface IPResultsCardProps {
 }
 
 function getScoreColor(score: number) {
-  if (score >= 80) return "text-success";
-  if (score >= 50) return "text-warning";
+  if (score >= 90) return "text-success";
+  if (score >= 70) return "text-warning";
+  if (score >= 50) return "text-orange-500";
   return "text-destructive";
 }
 
 function getScoreBg(score: number) {
-  if (score >= 80) return "bg-success/10";
-  if (score >= 50) return "bg-warning/10";
+  if (score >= 90) return "bg-success/10";
+  if (score >= 70) return "bg-warning/10";
+  if (score >= 50) return "bg-orange-500/10";
   return "bg-destructive/10";
 }
 
@@ -139,14 +141,54 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
               <span className="text-lg font-semibold">{result.riskLabel}</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              {result.score >= 80
+              {result.score >= 90
                 ? "Your design appears safe for listing."
+                : result.score >= 70
+                ? "Some potential issues detected. Review flagged terms before listing."
                 : result.score >= 50
-                ? "Some potential issues detected. Review flagged terms."
-                : "High risk detected. Strongly consider removing flagged terms."}
+                ? "High risk detected. These terms are not recommended for use."
+                : "Critical IP violations found. Do NOT use these terms."}
             </p>
           </div>
         </div>
+
+        {/* High-risk warning banner */}
+        {result.matches.some((m) => m.riskLevel === "high") && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 space-y-1">
+            <p className="text-sm font-bold text-destructive flex items-center gap-2">
+              ⚠️ High-Risk Trademark Detected
+            </p>
+            <p className="text-xs text-destructive/90">
+              This trademark can result in account bans on Etsy, Amazon, and other POD platforms. Immediate removal is strongly recommended.
+            </p>
+            {result.matches
+              .filter((m) => m.riskLevel === "high" && m.ownerName)
+              .map((m, i) => (
+                <p key={i} className="text-xs text-destructive/80">
+                  <strong>"{m.term}"</strong> — owned by {m.ownerName}
+                </p>
+              ))}
+          </div>
+        )}
+
+        {/* Score breakdown */}
+        {result.matches.length > 0 && (
+          <div className="rounded-lg border bg-muted/30 p-3 text-xs text-muted-foreground space-y-1">
+            <p className="font-medium text-foreground text-sm">Score Breakdown</p>
+            {result.matches.map((m, i) => (
+              <div key={i} className="flex justify-between">
+                <span>"{m.matchedKeyword}" → {m.term} ({m.riskLevel} risk)</span>
+                <span className="font-mono text-destructive">
+                  -{m.riskLevel === "high" ? 50 : m.riskLevel === "medium" ? 30 : 10}
+                </span>
+              </div>
+            ))}
+            <div className="flex justify-between border-t pt-1 font-medium text-foreground">
+              <span>Final Score</span>
+              <span>{result.score}/100</span>
+            </div>
+          </div>
+        )}
 
         {/* Flagged terms */}
         {result.matches.length > 0 ? (
