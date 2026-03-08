@@ -1,4 +1,4 @@
-import { Home, LayoutDashboard, History, CreditCard, Info, LucideIcon } from "lucide-react";
+import { Home, LayoutDashboard, History, CreditCard, Info, ScanSearch, LucideIcon } from "lucide-react";
 
 export interface RouteConfig {
   name: string;
@@ -11,6 +11,7 @@ export interface RouteConfig {
 export const routes: RouteConfig[] = [
   { name: "Home", href: "/", icon: Home, showInNav: true, requiresAuth: false },
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard, showInNav: true, requiresAuth: true },
+  { name: "New Scan", href: "/scan", icon: ScanSearch, showInNav: true, requiresAuth: true },
   { name: "Scan History", href: "/scan-history", icon: History, showInNav: true, requiresAuth: true },
   { name: "Pricing", href: "/pricing", icon: CreditCard, showInNav: true, requiresAuth: false },
   { name: "About", href: "/about", icon: Info, showInNav: true, requiresAuth: false },

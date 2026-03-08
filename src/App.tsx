@@ -10,6 +10,7 @@ import { ThemeProvider } from "./hooks/useTheme";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import ScanHistory from "./pages/ScanHistory";
+import Scan from "./pages/Scan";
 import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
@@ -32,6 +33,14 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/scan"
+                  element={
+                    <ProtectedRoute>
+                      <Scan />
                     </ProtectedRoute>
                   }
                 />
