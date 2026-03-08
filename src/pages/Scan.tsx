@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Loader2, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,7 @@ export default function Scan() {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [phase, setPhase] = useState<Phase>("upload");
   const [result, setResult] = useState<IPCheckResult | null>(null);
+  const keywordInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = useCallback((f: File | null, p: string | null) => {
     setFile(f);
@@ -26,7 +27,22 @@ export default function Scan() {
   }, []);
 
   const runIPCheck = async () => {
-    if (keywords.length === 0) {
+    // Flush any text still in the keyword input
+    if (keywordInputRef.current) {
+      const val = keywordInputRef.current.value.trim().replace(/,$/, "");
+      if (val && !keywords.includes(val)) {
+        const updated = [...keywords, val];
+        setKeywords(updated);
+        keywordInputRef.current.value = "";
+        // Use updated list for the check
+        return runIPCheckWithKeywords(updated);
+      }
+    }
+    return runIPCheckWithKeywords(keywords);
+  };
+
+  const runIPCheckWithKeywords = async (kws: string[]) => {
+    if (kws.length === 0) {
       toast.error("Please add at least one keyword to check.");
       return;
     }
@@ -50,7 +66,7 @@ export default function Scan() {
       // Compare keywords against trademarks (case-insensitive)
       const matches: IPMatch[] = [];
 
-      for (const kw of keywords) {
+      for (const kw of kws) {
         const kwLower = kw.toLowerCase();
         for (const tm of trademarks) {
           const termLower = tm.term.toLowerCase();
@@ -133,22 +149,16 @@ export default function Scan() {
           </CardHeader>
           <CardContent className="space-y-6">
             <DesignUpload file={file} preview={preview} onFileChange={handleFileChange} />
-            <KeywordInput keywords={keywords} onKeywordsChange={setKeywords} />
+            <KeywordInput keywords={keywords} onKeywordsChange={setKeywords} inputRef={keywordInputRef} />
 
             <div className="pt-2">
               <Button
                 onClick={runIPCheck}
-                disabled={keywords.length === 0}
                 className="w-full sm:w-auto"
               >
                 Run IP Check
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
-              {keywords.length === 0 && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  Add at least one keyword to begin the check
-                </p>
-              )}
             </div>
           </CardContent>
         </Card>
