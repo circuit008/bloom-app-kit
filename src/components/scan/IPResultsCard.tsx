@@ -141,11 +141,13 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
               <span className="text-lg font-semibold">{result.riskLabel}</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              {result.score >= 80
+              {result.score >= 90
                 ? "Your design appears safe for listing."
+                : result.score >= 70
+                ? "Some potential issues detected. Review flagged terms before listing."
                 : result.score >= 50
-                ? "Some potential issues detected. Review flagged terms."
-                : "High risk detected. Strongly consider removing flagged terms."}
+                ? "High risk detected. These terms are not recommended for use."
+                : "Critical IP violations found. Do NOT use these terms."}
             </p>
           </div>
         </div>
