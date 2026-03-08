@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle } from "lucide-react";
+import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle, RefreshCw, Globe, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -26,9 +26,25 @@ interface Report {
   created_at: string;
 }
 
+interface SyncLog {
+  id: string;
+  source: string;
+  trademarks_synced: number;
+  status: string;
+  error_message: string | null;
+  sync_duration_ms: number | null;
+  created_at: string;
+}
+
 function statusBadge(status: string) {
   if (status === "verified") return <Badge className="bg-success/20 text-success border-success/30">Verified</Badge>;
   if (status === "rejected") return <Badge variant="destructive">Rejected</Badge>;
+  return <Badge variant="secondary">Pending</Badge>;
+}
+
+function syncStatusBadge(status: string) {
+  if (status === "success") return <Badge className="bg-success/20 text-success border-success/30">Success</Badge>;
+  if (status === "failed") return <Badge variant="destructive">Failed</Badge>;
   return <Badge variant="secondary">Pending</Badge>;
 }
 
@@ -36,14 +52,17 @@ export default function AdminReports() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);
+  const [syncLogs, setSyncLogs] = useState<SyncLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [syncing, setSyncing] = useState(false);
 
   const isAdmin = user?.email?.includes("admin");
 
   useEffect(() => {
     if (!isAdmin) return;
     fetchReports();
+    fetchSyncLogs();
   }, [isAdmin]);
 
   const fetchReports = async () => {
@@ -56,6 +75,41 @@ export default function AdminReports() {
     setLoading(false);
   };
 
+  const fetchSyncLogs = async () => {
+    const { data } = await supabase
+      .from("api_sync_logs")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(10);
+
+    if (data) setSyncLogs(data as SyncLog[]);
+  };
+
+  const syncFromEUIPO = async () => {
+    setSyncing(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("sync-euipo", {
+        body: { searchTerm: "clothing", maxResults: 100 },
+      });
+
+      if (error) throw error;
+
+      if (data?.success) {
+        toast.success(`Synced ${data.count} trademarks from EUIPO in ${data.duration_ms}ms`);
+      } else {
+        toast.error("Sync completed but returned no results.");
+      }
+
+      fetchSyncLogs();
+    } catch (err: any) {
+      console.error("EUIPO sync error:", err);
+      toast.error("Failed to sync from EUIPO. " + (err.message || ""));
+      fetchSyncLogs();
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const updateStatus = async (report: Report, newStatus: "verified" | "rejected") => {
     setUpdating(report.id);
     try {
@@ -66,7 +120,6 @@ export default function AdminReports() {
 
       if (error) throw error;
 
-      // If verified, add to trademark_database
       if (newStatus === "verified") {
         const { error: insertError } = await supabase
           .from("trademark_database")
@@ -113,15 +166,76 @@ export default function AdminReports() {
         </Button>
         <div>
           <h1 className="text-2xl font-bold">Admin: Trademark Reports</h1>
-          <p className="text-sm text-muted-foreground">Review and verify community-reported trademarks</p>
+          <p className="text-sm text-muted-foreground">Review reports and sync external trademark databases</p>
         </div>
       </div>
 
+      {/* EUIPO Sync Section */}
+      <Card className="border-primary/30">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Globe className="h-5 w-5 text-primary" />
+            EUIPO Trademark Sync
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Fetch European trademarks from the EUIPO public API and add them to your database.
+            </p>
+            <Button onClick={syncFromEUIPO} disabled={syncing} className="gap-2">
+              {syncing ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
+              {syncing ? "Syncing..." : "Sync from EUIPO API"}
+            </Button>
+          </div>
+
+          {syncLogs.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-sm font-semibold flex items-center gap-2">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                Recent Sync History
+              </h4>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Source</TableHead>
+                    <TableHead>Synced</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Duration</TableHead>
+                    <TableHead>Date</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {syncLogs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className="font-medium">{log.source}</TableCell>
+                      <TableCell>{log.trademarks_synced}</TableCell>
+                      <TableCell>{syncStatusBadge(log.status)}</TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {log.sync_duration_ms ? `${log.sync_duration_ms}ms` : "—"}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground text-sm">
+                        {new Date(log.created_at).toLocaleString()}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Community Reports */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <ShieldCheck className="h-5 w-5 text-primary" />
-            All Reports ({reports.length})
+            Community Reports ({reports.length})
           </CardTitle>
         </CardHeader>
         <CardContent>

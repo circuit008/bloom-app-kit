@@ -44,6 +44,36 @@ export type Database = {
         }
         Relationships: []
       }
+      api_sync_logs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          source: string
+          status: string
+          sync_duration_ms: number | null
+          trademarks_synced: number | null
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          source: string
+          status?: string
+          sync_duration_ms?: number | null
+          trademarks_synced?: number | null
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          source?: string
+          status?: string
+          sync_duration_ms?: number | null
+          trademarks_synced?: number | null
+        }
+        Relationships: []
+      }
       design_suggestions: {
         Row: {
           created_at: string
@@ -240,27 +270,45 @@ export type Database = {
       }
       trademark_database: {
         Row: {
+          auto_synced: boolean | null
           category: string
           created_at: string
           description: string | null
           id: string
+          last_verified: string | null
+          owner_name: string | null
+          region: string | null
+          registration_number: string | null
           risk_level: string
+          source: string | null
           term: string
         }
         Insert: {
+          auto_synced?: boolean | null
           category?: string
           created_at?: string
           description?: string | null
           id?: string
+          last_verified?: string | null
+          owner_name?: string | null
+          region?: string | null
+          registration_number?: string | null
           risk_level?: string
+          source?: string | null
           term: string
         }
         Update: {
+          auto_synced?: boolean | null
           category?: string
           created_at?: string
           description?: string | null
           id?: string
+          last_verified?: string | null
+          owner_name?: string | null
+          region?: string | null
+          registration_number?: string | null
           risk_level?: string
+          source?: string | null
           term?: string
         }
         Relationships: []
