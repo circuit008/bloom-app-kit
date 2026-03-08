@@ -13,6 +13,7 @@ const stats = [
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="container py-8 space-y-8">
