@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Moon, Sun, LogOut, User, ChevronDown, Shield } from "lucide-react";
+import { Footer } from "./Footer";
 import { cn } from "@/lib/utils";
 import { Button } from "./ui/button";
 import { toast } from "sonner";
