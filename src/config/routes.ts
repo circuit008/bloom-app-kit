@@ -1,4 +1,4 @@
-import { Home, LayoutDashboard, History, CreditCard, Info, LucideIcon } from "lucide-react";
+import { Home, LayoutDashboard, History, CreditCard, Info, ScanSearch, LucideIcon } from "lucide-react";
 
 export interface RouteConfig {
   name: string;
