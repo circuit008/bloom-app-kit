@@ -93,6 +93,10 @@ export default function AdminReports() {
   const [totalTrademarks, setTotalTrademarks] = useState(0);
   const [sourceBreakdown, setSourceBreakdown] = useState<SourceBreakdown>({ manual: 0, EUIPO: 0, USPTO: 0, CIPO: 0, other: 0 });
   const [autoSyncEnabled, setAutoSyncEnabled] = useState(false);
+  const [analytics, setAnalytics] = useState<AnalyticsData>({
+    scansToday: 0, scansWeek: 0, scansMonth: 0,
+    totalAdImpressions: 0, topFlaggedTerms: [], affiliateClicks: 0,
+  });
 
   const isAdmin = user?.email?.includes("admin");
 
@@ -101,7 +105,43 @@ export default function AdminReports() {
     fetchReports();
     fetchSyncLogs();
     fetchTrademarkStats();
+    fetchAnalytics();
   }, [isAdmin]);
+
+  const fetchAnalytics = async () => {
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+    const weekStart = new Date(now.getTime() - 7 * 86400000).toISOString();
+    const monthStart = new Date(now.getTime() - 30 * 86400000).toISOString();
+
+    const [scansRes, adRes, profilesRes] = await Promise.all([
+      supabase.from("scan_results").select("created_at, keywords"),
+      supabase.from("ad_impressions").select("id"),
+      supabase.from("user_profiles").select("affiliate_clicks"),
+    ]);
+
+    const scans = scansRes.data || [];
+    const scansToday = scans.filter((s: any) => s.created_at >= todayStart).length;
+    const scansWeek = scans.filter((s: any) => s.created_at >= weekStart).length;
+    const scansMonth = scans.filter((s: any) => s.created_at >= monthStart).length;
+
+    // Top flagged terms from keywords
+    const termCounts: Record<string, number> = {};
+    scans.forEach((s: any) => {
+      (s.keywords || []).forEach((k: string) => {
+        termCounts[k] = (termCounts[k] || 0) + 1;
+      });
+    });
+    const topFlaggedTerms = Object.entries(termCounts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([term, count]) => ({ term, count }));
+
+    const totalAdImpressions = adRes.data?.length || 0;
+    const affiliateClicks = (profilesRes.data || []).reduce((sum: number, p: any) => sum + (p.affiliate_clicks || 0), 0);
+
+    setAnalytics({ scansToday, scansWeek, scansMonth, totalAdImpressions, topFlaggedTerms, affiliateClicks });
+  };
 
   const fetchTrademarkStats = async () => {
     const { data, error } = await supabase
