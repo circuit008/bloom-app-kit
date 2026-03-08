@@ -37,6 +37,14 @@ const App = () => (
                   }
                 />
                 <Route
+                  path="/scan"
+                  element={
+                    <ProtectedRoute>
+                      <Scan />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="/scan-history"
                   element={
                     <ProtectedRoute>
