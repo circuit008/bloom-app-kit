@@ -33,10 +33,10 @@ function getConfidence(source: string | null): "high" | "medium" | "low" {
   return "low";
 }
 
-function getScoreDeduction(confidence: "high" | "medium" | "low"): number {
-  if (confidence === "high") return 25;
-  if (confidence === "medium") return 15;
-  return 5;
+function getRiskDeduction(riskLevel: string): number {
+  if (riskLevel === "high") return 50;
+  if (riskLevel === "medium") return 30;
+  return 10;
 }
 
 export default function Scan() {
