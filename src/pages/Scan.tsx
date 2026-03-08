@@ -66,7 +66,7 @@ export default function Scan() {
       // Compare keywords against trademarks (case-insensitive)
       const matches: IPMatch[] = [];
 
-      for (const kw of keywords) {
+      for (const kw of kws) {
         const kwLower = kw.toLowerCase();
         for (const tm of trademarks) {
           const termLower = tm.term.toLowerCase();
