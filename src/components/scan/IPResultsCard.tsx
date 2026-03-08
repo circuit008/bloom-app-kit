@@ -152,6 +152,44 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
           </div>
         </div>
 
+        {/* High-risk warning banner */}
+        {result.matches.some((m) => m.riskLevel === "high") && (
+          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 space-y-1">
+            <p className="text-sm font-bold text-destructive flex items-center gap-2">
+              ⚠️ High-Risk Trademark Detected
+            </p>
+            <p className="text-xs text-destructive/90">
+              This trademark can result in account bans on Etsy, Amazon, and other POD platforms. Immediate removal is strongly recommended.
+            </p>
+            {result.matches
+              .filter((m) => m.riskLevel === "high" && m.ownerName)
+              .map((m, i) => (
+                <p key={i} className="text-xs text-destructive/80">
+                  <strong>"{m.term}"</strong> — owned by {m.ownerName}
+                </p>
+              ))}
+          </div>
+        )}
+
+        {/* Score breakdown */}
+        {result.matches.length > 0 && (
+          <div className="rounded-lg border bg-muted/30 p-3 text-xs text-muted-foreground space-y-1">
+            <p className="font-medium text-foreground text-sm">Score Breakdown</p>
+            {result.matches.map((m, i) => (
+              <div key={i} className="flex justify-between">
+                <span>"{m.matchedKeyword}" → {m.term} ({m.riskLevel} risk)</span>
+                <span className="font-mono text-destructive">
+                  -{m.riskLevel === "high" ? 50 : m.riskLevel === "medium" ? 30 : 10}
+                </span>
+              </div>
+            ))}
+            <div className="flex justify-between border-t pt-1 font-medium text-foreground">
+              <span>Final Score</span>
+              <span>{result.score}/100</span>
+            </div>
+          </div>
+        )}
+
         {/* Flagged terms */}
         {result.matches.length > 0 ? (
           <div className="space-y-3">

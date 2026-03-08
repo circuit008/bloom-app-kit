@@ -124,20 +124,24 @@ export default function Scan() {
         }
       }
 
-      const totalDeduction = matches.reduce((sum, m) => sum + getScoreDeduction(m.confidence), 0);
+      const hasHighRisk = matches.some((m) => m.riskLevel === "high");
+      const totalDeduction = matches.reduce((sum, m) => sum + getRiskDeduction(m.riskLevel), 0);
       const score = Math.max(0, 100 - totalDeduction);
 
       let riskLabel: string;
       let riskEmoji: string;
-      if (score >= 80) {
-        riskLabel = "Safe";
-        riskEmoji = "🟢";
-      } else if (score >= 50) {
-        riskLabel = "Caution";
+      if (hasHighRisk || score < 50) {
+        riskLabel = "CRITICAL - Do Not Use";
+        riskEmoji = "🔴";
+      } else if (score < 70) {
+        riskLabel = "High Risk - Not Recommended";
+        riskEmoji = "🟠";
+      } else if (score < 90) {
+        riskLabel = "Caution - Review Required";
         riskEmoji = "🟡";
       } else {
-        riskLabel = "High Risk";
-        riskEmoji = "🔴";
+        riskLabel = "Safe to Use";
+        riskEmoji = "🟢";
       }
 
       setIpResult({
