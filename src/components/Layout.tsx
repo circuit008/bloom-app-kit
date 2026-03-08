@@ -72,6 +72,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               size="icon"
               onClick={toggleTheme}
               className="h-9 w-9"
+              aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             >
               {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
