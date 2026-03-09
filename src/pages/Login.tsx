@@ -131,63 +131,33 @@ const Login = () => {
       <Dialog open={showRecovery} onOpenChange={setShowRecovery}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-display">Reset Password</DialogTitle>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              Reset Password
+            </DialogTitle>
             <DialogDescription>
-              {recoveryStep === "email" && "Enter your email to receive a 6-digit recovery code"}
-              {recoveryStep === "otp" && "Enter the 6-digit code sent to your email"}
-              {recoveryStep === "password" && "Enter your new password"}
+              Enter your email and we'll send you a link to reset your password
             </DialogDescription>
           </DialogHeader>
 
-          {recoveryStep === "email" && (
-            <form onSubmit={handleSendOtp} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="recovery-email">Email</Label>
-                <Input id="recovery-email" type="email" placeholder="you@example.com" value={recoveryEmail} onChange={(e) => setRecoveryEmail(e.target.value)} required className="h-11" />
-              </div>
-              <Button type="submit" className="w-full h-11" disabled={recoveryLoading}>
-                {recoveryLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Send Code
-              </Button>
-            </form>
-          )}
-
-          {recoveryStep === "otp" && (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Enter 6-digit code</Label>
-                <div className="flex justify-center">
-                  <InputOTP maxLength={6} value={otp} onChange={setOtp}>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-              </div>
-              <Button type="submit" className="w-full h-11" disabled={recoveryLoading}>
-                {recoveryLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Verify Code
-              </Button>
-            </form>
-          )}
-
-          {recoveryStep === "password" && (
-            <form onSubmit={handleResetPassword} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input id="new-password" type="password" placeholder="••••••••" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={6} className="h-11" />
-              </div>
-              <Button type="submit" className="w-full h-11" disabled={recoveryLoading}>
-                {recoveryLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Reset Password
-              </Button>
-            </form>
-          )}
+          <form onSubmit={handleSendResetEmail} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="recovery-email">Email</Label>
+              <Input 
+                id="recovery-email" 
+                type="email" 
+                placeholder="you@example.com" 
+                value={recoveryEmail} 
+                onChange={(e) => setRecoveryEmail(e.target.value)} 
+                required 
+                className="h-11" 
+              />
+            </div>
+            <Button type="submit" className="w-full h-11" disabled={recoveryLoading}>
+              {recoveryLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send Reset Link
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
     </AuthLayout>
