@@ -94,7 +94,20 @@ const Signup = () => {
             <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="h-11" />
           </div>
-          <Button type="submit" className="w-full h-11" disabled={loading}>
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="terms-signup"
+              checked={termsAccepted}
+              onCheckedChange={(v) => setTermsAccepted(v === true)}
+            />
+            <Label htmlFor="terms-signup" className="text-sm leading-relaxed cursor-pointer">
+              I agree to the{" "}
+              <Link to="/terms" className="text-primary underline" target="_blank">Terms & Conditions</Link>{" "}
+              and{" "}
+              <Link to="/privacy" className="text-primary underline" target="_blank">Privacy Policy</Link>.
+            </Label>
+          </div>
+          <Button type="submit" className="w-full h-11" disabled={loading || !termsAccepted}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Create Account
           </Button>
