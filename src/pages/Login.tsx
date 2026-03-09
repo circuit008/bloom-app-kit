@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
 import { AuthLayout } from "@/components/shared/AuthLayout";
 import { GoogleAuthButton } from "@/components/shared/GoogleAuthButton";
 
@@ -19,10 +18,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
-  const [recoveryStep, setRecoveryStep] = useState<"email" | "otp" | "password">("email");
   const [recoveryEmail, setRecoveryEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [newPassword, setNewPassword] = useState("");
   const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
