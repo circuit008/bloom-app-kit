@@ -237,8 +237,23 @@ export default function Scan() {
           <CardContent className="space-y-6">
             <DesignUpload file={file} preview={preview} onFileChange={handleFileChange} />
             <KeywordInput keywords={keywords} onKeywordsChange={setKeywords} inputRef={keywordInputRef} />
+
+            <div className="rounded-lg border border-muted bg-muted/30 p-3 space-y-2">
+              <div className="flex items-start gap-3">
+                <Checkbox
+                  id="scan-confirm"
+                  checked={scanConfirmed}
+                  onCheckedChange={(v) => setScanConfirmed(v === true)}
+                />
+                <Label htmlFor="scan-confirm" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
+                  I confirm that I have the right to scan this design and understand that results are informational only, not legal advice. See our{" "}
+                  <a href="/terms" target="_blank" className="text-primary underline">Terms</a>.
+                </Label>
+              </div>
+            </div>
+
             <div className="pt-2">
-              <Button onClick={runIPCheck} className="w-full sm:w-auto">
+              <Button onClick={runIPCheck} className="w-full sm:w-auto" disabled={!scanConfirmed}>
                 Run IP Check
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
