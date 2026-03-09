@@ -51,6 +51,7 @@ export default function Scan() {
   const [accessibilityResult, setAccessibilityResult] = useState<AccessibilityResult | null>(null);
   const [qualityResult, setQualityResult] = useState<QualityResult | null>(null);
   const [transparencyResult, setTransparencyResult] = useState<TransparencyResult | null>(null);
+  const [scanConfirmed, setScanConfirmed] = useState(false);
   const keywordInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = useCallback((f: File | null, p: string | null) => {
