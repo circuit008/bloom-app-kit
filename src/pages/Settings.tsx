@@ -96,6 +96,59 @@ const Settings = () => {
     setSaving(false);
   };
 
+  const handlePasswordChange = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      toast.error("New password must be at least 6 characters");
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    setPasswordLoading(true);
+    console.log("Password change: verifying current password");
+
+    try {
+      // First verify current password by trying to sign in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user?.email || "",
+        password: currentPassword
+      });
+
+      if (signInError) {
+        toast.error("Current password is incorrect");
+        setPasswordLoading(false);
+        return;
+      }
+
+      // Update to new password
+      console.log("Password change: updating to new password");
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (updateError) throw updateError;
+
+      console.log("Password change: success");
+      toast.success("Password updated successfully!");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      console.error("Password change error:", error);
+      toast.error(error.message || "Failed to update password");
+    } finally {
+      setPasswordLoading(false);
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Header */}
