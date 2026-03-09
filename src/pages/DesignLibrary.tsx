@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ProtectedImage } from "@/components/shared/ProtectedImage";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -139,10 +140,11 @@ const DesignLibrary = () => {
             return (
               <Card key={design.id} className="overflow-hidden">
                 <div className="aspect-square bg-secondary/20 relative">
-                  <img
+                  <ProtectedImage
                     src={design.image_url}
                     alt={design.prompt}
                     className="w-full h-full object-contain p-4"
+                    lowRes
                   />
                   {design.uploaded_to_shopify && (
                     <Badge className="absolute top-2 right-2 bg-green-500">
