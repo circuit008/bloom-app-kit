@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Loader2, Mail, Lock, ArrowRight } from "lucide-react";
@@ -17,6 +18,9 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showRecovery, setShowRecovery] = useState(false);
+  const [recoveryEmail, setRecoveryEmail] = useState("");
+  const [recoveryLoading, setRecoveryLoading] = useState(false);
 
   // SIGNUP FUNCTION - Uses supabase.auth.signUp()
   const handleSignup = async () => {
@@ -92,6 +96,31 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Send password reset email with link
+  const handleSendResetEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecoveryLoading(true);
+    console.log("Sending password reset email to:", recoveryEmail);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      
+      if (error) throw error;
+      
+      console.log("Password reset email sent successfully");
+      toast.success("Password reset link sent! Check your email.");
+      setShowRecovery(false);
+      setRecoveryEmail("");
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      toast.error(error.message || "Failed to send reset email");
+    } finally {
+      setRecoveryLoading(false);
     }
   };
 
