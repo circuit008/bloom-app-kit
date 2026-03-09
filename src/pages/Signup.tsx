@@ -27,10 +27,42 @@ const Signup = () => {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🔐 Signup: Starting signup process");
     setLoading(true);
-    const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: `${window.location.origin}/` } });
-    if (error) { toast.error(error.message); } else { toast.success("Account created! Please check your email to verify."); navigate("/login"); }
-    setLoading(false);
+
+    try {
+      const { data, error } = await supabase.auth.signUp({ 
+        email, 
+        password, 
+        options: { emailRedirectTo: `${window.location.origin}/` } 
+      });
+      
+      if (error) throw error;
+      
+      // Clear form state
+      setEmail("");
+      setPassword("");
+      
+      // Check if email confirmation is disabled (user is auto-confirmed)
+      if (data.user?.email_confirmed_at) {
+        console.log("🔐 Signup: User auto-confirmed, redirecting to dashboard");
+        toast.success("Account created and logged in!");
+        navigate("/");
+      } else {
+        console.log("🔐 Signup: Email confirmation required");
+        toast.success("Account created! Please check your email to verify.");
+        navigate("/login");
+      }
+    } catch (error: any) {
+      console.error("🔐 Signup: Error:", error);
+      if (error.message?.includes("already registered")) {
+        toast.error("Email already registered. Please try signing in instead.");
+      } else {
+        toast.error(error.message || "Signup failed");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
