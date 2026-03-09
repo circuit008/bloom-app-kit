@@ -39,8 +39,9 @@ export function Footer() {
           <div className="space-y-3">
             <h3 className="text-sm font-semibold">Legal</h3>
             <nav className="flex flex-col gap-2 text-sm text-muted-foreground" aria-label="Legal links">
+              <Link to="/terms" className="hover:text-foreground transition-colors">Terms & Conditions</Link>
+              <Link to="/dmca" className="hover:text-foreground transition-colors">DMCA Takedown Policy</Link>
               <Link to="/about#privacy-heading" className="hover:text-foreground transition-colors">Privacy Policy</Link>
-              <Link to="/about#terms-heading" className="hover:text-foreground transition-colors">Terms of Service</Link>
               <Link to="/about#compliance-heading" className="hover:text-foreground transition-colors">Compliance Standards</Link>
             </nav>
           </div>
