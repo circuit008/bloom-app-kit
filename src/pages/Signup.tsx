@@ -25,9 +25,10 @@ const Signup = () => {
     else if (!result?.redirected) { toast.success("Signed up successfully!"); navigate("/"); }
   };
 
+  // SIGNUP FUNCTION - Uses supabase.auth.signUp()
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("🔐 Signup: Starting signup process");
+    console.log('Signup attempt:', email);
     setLoading(true);
 
     try {
@@ -37,6 +38,8 @@ const Signup = () => {
         options: { emailRedirectTo: `${window.location.origin}/` } 
       });
       
+      console.log('Signup result:', data, error);
+      
       if (error) throw error;
       
       // Clear form state
@@ -45,16 +48,16 @@ const Signup = () => {
       
       // Check if email confirmation is disabled (user is auto-confirmed)
       if (data.user?.email_confirmed_at) {
-        console.log("🔐 Signup: User auto-confirmed, redirecting to dashboard");
+        console.log('Signup: User auto-confirmed, redirecting to dashboard');
         toast.success("Account created and logged in!");
         navigate("/");
       } else {
-        console.log("🔐 Signup: Email confirmation required");
+        console.log('Signup: Email confirmation required');
         toast.success("Account created! Please check your email to verify.");
         navigate("/login");
       }
     } catch (error: any) {
-      console.error("🔐 Signup: Error:", error);
+      console.error('Signup error:', error);
       if (error.message?.includes("already registered")) {
         toast.error("Email already registered. Please try signing in instead.");
       } else {
