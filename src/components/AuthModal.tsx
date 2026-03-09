@@ -59,15 +59,18 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
     }
   };
 
+  // SIGNIN FUNCTION - Uses supabase.auth.signInWithPassword()
   const handleSignin = async () => {
-    console.log("🔐 AuthModal: Starting signin process");
+    console.log('Signin attempt:', email);
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({ 
+      const { data, error } = await supabase.auth.signInWithPassword({ 
         email, 
         password 
       });
+      
+      console.log('Signin result:', data, error);
       
       if (error) throw error;
       
@@ -75,11 +78,11 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
       setEmail("");
       setPassword("");
       
-      console.log("🔐 AuthModal: Signin successful");
+      console.log('Signin: Success, closing modal');
       toast.success("Welcome back!");
       onOpenChange(false);
     } catch (error: any) {
-      console.error("🔐 AuthModal: Signin error:", error);
+      console.error('Signin error:', error);
       if (error.message?.includes("Invalid login credentials")) {
         toast.error("Invalid email or password. Please try again.");
       } else if (error.message?.includes("Email not confirmed")) {
