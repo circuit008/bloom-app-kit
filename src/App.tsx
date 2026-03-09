@@ -93,6 +93,7 @@ const App = () => (
                     />
                     <Route path="/pricing" element={<Pricing />} />
                     <Route path="/about" element={<About />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>

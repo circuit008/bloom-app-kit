@@ -251,6 +251,71 @@ const Settings = () => {
         </Card>
       </div>
 
+      {/* Password Change */}
+      <Card className="border-border bg-card">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Lock className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-foreground">Change Password</CardTitle>
+              <CardDescription className="text-muted-foreground">Update your account password</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="current-password" className="text-foreground">Current Password</Label>
+            <Input
+              id="current-password"
+              type="password"
+              placeholder="Enter current password"
+              className="bg-secondary border-border text-foreground"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              disabled={passwordLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="new-password" className="text-foreground">New Password</Label>
+            <Input
+              id="new-password"
+              type="password"
+              placeholder="Enter new password (min 6 characters)"
+              className="bg-secondary border-border text-foreground"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              disabled={passwordLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-new-password" className="text-foreground">Confirm New Password</Label>
+            <Input
+              id="confirm-new-password"
+              type="password"
+              placeholder="Confirm new password"
+              className="bg-secondary border-border text-foreground"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={passwordLoading}
+            />
+          </div>
+          <Button 
+            onClick={handlePasswordChange}
+            disabled={passwordLoading}
+            className="w-full sm:w-auto"
+          >
+            {passwordLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Lock className="mr-2 h-4 w-4" />
+            )}
+            Update Password
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Preferences */}
       <Card className="border-border bg-card">
         <CardHeader>
