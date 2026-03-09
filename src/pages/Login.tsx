@@ -6,10 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Mail } from "lucide-react";
 import { AuthLayout } from "@/components/shared/AuthLayout";
 import { GoogleAuthButton } from "@/components/shared/GoogleAuthButton";
 
@@ -19,10 +18,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showRecovery, setShowRecovery] = useState(false);
-  const [recoveryStep, setRecoveryStep] = useState<"email" | "otp" | "password">("email");
   const [recoveryEmail, setRecoveryEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [newPassword, setNewPassword] = useState("");
   const [recoveryLoading, setRecoveryLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -71,36 +67,29 @@ const Login = () => {
     }
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  // Send password reset email with link
+  const handleSendResetEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setRecoveryLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, { redirectTo: `${window.location.origin}/login` });
-    if (error) { toast.error(error.message); setRecoveryLoading(false); return; }
-    const { error: otpError } = await supabase.auth.signInWithOtp({ email: recoveryEmail, options: { shouldCreateUser: false } });
-    if (otpError) { toast.error(otpError.message); } else { toast.success("6-digit code sent to your email!"); setRecoveryStep("otp"); }
-    setRecoveryLoading(false);
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.length !== 6) { toast.error("Please enter a valid 6-digit code"); return; }
-    setRecoveryLoading(true);
-    const { error } = await supabase.auth.verifyOtp({ email: recoveryEmail, token: otp, type: "email" });
-    if (error) { toast.error(error.message); } else { toast.success("Code verified! Set your new password."); setRecoveryStep("password"); }
-    setRecoveryLoading(false);
-  };
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPassword.length < 6) { toast.error("Password must be at least 6 characters"); return; }
-    setRecoveryLoading(true);
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) { toast.error(error.message); } else {
-      toast.success("Password updated successfully!");
-      setShowRecovery(false); setRecoveryStep("email"); setRecoveryEmail(""); setOtp(""); setNewPassword("");
-      navigate("/");
+    console.log("Sending password reset email to:", recoveryEmail);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      
+      if (error) throw error;
+      
+      console.log("Password reset email sent successfully");
+      toast.success("Password reset link sent! Check your email.");
+      setShowRecovery(false);
+      setRecoveryEmail("");
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      toast.error(error.message || "Failed to send reset email");
+    } finally {
+      setRecoveryLoading(false);
     }
-    setRecoveryLoading(false);
   };
 
   return (
@@ -142,63 +131,33 @@ const Login = () => {
       <Dialog open={showRecovery} onOpenChange={setShowRecovery}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="font-display">Reset Password</DialogTitle>
+            <DialogTitle className="font-display flex items-center gap-2">
+              <Mail className="h-5 w-5" />
+              Reset Password
+            </DialogTitle>
             <DialogDescription>
-              {recoveryStep === "email" && "Enter your email to receive a 6-digit recovery code"}
-              {recoveryStep === "otp" && "Enter the 6-digit code sent to your email"}
-              {recoveryStep === "password" && "Enter your new password"}
+              Enter your email and we'll send you a link to reset your password
             </DialogDescription>
           </DialogHeader>
 
-          {recoveryStep === "email" && (
-            <form onSubmit={handleSendOtp} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="recovery-email">Email</Label>
-                <Input id="recovery-email" type="email" placeholder="you@example.com" value={recoveryEmail} onChange={(e) => setRecoveryEmail(e.target.value)} required className="h-11" />
-              </div>
-              <Button type="submit" className="w-full h-11" disabled={recoveryLoading}>
-                {recoveryLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Send Code
-              </Button>
-            </form>
-          )}
-
-          {recoveryStep === "otp" && (
-            <form onSubmit={handleVerifyOtp} className="space-y-4">
-              <div className="space-y-2">
-                <Label>Enter 6-digit code</Label>
-                <div className="flex justify-center">
-                  <InputOTP maxLength={6} value={otp} onChange={setOtp}>
-                    <InputOTPGroup>
-                      <InputOTPSlot index={0} />
-                      <InputOTPSlot index={1} />
-                      <InputOTPSlot index={2} />
-                      <InputOTPSlot index={3} />
-                      <InputOTPSlot index={4} />
-                      <InputOTPSlot index={5} />
-                    </InputOTPGroup>
-                  </InputOTP>
-                </div>
-              </div>
-              <Button type="submit" className="w-full h-11" disabled={recoveryLoading}>
-                {recoveryLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Verify Code
-              </Button>
-            </form>
-          )}
-
-          {recoveryStep === "password" && (
-            <form onSubmit={handleResetPassword} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="new-password">New Password</Label>
-                <Input id="new-password" type="password" placeholder="••••••••" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} required minLength={6} className="h-11" />
-              </div>
-              <Button type="submit" className="w-full h-11" disabled={recoveryLoading}>
-                {recoveryLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Reset Password
-              </Button>
-            </form>
-          )}
+          <form onSubmit={handleSendResetEmail} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="recovery-email">Email</Label>
+              <Input 
+                id="recovery-email" 
+                type="email" 
+                placeholder="you@example.com" 
+                value={recoveryEmail} 
+                onChange={(e) => setRecoveryEmail(e.target.value)} 
+                required 
+                className="h-11" 
+              />
+            </div>
+            <Button type="submit" className="w-full h-11" disabled={recoveryLoading}>
+              {recoveryLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Send Reset Link
+            </Button>
+          </form>
         </DialogContent>
       </Dialog>
     </AuthLayout>
