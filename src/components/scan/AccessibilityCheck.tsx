@@ -94,7 +94,9 @@ export function AccessibilityCheck({ imageUrl, onComplete, onBack }: Accessibili
 
       // Load image onto canvas
       const img = new Image();
-      img.crossOrigin = "anonymous";
+      if (!imageUrl.startsWith("data:")) {
+        img.crossOrigin = "anonymous";
+      }
 
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
