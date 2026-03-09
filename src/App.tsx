@@ -23,6 +23,7 @@ const AdminReports = lazy(() => import("./pages/AdminReports"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Terms = lazy(() => import("./pages/Terms"));
 const DMCA = lazy(() => import("./pages/DMCA"));
+const Privacy = lazy(() => import("./pages/Privacy"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -98,6 +99,7 @@ const App = () => (
                     <Route path="/reset-password" element={<ResetPassword />} />
                     <Route path="/terms" element={<Terms />} />
                     <Route path="/dmca" element={<DMCA />} />
+                    <Route path="/privacy" element={<Privacy />} />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Suspense>
