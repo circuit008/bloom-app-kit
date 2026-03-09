@@ -5,17 +5,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
-import { Save, Key, Link as LinkIcon, Loader2, CheckCircle2 } from "lucide-react";
+import { Save, Key, Link as LinkIcon, Loader2, CheckCircle2, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
 
 const Settings = () => {
+  const { user } = useAuth();
   const [shopUrl, setShopUrl] = useState("");
   const [apiKey, setApiKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordLoading, setPasswordLoading] = useState(false);
 
   useEffect(() => {
     loadCredentials();
@@ -86,6 +94,59 @@ const Settings = () => {
       setIsConnected(true);
     }
     setSaving(false);
+  };
+
+  const handlePasswordChange = async () => {
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      toast.error("Please fill in all password fields");
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      toast.error("New password must be at least 6 characters");
+      return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match");
+      return;
+    }
+
+    setPasswordLoading(true);
+    console.log("Password change: verifying current password");
+
+    try {
+      // First verify current password by trying to sign in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user?.email || "",
+        password: currentPassword
+      });
+
+      if (signInError) {
+        toast.error("Current password is incorrect");
+        setPasswordLoading(false);
+        return;
+      }
+
+      // Update to new password
+      console.log("Password change: updating to new password");
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword
+      });
+
+      if (updateError) throw updateError;
+
+      console.log("Password change: success");
+      toast.success("Password updated successfully!");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      console.error("Password change error:", error);
+      toast.error(error.message || "Failed to update password");
+    } finally {
+      setPasswordLoading(false);
+    }
   };
 
   return (
@@ -189,6 +250,71 @@ const Settings = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Password Change */}
+      <Card className="border-border bg-card">
+        <CardHeader>
+          <div className="flex items-center gap-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+              <Lock className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <CardTitle className="text-foreground">Change Password</CardTitle>
+              <CardDescription className="text-muted-foreground">Update your account password</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="current-password" className="text-foreground">Current Password</Label>
+            <Input
+              id="current-password"
+              type="password"
+              placeholder="Enter current password"
+              className="bg-secondary border-border text-foreground"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              disabled={passwordLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="new-password" className="text-foreground">New Password</Label>
+            <Input
+              id="new-password"
+              type="password"
+              placeholder="Enter new password (min 6 characters)"
+              className="bg-secondary border-border text-foreground"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              disabled={passwordLoading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm-new-password" className="text-foreground">Confirm New Password</Label>
+            <Input
+              id="confirm-new-password"
+              type="password"
+              placeholder="Confirm new password"
+              className="bg-secondary border-border text-foreground"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              disabled={passwordLoading}
+            />
+          </div>
+          <Button 
+            onClick={handlePasswordChange}
+            disabled={passwordLoading}
+            className="w-full sm:w-auto"
+          >
+            {passwordLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Lock className="mr-2 h-4 w-4" />
+            )}
+            Update Password
+          </Button>
+        </CardContent>
+      </Card>
 
       {/* Preferences */}
       <Card className="border-border bg-card">
