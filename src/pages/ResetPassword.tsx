@@ -17,26 +17,45 @@ const ResetPassword = () => {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    // Check if user came from password reset email
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      // Check URL hash for recovery token
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const type = hashParams.get("type");
-      
-      console.log("Reset password: checking session", { session: !!session, type });
-      
-      if (type === "recovery" || session) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      console.log("Reset password: auth event", event);
+      if (event === "PASSWORD_RECOVERY") {
         setIsValidSession(true);
-      } else {
-        toast.error("Invalid or expired reset link");
-        navigate("/login");
+        setChecking(false);
       }
-      setChecking(false);
+    });
+
+    // Also check if already in a valid session (e.g. page refresh)
+    const checkExisting = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        setIsValidSession(true);
+      }
+      // Give onAuthStateChange a moment to fire before giving up
+      setTimeout(() => {
+        setChecking((prev) => {
+          // Only redirect if still checking (no event fired)
+          return prev;
+        });
+      }, 2000);
     };
-    
-    checkSession();
+    checkExisting();
+
+    // Timeout fallback: if nothing happens in 3s, redirect
+    const timeout = setTimeout(() => {
+      setChecking((prev) => {
+        if (prev) {
+          toast.error("Invalid or expired reset link");
+          navigate("/");
+        }
+        return false;
+      });
+    }, 3000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, [navigate]);
 
   const handleResetPassword = async (e: React.FormEvent) => {
