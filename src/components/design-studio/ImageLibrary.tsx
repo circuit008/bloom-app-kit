@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ProtectedImage } from "@/components/shared/ProtectedImage";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
