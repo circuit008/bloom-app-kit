@@ -38,24 +38,27 @@ const Login = () => {
     }
   };
 
+  // SIGNIN FUNCTION - Uses supabase.auth.signInWithPassword()
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("🔐 Login: Starting signin process");
+    console.log('Signin attempt:', email);
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      console.log('Signin result:', data, error);
+      
       if (error) throw error;
       
       // Clear form state
       setEmail("");
       setPassword("");
       
-      console.log("🔐 Login: Signin successful");
+      console.log('Signin: Success, redirecting to dashboard');
       toast.success("Logged in successfully!");
       navigate("/");
     } catch (error: any) {
-      console.error("🔐 Login: Signin error:", error);
+      console.error('Signin error:', error);
       if (error.message?.includes("Invalid login credentials")) {
         toast.error("Invalid email or password. Please check and try again.");
       } else if (error.message?.includes("Email not confirmed")) {
