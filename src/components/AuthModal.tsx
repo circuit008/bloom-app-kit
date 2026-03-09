@@ -194,29 +194,90 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
           </Button>
         </form>
 
-        <div className="text-center text-sm text-muted-foreground mt-2">
-          {mode === "login" ? (
-            <>
-              Don't have an account?{" "}
-              <button
-                onClick={() => setMode("signup")}
-                className="text-primary font-medium hover:underline"
-              >
-                Sign up
-              </button>
-            </>
-          ) : (
-            <>
-              Already have an account?{" "}
-              <button
-                onClick={() => setMode("login")}
-                className="text-primary font-medium hover:underline"
-              >
-                Sign in
-              </button>
-            </>
-          )}
-        </div>
+        {/* Forgot Password Link - Only show in login mode */}
+        {mode === "login" && !showRecovery && (
+          <div className="text-center text-sm mt-2">
+            <button
+              onClick={() => setShowRecovery(true)}
+              className="text-primary font-medium hover:underline"
+            >
+              Forgot your password?
+            </button>
+          </div>
+        )}
+
+        {/* Password Recovery Form */}
+        {showRecovery && (
+          <div className="border-t pt-4 mt-4">
+            <h3 className="text-lg font-semibold mb-2">Reset Password</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              Enter your email and we'll send you a reset link
+            </p>
+            <form onSubmit={handleSendResetEmail} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="recovery-email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="recovery-email"
+                    type="email"
+                    placeholder="you@example.com"
+                    value={recoveryEmail}
+                    onChange={(e) => setRecoveryEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button type="submit" disabled={recoveryLoading} className="flex-1">
+                  {recoveryLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    "Send Reset Link"
+                  )}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => {
+                    setShowRecovery(false);
+                    setRecoveryEmail("");
+                  }}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Mode Toggle - Hide when showing recovery form */}
+        {!showRecovery && (
+          <div className="text-center text-sm text-muted-foreground mt-2">
+            {mode === "login" ? (
+              <>
+                Don't have an account?{" "}
+                <button
+                  onClick={() => setMode("signup")}
+                  className="text-primary font-medium hover:underline"
+                >
+                  Sign up
+                </button>
+              </>
+            ) : (
+              <>
+                Already have an account?{" "}
+                <button
+                  onClick={() => setMode("login")}
+                  className="text-primary font-medium hover:underline"
+                >
+                  Sign in
+                </button>
+              </>
+            )}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
