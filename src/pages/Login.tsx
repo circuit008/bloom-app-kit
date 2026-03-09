@@ -71,36 +71,29 @@ const Login = () => {
     }
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  // Send password reset email with link
+  const handleSendResetEmail = async (e: React.FormEvent) => {
     e.preventDefault();
     setRecoveryLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, { redirectTo: `${window.location.origin}/login` });
-    if (error) { toast.error(error.message); setRecoveryLoading(false); return; }
-    const { error: otpError } = await supabase.auth.signInWithOtp({ email: recoveryEmail, options: { shouldCreateUser: false } });
-    if (otpError) { toast.error(otpError.message); } else { toast.success("6-digit code sent to your email!"); setRecoveryStep("otp"); }
-    setRecoveryLoading(false);
-  };
-
-  const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.length !== 6) { toast.error("Please enter a valid 6-digit code"); return; }
-    setRecoveryLoading(true);
-    const { error } = await supabase.auth.verifyOtp({ email: recoveryEmail, token: otp, type: "email" });
-    if (error) { toast.error(error.message); } else { toast.success("Code verified! Set your new password."); setRecoveryStep("password"); }
-    setRecoveryLoading(false);
-  };
-
-  const handleResetPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPassword.length < 6) { toast.error("Password must be at least 6 characters"); return; }
-    setRecoveryLoading(true);
-    const { error } = await supabase.auth.updateUser({ password: newPassword });
-    if (error) { toast.error(error.message); } else {
-      toast.success("Password updated successfully!");
-      setShowRecovery(false); setRecoveryStep("email"); setRecoveryEmail(""); setOtp(""); setNewPassword("");
-      navigate("/");
+    console.log("Sending password reset email to:", recoveryEmail);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      
+      if (error) throw error;
+      
+      console.log("Password reset email sent successfully");
+      toast.success("Password reset link sent! Check your email.");
+      setShowRecovery(false);
+      setRecoveryEmail("");
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      toast.error(error.message || "Failed to send reset email");
+    } finally {
+      setRecoveryLoading(false);
     }
-    setRecoveryLoading(false);
   };
 
   return (
