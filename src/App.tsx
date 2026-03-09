@@ -21,6 +21,8 @@ const About = lazy(() => import("./pages/About"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const AdminReports = lazy(() => import("./pages/AdminReports"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const Terms = lazy(() => import("./pages/Terms"));
+const DMCA = lazy(() => import("./pages/DMCA"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
