@@ -101,7 +101,7 @@ export const ImageLibrary = ({ onSelectImage }: ImageLibraryProps) => {
         {images.map((image) => (
           <Card key={image.id} className="overflow-hidden group">
             <CardContent className="p-0 relative">
-              <img
+              <ProtectedImage
                 src={image.image_url}
                 alt={image.title}
                 className="w-full h-32 object-cover"
