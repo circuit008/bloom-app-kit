@@ -99,6 +99,31 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
     }
   };
 
+  // Send password reset email with link
+  const handleSendResetEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setRecoveryLoading(true);
+    console.log("Sending password reset email to:", recoveryEmail);
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(recoveryEmail, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      
+      if (error) throw error;
+      
+      console.log("Password reset email sent successfully");
+      toast.success("Password reset link sent! Check your email.");
+      setShowRecovery(false);
+      setRecoveryEmail("");
+    } catch (error: any) {
+      console.error("Password reset error:", error);
+      toast.error(error.message || "Failed to send reset email");
+    } finally {
+      setRecoveryLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
