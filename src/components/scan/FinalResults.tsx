@@ -280,6 +280,13 @@ export function FinalResults({ ipResult, accessibilityResult, qualityResult, tra
         </Card>
       )}
 
+      {/* Legal Disclaimer */}
+      <div className="rounded-lg border border-muted bg-muted/30 p-4 text-xs text-muted-foreground leading-relaxed">
+        <strong>⚠️ Disclaimer:</strong> POD Guard provides compliance scanning on a best-effort basis. Results are for informational purposes only and do <strong>not</strong> constitute legal advice. We recommend consulting a qualified intellectual property attorney before making business decisions based on these results. See our{" "}
+        <a href="/terms" target="_blank" className="text-primary underline">Terms & Conditions</a>{" "}and{" "}
+        <a href="/dmca" target="_blank" className="text-primary underline">DMCA Policy</a>.
+      </div>
+
       {/* Restart */}
       <div className="flex gap-3 print:hidden">
         <Button variant="outline" onClick={onRestart}>Scan Another Design</Button>

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { AuthLayout } from "@/components/shared/AuthLayout";
@@ -17,6 +18,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const handleGoogleSignup = async () => {
     setGoogleLoading(true);
@@ -92,7 +94,20 @@ const Signup = () => {
             <Label htmlFor="password">Password</Label>
             <Input id="password" type="password" placeholder="••••••••" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="h-11" />
           </div>
-          <Button type="submit" className="w-full h-11" disabled={loading}>
+          <div className="flex items-start gap-3">
+            <Checkbox
+              id="terms-signup"
+              checked={termsAccepted}
+              onCheckedChange={(v) => setTermsAccepted(v === true)}
+            />
+            <Label htmlFor="terms-signup" className="text-sm leading-relaxed cursor-pointer">
+              I agree to the{" "}
+              <Link to="/terms" className="text-primary underline" target="_blank">Terms & Conditions</Link>{" "}
+              and{" "}
+              <Link to="/privacy" className="text-primary underline" target="_blank">Privacy Policy</Link>.
+            </Label>
+          </div>
+          <Button type="submit" className="w-full h-11" disabled={loading || !termsAccepted}>
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Create Account
           </Button>
