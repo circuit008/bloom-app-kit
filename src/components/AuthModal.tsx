@@ -18,29 +18,84 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSignup = async () => {
+    console.log("🔐 AuthModal: Starting signup process");
     setLoading(true);
 
     try {
-      if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        if (error) throw error;
-        toast.success("Check your email to confirm your account!");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        toast.success("Welcome back!");
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      
+      if (error) throw error;
+      
+      // Clear form state
+      setEmail("");
+      setPassword("");
+      
+      // Check if email confirmation is disabled (user is auto-confirmed)
+      if (data.user?.email_confirmed_at) {
+        console.log("🔐 AuthModal: User auto-confirmed, logging in");
+        toast.success("Account created and logged in!");
         onOpenChange(false);
+      } else {
+        console.log("🔐 AuthModal: Email confirmation required");
+        toast.success("Account created! Please check your email to verify.");
       }
     } catch (error: any) {
-      toast.error(error.message || "Authentication failed");
+      console.error("🔐 AuthModal: Signup error:", error);
+      if (error.message?.includes("already registered")) {
+        toast.error("Email already registered. Please try signing in instead.");
+      } else {
+        toast.error(error.message || "Signup failed");
+      }
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSignin = async () => {
+    console.log("🔐 AuthModal: Starting signin process");
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ 
+        email, 
+        password 
+      });
+      
+      if (error) throw error;
+      
+      // Clear form state
+      setEmail("");
+      setPassword("");
+      
+      console.log("🔐 AuthModal: Signin successful");
+      toast.success("Welcome back!");
+      onOpenChange(false);
+    } catch (error: any) {
+      console.error("🔐 AuthModal: Signin error:", error);
+      if (error.message?.includes("Invalid login credentials")) {
+        toast.error("Invalid email or password. Please try again.");
+      } else if (error.message?.includes("Email not confirmed")) {
+        toast.error("Please check your email and confirm your account first.");
+      } else {
+        toast.error(error.message || "Sign in failed");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (mode === "signup") {
+      await handleSignup();
+    } else {
+      await handleSignin();
     }
   };
 
