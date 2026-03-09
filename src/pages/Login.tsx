@@ -40,10 +40,32 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🔐 Login: Starting signin process");
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { toast.error(error.message); } else { toast.success("Logged in successfully!"); navigate("/"); }
-    setLoading(false);
+
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      
+      // Clear form state
+      setEmail("");
+      setPassword("");
+      
+      console.log("🔐 Login: Signin successful");
+      toast.success("Logged in successfully!");
+      navigate("/");
+    } catch (error: any) {
+      console.error("🔐 Login: Signin error:", error);
+      if (error.message?.includes("Invalid login credentials")) {
+        toast.error("Invalid email or password. Please check and try again.");
+      } else if (error.message?.includes("Email not confirmed")) {
+        toast.error("Please verify your email before signing in.");
+      } else {
+        toast.error(error.message || "Sign in failed");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSendOtp = async (e: React.FormEvent) => {
