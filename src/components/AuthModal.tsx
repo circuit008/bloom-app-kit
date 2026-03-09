@@ -18,8 +18,9 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // SIGNUP FUNCTION - Uses supabase.auth.signUp()
   const handleSignup = async () => {
-    console.log("🔐 AuthModal: Starting signup process");
+    console.log('Signup attempt:', email);
     setLoading(true);
 
     try {
@@ -29,6 +30,8 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
         options: { emailRedirectTo: window.location.origin },
       });
       
+      console.log('Signup result:', data, error);
+      
       if (error) throw error;
       
       // Clear form state
@@ -37,15 +40,15 @@ export const AuthModal = ({ open, onOpenChange }: AuthModalProps) => {
       
       // Check if email confirmation is disabled (user is auto-confirmed)
       if (data.user?.email_confirmed_at) {
-        console.log("🔐 AuthModal: User auto-confirmed, logging in");
+        console.log('Signup: User auto-confirmed, redirecting...');
         toast.success("Account created and logged in!");
         onOpenChange(false);
       } else {
-        console.log("🔐 AuthModal: Email confirmation required");
+        console.log('Signup: Email confirmation required');
         toast.success("Account created! Please check your email to verify.");
       }
     } catch (error: any) {
-      console.error("🔐 AuthModal: Signup error:", error);
+      console.error('Signup error:', error);
       if (error.message?.includes("already registered")) {
         toast.error("Email already registered. Please try signing in instead.");
       } else {
