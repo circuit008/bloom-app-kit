@@ -140,7 +140,7 @@ export function FinalResults({ reverseImageResult, ipResult, accessibilityResult
                 }
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                Weighted score: IP (30%) + Quality (30%) + Accessibility (25%) + Transparency (15%)
+                Weighted score: Image Search (20%) + IP (25%) + Quality (25%) + Accessibility (20%) + Transparency (10%)
               </p>
               {saved && <p className="text-xs text-muted-foreground mt-1">✓ Results saved to your account</p>}
             </div>
