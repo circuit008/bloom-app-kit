@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Trophy, AlertTriangle, Download, Share2, Printer, ExternalLink, CheckCircle2, XCircle, Shield, Eye, Ruler, Leaf, RotateCcw } from "lucide-react";
+import { Trophy, AlertTriangle, Download, Share2, Printer, ExternalLink, CheckCircle2, XCircle, Shield, Eye, Ruler, Leaf, RotateCcw, Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,11 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AdBanner } from "@/components/shared/AdBanner";
 import type { IPCheckResult } from "./IPResultsCard";
+import type { ReverseImageResult } from "./ReverseImageSearch";
 import type { AccessibilityResult } from "./AccessibilityCheck";
 import type { QualityResult } from "./QualityCheck";
 import type { TransparencyResult } from "./TransparencyCheck";
 
 interface FinalResultsProps {
+  reverseImageResult: ReverseImageResult;
   ipResult: IPCheckResult;
   accessibilityResult: AccessibilityResult;
   qualityResult: QualityResult;
@@ -59,14 +61,15 @@ function ScoreBar({ label, score, icon: Icon, weight }: { label: string; score: 
   );
 }
 
-export function FinalResults({ ipResult, accessibilityResult, qualityResult, transparencyResult, keywords, onRestart }: FinalResultsProps) {
+export function FinalResults({ reverseImageResult, ipResult, accessibilityResult, qualityResult, transparencyResult, keywords, onRestart }: FinalResultsProps) {
   const [saved, setSaved] = useState(false);
 
   const overall = Math.round(
-    ipResult.score * 0.30 +
-    accessibilityResult.score * 0.25 +
-    qualityResult.score * 0.30 +
-    transparencyResult.score * 0.15
+    reverseImageResult.score * 0.20 +
+    ipResult.score * 0.25 +
+    accessibilityResult.score * 0.20 +
+    qualityResult.score * 0.25 +
+    transparencyResult.score * 0.10
   );
   const passed = overall >= 70;
   const overallColor = overall >= 80 ? "text-success" : overall >= 50 ? "text-warning" : "text-destructive";
@@ -94,7 +97,7 @@ export function FinalResults({ ipResult, accessibilityResult, qualityResult, tra
   }, []);
 
   const handleShare = () => {
-    const text = `Design Compliance Score: ${overall}/100 (${passed ? "PASS ✅" : "FAIL ❌"}) — IP: ${ipResult.score}, Accessibility: ${accessibilityResult.score}, Quality: ${qualityResult.score}, Transparency: ${transparencyResult.score}`;
+    const text = `Design Compliance Score: ${overall}/100 (${passed ? "PASS ✅" : "FAIL ❌"}) — Image Search: ${reverseImageResult.score}, IP: ${ipResult.score}, Accessibility: ${accessibilityResult.score}, Quality: ${qualityResult.score}, Transparency: ${transparencyResult.score}`;
     navigator.clipboard.writeText(text);
     toast.success("Results copied to clipboard!");
   };
@@ -105,6 +108,7 @@ export function FinalResults({ ipResult, accessibilityResult, qualityResult, tra
 
   // Build issue checklist for failures
   const issues: { label: string; fixed: boolean }[] = [];
+  if (reverseImageResult.score < 70) issues.push({ label: `Copyright concern: ${reverseImageResult.matches.length} similar image(s) found in database`, fixed: false });
   if (ipResult.score < 70) issues.push({ label: `Fix IP issues: ${ipResult.matches.length} trademark conflict(s) found`, fixed: false });
   if (accessibilityResult.score < 70) issues.push({ label: `Improve accessibility: contrast ratio ${accessibilityResult.contrastRatio.toFixed(1)}:1`, fixed: false });
   if (qualityResult.score < 70) issues.push({ label: `Increase image quality: ${qualityResult.width}×${qualityResult.height}px (min ${qualityResult.requiredWidth}×${qualityResult.requiredHeight}px)`, fixed: false });
@@ -136,7 +140,7 @@ export function FinalResults({ ipResult, accessibilityResult, qualityResult, tra
                 }
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                Weighted score: IP (30%) + Quality (30%) + Accessibility (25%) + Transparency (15%)
+                Weighted score: Image Search (20%) + IP (25%) + Quality (25%) + Accessibility (20%) + Transparency (10%)
               </p>
               {saved && <p className="text-xs text-muted-foreground mt-1">✓ Results saved to your account</p>}
             </div>
@@ -144,15 +148,17 @@ export function FinalResults({ ipResult, accessibilityResult, qualityResult, tra
 
           {/* Score Breakdown */}
           <div className="space-y-3 py-4 border-y">
-            <ScoreBar label="IP Check" score={ipResult.score} icon={Shield} weight="30%" />
-            <ScoreBar label="Quality" score={qualityResult.score} icon={Ruler} weight="30%" />
-            <ScoreBar label="Accessibility" score={accessibilityResult.score} icon={Eye} weight="25%" />
-            <ScoreBar label="Transparency" score={transparencyResult.score} icon={Leaf} weight="15%" />
+            <ScoreBar label="Image Search" score={reverseImageResult.score} icon={Search} weight="20%" />
+            <ScoreBar label="IP Check" score={ipResult.score} icon={Shield} weight="25%" />
+            <ScoreBar label="Quality" score={qualityResult.score} icon={Ruler} weight="25%" />
+            <ScoreBar label="Accessibility" score={accessibilityResult.score} icon={Eye} weight="20%" />
+            <ScoreBar label="Transparency" score={transparencyResult.score} icon={Leaf} weight="10%" />
           </div>
 
           {/* Pass/Fail Summary Row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
             {[
+              { label: "Img Search", score: reverseImageResult.score },
               { label: "IP", score: ipResult.score },
               { label: "Quality", score: qualityResult.score },
               { label: "Access.", score: accessibilityResult.score },

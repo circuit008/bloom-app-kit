@@ -10,22 +10,24 @@ import { toast } from "sonner";
 import { DesignUpload } from "@/components/scan/DesignUpload";
 import { KeywordInput } from "@/components/scan/KeywordInput";
 import { ScanProgress } from "@/components/scan/ScanProgress";
+import { ReverseImageSearch, type ReverseImageResult } from "@/components/scan/ReverseImageSearch";
 import { IPResultsCard, type IPCheckResult, type IPMatch } from "@/components/scan/IPResultsCard";
 import { AccessibilityCheck, type AccessibilityResult } from "@/components/scan/AccessibilityCheck";
 import { QualityCheck, type QualityResult } from "@/components/scan/QualityCheck";
 import { TransparencyCheck, type TransparencyResult } from "@/components/scan/TransparencyCheck";
 import { FinalResults } from "@/components/scan/FinalResults";
 
-type Phase = "upload" | "checking" | "ip-results" | "accessibility" | "quality" | "transparency" | "final";
+type Phase = "upload" | "reverse-image" | "checking" | "ip-results" | "accessibility" | "quality" | "transparency" | "final";
 
 const stepLabels: Record<Phase, { step: number; label: string }> = {
-  upload: { step: 1, label: "IP Check" },
-  checking: { step: 1, label: "IP Check" },
-  "ip-results": { step: 1, label: "IP Check" },
-  accessibility: { step: 2, label: "Accessibility" },
-  quality: { step: 3, label: "Quality" },
-  transparency: { step: 4, label: "Transparency" },
-  final: { step: 4, label: "Results" },
+  upload: { step: 1, label: "Upload" },
+  "reverse-image": { step: 2, label: "Image Search" },
+  checking: { step: 3, label: "IP Check" },
+  "ip-results": { step: 3, label: "IP Check" },
+  accessibility: { step: 4, label: "Accessibility" },
+  quality: { step: 5, label: "Quality" },
+  transparency: { step: 5, label: "Transparency" },
+  final: { step: 5, label: "Results" },
 };
 
 function getConfidence(source: string | null): "high" | "medium" | "low" {
@@ -47,6 +49,7 @@ export default function Scan() {
   const [preview, setPreview] = useState<string | null>(null);
   const [keywords, setKeywords] = useState<string[]>([]);
   const [phase, setPhase] = useState<Phase>("upload");
+  const [reverseImageResult, setReverseImageResult] = useState<ReverseImageResult | null>(null);
   const [ipResult, setIpResult] = useState<IPCheckResult | null>(null);
   const [accessibilityResult, setAccessibilityResult] = useState<AccessibilityResult | null>(null);
   const [qualityResult, setQualityResult] = useState<QualityResult | null>(null);
@@ -58,6 +61,32 @@ export default function Scan() {
     setFile(f);
     setPreview(p);
   }, []);
+
+  const handleStartScan = () => {
+    if (!preview) {
+      toast.error("Please upload an image first.");
+      return;
+    }
+    setPhase("reverse-image");
+  };
+
+  const handleReverseImageComplete = (result: ReverseImageResult) => {
+    setReverseImageResult(result);
+    setPhase("checking");
+    // Auto-run IP check after reverse image search
+    setTimeout(() => {
+      if (keywordInputRef.current) {
+        const val = keywordInputRef.current.value?.trim().replace(/,$/, "");
+        if (val && !keywords.includes(val)) {
+          const updated = [...keywords, val];
+          setKeywords(updated);
+          runIPCheckWithKeywords(updated);
+          return;
+        }
+      }
+      runIPCheckWithKeywords(keywords);
+    }, 100);
+  };
 
   const runIPCheck = async () => {
     if (keywordInputRef.current) {
@@ -75,6 +104,7 @@ export default function Scan() {
   const runIPCheckWithKeywords = async (kws: string[]) => {
     if (kws.length === 0) {
       toast.error("Please add at least one keyword to check.");
+      setPhase("upload");
       return;
     }
 
@@ -199,11 +229,13 @@ export default function Scan() {
     setFile(null);
     setPreview(null);
     setKeywords([]);
+    setReverseImageResult(null);
     setIpResult(null);
     setAccessibilityResult(null);
     setQualityResult(null);
     setTransparencyResult(null);
     setPhase("upload");
+    setScanConfirmed(false);
   };
 
   const currentStepInfo = stepLabels[phase];
@@ -222,7 +254,7 @@ export default function Scan() {
 
       <ScanProgress
         currentStep={currentStepInfo.step}
-        totalSteps={4}
+        totalSteps={5}
         stepLabel={currentStepInfo.label}
       />
 
@@ -231,7 +263,7 @@ export default function Scan() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Shield className="h-5 w-5 text-primary" />
-              Step 1: IP Copyright Check
+              Step 1: Upload Design & Keywords
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -253,13 +285,21 @@ export default function Scan() {
             </div>
 
             <div className="pt-2">
-              <Button onClick={runIPCheck} className="w-full sm:w-auto" disabled={!scanConfirmed}>
-                Run IP Check
+              <Button onClick={handleStartScan} className="w-full sm:w-auto" disabled={!scanConfirmed || !preview || keywords.length === 0}>
+                Start Scan
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {phase === "reverse-image" && preview && (
+        <ReverseImageSearch
+          imageUrl={preview}
+          onComplete={handleReverseImageComplete}
+          onBack={() => setPhase("upload")}
+        />
       )}
 
       {phase === "checking" && (
@@ -311,8 +351,9 @@ export default function Scan() {
         />
       )}
 
-      {phase === "final" && ipResult && accessibilityResult && qualityResult && transparencyResult && (
+      {phase === "final" && ipResult && reverseImageResult && accessibilityResult && qualityResult && transparencyResult && (
         <FinalResults
+          reverseImageResult={reverseImageResult}
           ipResult={ipResult}
           accessibilityResult={accessibilityResult}
           qualityResult={qualityResult}
