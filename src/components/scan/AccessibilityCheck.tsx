@@ -249,6 +249,24 @@ export function AccessibilityCheck({ imageUrl, onComplete, onBack }: Accessibili
     );
   }
 
+  if (error) {
+    return (
+      <Card>
+        <CardContent className="py-16 flex flex-col items-center gap-4">
+          <AlertTriangle className="h-10 w-10 text-destructive" />
+          <div className="text-center">
+            <p className="font-semibold">Accessibility Check Failed</p>
+            <p className="text-sm text-muted-foreground mt-1">{error}</p>
+          </div>
+          <div className="flex gap-3">
+            <Button variant="outline" onClick={onBack}>Back</Button>
+            <Button onClick={analyzeImage}>Retry</Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (!result) return null;
 
   return (
