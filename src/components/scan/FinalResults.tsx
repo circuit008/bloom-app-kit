@@ -108,6 +108,7 @@ export function FinalResults({ reverseImageResult, ipResult, accessibilityResult
 
   // Build issue checklist for failures
   const issues: { label: string; fixed: boolean }[] = [];
+  if (reverseImageResult.score < 70) issues.push({ label: `Copyright concern: ${reverseImageResult.matches.length} similar image(s) found in database`, fixed: false });
   if (ipResult.score < 70) issues.push({ label: `Fix IP issues: ${ipResult.matches.length} trademark conflict(s) found`, fixed: false });
   if (accessibilityResult.score < 70) issues.push({ label: `Improve accessibility: contrast ratio ${accessibilityResult.contrastRatio.toFixed(1)}:1`, fixed: false });
   if (qualityResult.score < 70) issues.push({ label: `Increase image quality: ${qualityResult.width}×${qualityResult.height}px (min ${qualityResult.requiredWidth}×${qualityResult.requiredHeight}px)`, fixed: false });
