@@ -7,10 +7,11 @@ interface ScanProgressProps {
 }
 
 const steps = [
-  { label: "IP Check", step: 1 },
-  { label: "Accessibility", step: 2 },
-  { label: "Quality", step: 3 },
-  { label: "Transparency", step: 4 },
+  { label: "Upload", step: 1 },
+  { label: "Image Search", step: 2 },
+  { label: "IP Check", step: 3 },
+  { label: "Accessibility", step: 4 },
+  { label: "Quality", step: 5 },
 ];
 
 export function ScanProgress({ currentStep, totalSteps, stepLabel }: ScanProgressProps) {
