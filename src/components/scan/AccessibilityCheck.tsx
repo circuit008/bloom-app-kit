@@ -62,11 +62,13 @@ function rgbToHex(r: number, g: number, b: number): string {
 
 export function AccessibilityCheck({ imageUrl, onComplete, onBack }: AccessibilityCheckProps) {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AccessibilityResult | null>(null);
   const [colorblindMode, setColorblindMode] = useState<ColorblindMode>("none");
   const [showDetails, setShowDetails] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const simCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [analysisCanvas, setAnalysisCanvas] = useState<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
     analyzeImage();
@@ -78,38 +80,48 @@ export function AccessibilityCheck({ imageUrl, onComplete, onBack }: Accessibili
     }
   }, [colorblindMode, result]);
 
+  // Copy analysis canvas to visible canvas when both are ready
+  useEffect(() => {
+    if (analysisCanvas && canvasRef.current && result) {
+      const visCanvas = canvasRef.current;
+      visCanvas.width = analysisCanvas.width;
+      visCanvas.height = analysisCanvas.height;
+      const ctx = visCanvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(analysisCanvas, 0, 0);
+      }
+    }
+  }, [analysisCanvas, result]);
+
   const analyzeImage = async () => {
     setLoading(true);
+    setError(null);
+    console.log("[Accessibility] Starting analysis for:", imageUrl?.substring(0, 80));
+
     try {
-      // Fetch accessibility rules from DB
-      const { data: rules, error } = await supabase
-        .from("accessibility_rules")
-        .select("*");
-      if (error) throw error;
-
-      const aaRule = rules?.find((r) => r.rule_name === "Normal Text AA");
-      const aaaRule = rules?.find((r) => r.rule_name === "Normal Text AAA");
-      const aaThreshold = aaRule ? Number(aaRule.min_contrast_ratio) : 4.5;
-      const aaaThreshold = aaaRule ? Number(aaaRule.min_contrast_ratio) : 7.0;
-
-      // Load image onto canvas
+      // Load image
       const img = new Image();
-      if (!imageUrl.startsWith("data:")) {
+      if (!imageUrl.startsWith("data:") && !imageUrl.startsWith("blob:")) {
         img.crossOrigin = "anonymous";
       }
 
       await new Promise<void>((resolve, reject) => {
         img.onload = () => resolve();
-        img.onerror = () => reject(new Error("Failed to load image"));
+        img.onerror = () => reject(new Error("Failed to load image. Ensure the format is PNG, JPG, JPEG, or WEBP."));
         img.src = imageUrl;
       });
 
-      const canvas = canvasRef.current!;
-      const ctx = canvas.getContext("2d")!;
+      console.log("[Accessibility] Image loaded:", img.width, "x", img.height);
+
+      // Use an offscreen canvas for analysis (not dependent on DOM ref)
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Could not create canvas context");
+
       const maxDim = 300;
       const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
-      canvas.width = img.width * scale;
-      canvas.height = img.height * scale;
+      canvas.width = Math.round(img.width * scale);
+      canvas.height = Math.round(img.height * scale);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
@@ -118,7 +130,7 @@ export function AccessibilityCheck({ imageUrl, onComplete, onBack }: Accessibili
       // Collect color samples and luminances
       const luminances: number[] = [];
       const colorCounts: Map<string, number> = new Map();
-      const step = 4; // sample every 4th pixel for speed
+      const step = 4;
 
       for (let i = 0; i < pixels.length; i += 4 * step) {
         const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
@@ -131,11 +143,13 @@ export function AccessibilityCheck({ imageUrl, onComplete, onBack }: Accessibili
         colorCounts.set(hex, (colorCounts.get(hex) || 0) + 1);
       }
 
-      // Sort luminances and get contrast between lightest and darkest quartiles
+      // Contrast between lightest and darkest regions
       luminances.sort((a, b) => a - b);
       const q1 = luminances[Math.floor(luminances.length * 0.1)];
       const q4 = luminances[Math.floor(luminances.length * 0.9)];
       const contrastRatio = getContrastRatio(q4, q1);
+
+      console.log("[Accessibility] Contrast ratio:", contrastRatio.toFixed(2) + ":1");
 
       // Dominant colors
       const sortedColors = [...colorCounts.entries()]
@@ -143,10 +157,13 @@ export function AccessibilityCheck({ imageUrl, onComplete, onBack }: Accessibili
         .slice(0, 5)
         .map(([hex]) => hex);
 
+      // WCAG thresholds (hardcoded defaults, no DB dependency)
+      const aaThreshold = 4.5;
+      const aaaThreshold = 7.0;
+
       const wcagAA = contrastRatio >= aaThreshold;
       const wcagAAA = contrastRatio >= aaaThreshold;
 
-      // Score calculation
       let score: number;
       if (contrastRatio >= aaaThreshold) {
         score = 100;
@@ -178,10 +195,14 @@ export function AccessibilityCheck({ imageUrl, onComplete, onBack }: Accessibili
         suggestions,
       };
 
+      console.log("[Accessibility] Analysis complete:", res);
+      setAnalysisCanvas(canvas);
       setResult(res);
     } catch (err: any) {
-      console.error("Accessibility analysis error:", err);
-      toast.error("Failed to analyze image accessibility");
+      console.error("[Accessibility] Error:", err);
+      const msg = err?.message || "Unknown error during accessibility analysis";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
