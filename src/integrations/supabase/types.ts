@@ -98,6 +98,36 @@ export type Database = {
         }
         Relationships: []
       }
+      copyrighted_images: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          image_hash: string
+          owner: string
+          source_url: string | null
+          term: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          image_hash: string
+          owner: string
+          source_url?: string | null
+          term: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          image_hash?: string
+          owner?: string
+          source_url?: string | null
+          term?: string
+        }
+        Relationships: []
+      }
       design_suggestions: {
         Row: {
           created_at: string
@@ -447,6 +477,30 @@ export type Database = {
           notes?: string | null
           reported_term?: string
           status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      uploaded_images: {
+        Row: {
+          id: string
+          image_hash: string
+          is_copyrighted: boolean
+          upload_date: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          image_hash: string
+          is_copyrighted?: boolean
+          upload_date?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          image_hash?: string
+          is_copyrighted?: boolean
+          upload_date?: string
           user_id?: string
         }
         Relationships: []
