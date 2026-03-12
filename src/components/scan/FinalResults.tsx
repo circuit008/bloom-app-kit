@@ -61,14 +61,15 @@ function ScoreBar({ label, score, icon: Icon, weight }: { label: string; score: 
   );
 }
 
-export function FinalResults({ ipResult, accessibilityResult, qualityResult, transparencyResult, keywords, onRestart }: FinalResultsProps) {
+export function FinalResults({ reverseImageResult, ipResult, accessibilityResult, qualityResult, transparencyResult, keywords, onRestart }: FinalResultsProps) {
   const [saved, setSaved] = useState(false);
 
   const overall = Math.round(
-    ipResult.score * 0.30 +
-    accessibilityResult.score * 0.25 +
-    qualityResult.score * 0.30 +
-    transparencyResult.score * 0.15
+    reverseImageResult.score * 0.20 +
+    ipResult.score * 0.25 +
+    accessibilityResult.score * 0.20 +
+    qualityResult.score * 0.25 +
+    transparencyResult.score * 0.10
   );
   const passed = overall >= 70;
   const overallColor = overall >= 80 ? "text-success" : overall >= 50 ? "text-warning" : "text-destructive";
