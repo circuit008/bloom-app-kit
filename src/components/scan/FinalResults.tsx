@@ -144,7 +144,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
                 }
               </div>
               <p className="text-sm text-muted-foreground mt-2">
-                Weighted score: Image Search (20%) + IP (25%) + Quality (25%) + Accessibility (20%) + Transparency (10%)
+                Weighted score: Image Search (15%) + OCR (15%) + IP (20%) + Quality (20%) + Accessibility (20%) + Transparency (10%)
               </p>
               {saved && <p className="text-xs text-muted-foreground mt-1">✓ Results saved to your account</p>}
             </div>
