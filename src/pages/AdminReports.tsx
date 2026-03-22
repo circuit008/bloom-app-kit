@@ -111,6 +111,7 @@ export default function AdminReports() {
     fetchSyncLogs();
     fetchTrademarkStats();
     fetchAnalytics();
+    fetchOCRAndFPStats();
   }, [isAdmin]);
 
   const fetchAnalytics = async () => {
