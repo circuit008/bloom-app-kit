@@ -100,7 +100,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
   }, []);
 
   const handleShare = () => {
-    const text = `Design Compliance Score: ${overall}/100 (${passed ? "PASS ✅" : "FAIL ❌"}) — Image Search: ${reverseImageResult.score}, IP: ${ipResult.score}, Accessibility: ${accessibilityResult.score}, Quality: ${qualityResult.score}, Transparency: ${transparencyResult.score}`;
+    const text = `Design Compliance Score: ${overall}/100 (${passed ? "PASS ✅" : "FAIL ❌"}) — Image Search: ${reverseImageResult.score}, OCR: ${ocrResult.score}, IP: ${ipResult.score}, Accessibility: ${accessibilityResult.score}, Quality: ${qualityResult.score}, Transparency: ${transparencyResult.score}`;
     navigator.clipboard.writeText(text);
     toast.success("Results copied to clipboard!");
   };
