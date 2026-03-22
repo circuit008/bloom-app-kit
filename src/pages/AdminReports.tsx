@@ -100,6 +100,7 @@ export default function AdminReports() {
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     scansToday: 0, scansWeek: 0, scansMonth: 0,
     totalAdImpressions: 0, topFlaggedTerms: [], affiliateClicks: 0,
+    totalOCRScans: 0, ocrFlaggedCount: 0, falsePositivesPending: 0, falsePositivesResolved: 0,
   });
 
   const isAdmin = user?.email?.includes("admin");
