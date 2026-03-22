@@ -152,9 +152,10 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
 
           {/* Score Breakdown */}
           <div className="space-y-3 py-4 border-y">
-            <ScoreBar label="Image Search" score={reverseImageResult.score} icon={Search} weight="20%" />
-            <ScoreBar label="IP Check" score={ipResult.score} icon={Shield} weight="25%" />
-            <ScoreBar label="Quality" score={qualityResult.score} icon={Ruler} weight="25%" />
+            <ScoreBar label="Image Search" score={reverseImageResult.score} icon={Search} weight="15%" />
+            <ScoreBar label="OCR Text Check" score={ocrResult.score} icon={ScanText} weight="15%" />
+            <ScoreBar label="IP Check" score={ipResult.score} icon={Shield} weight="20%" />
+            <ScoreBar label="Quality" score={qualityResult.score} icon={Ruler} weight="20%" />
             <ScoreBar label="Accessibility" score={accessibilityResult.score} icon={Eye} weight="20%" />
             <ScoreBar label="Transparency" score={transparencyResult.score} icon={Leaf} weight="10%" />
           </div>
