@@ -311,6 +311,14 @@ export default function Scan() {
         />
       )}
 
+      {phase === "ocr" && preview && (
+        <OCRCheck
+          imageUrl={preview}
+          onComplete={handleOCRComplete}
+          onBack={() => setPhase("reverse-image")}
+        />
+      )}
+
       {phase === "checking" && (
         <Card>
           <CardContent className="py-16 flex flex-col items-center gap-4">
