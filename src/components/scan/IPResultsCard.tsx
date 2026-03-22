@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ReportTrademarkModal } from "./ReportTrademarkModal";
+import { FalsePositiveReport } from "./FalsePositiveReport";
 
 export interface IPMatch {
   term: string;
@@ -238,6 +239,8 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
                     {m.description && (
                       <p className="text-xs text-muted-foreground">{m.description}</p>
                     )}
+
+                    <FalsePositiveReport flaggedTerm={m.term} />
                   </div>
                 </div>
               ))}

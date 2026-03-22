@@ -271,6 +271,88 @@ export type Database = {
         }
         Relationships: []
       }
+      false_positive_reports: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          flagged_term: string
+          id: string
+          reason: string
+          reviewed_at: string | null
+          scan_id: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          flagged_term: string
+          id?: string
+          reason?: string
+          reviewed_at?: string | null
+          scan_id?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          flagged_term?: string
+          id?: string
+          reason?: string
+          reviewed_at?: string | null
+          scan_id?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "false_positive_reports_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "scan_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ocr_results: {
+        Row: {
+          confidence: number
+          created_at: string
+          extracted_text: string
+          flagged_terms: string[]
+          id: string
+          scan_id: string | null
+          user_id: string
+        }
+        Insert: {
+          confidence?: number
+          created_at?: string
+          extracted_text?: string
+          flagged_terms?: string[]
+          id?: string
+          scan_id?: string | null
+          user_id: string
+        }
+        Update: {
+          confidence?: number
+          created_at?: string
+          extracted_text?: string
+          flagged_terms?: string[]
+          id?: string
+          scan_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_results_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "scan_results"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       print_requirements: {
         Row: {
           created_at: string

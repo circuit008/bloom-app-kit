@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle, RefreshCw, Globe, Clock, KeyRound, MapPin, Database, Timer, BarChart3, TrendingUp, Eye, MousePointer } from "lucide-react";
+import { ArrowLeft, Loader2, ShieldCheck, XCircle, CheckCircle, RefreshCw, Globe, Clock, KeyRound, MapPin, Database, Timer, BarChart3, TrendingUp, Eye, MousePointer, ScanText, Flag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +55,10 @@ interface AnalyticsData {
   totalAdImpressions: number;
   topFlaggedTerms: { term: string; count: number }[];
   affiliateClicks: number;
+  totalOCRScans: number;
+  ocrFlaggedCount: number;
+  falsePositivesPending: number;
+  falsePositivesResolved: number;
 }
 
 function statusBadge(status: string) {
@@ -96,6 +100,7 @@ export default function AdminReports() {
   const [analytics, setAnalytics] = useState<AnalyticsData>({
     scansToday: 0, scansWeek: 0, scansMonth: 0,
     totalAdImpressions: 0, topFlaggedTerms: [], affiliateClicks: 0,
+    totalOCRScans: 0, ocrFlaggedCount: 0, falsePositivesPending: 0, falsePositivesResolved: 0,
   });
 
   const isAdmin = user?.email?.includes("admin");
@@ -106,6 +111,7 @@ export default function AdminReports() {
     fetchSyncLogs();
     fetchTrademarkStats();
     fetchAnalytics();
+    fetchOCRAndFPStats();
   }, [isAdmin]);
 
   const fetchAnalytics = async () => {
@@ -140,7 +146,25 @@ export default function AdminReports() {
     const totalAdImpressions = adRes.data?.length || 0;
     const affiliateClicks = (profilesRes.data || []).reduce((sum: number, p: any) => sum + (p.affiliate_clicks || 0), 0);
 
-    setAnalytics({ scansToday, scansWeek, scansMonth, totalAdImpressions, topFlaggedTerms, affiliateClicks });
+    setAnalytics(prev => ({ ...prev, scansToday, scansWeek, scansMonth, totalAdImpressions, topFlaggedTerms, affiliateClicks }));
+  };
+
+  const fetchOCRAndFPStats = async () => {
+    const [ocrRes, fpRes] = await Promise.all([
+      supabase.from("ocr_results").select("id, flagged_terms"),
+      supabase.from("false_positive_reports").select("id, status"),
+    ]);
+
+    const ocrData = ocrRes.data || [];
+    const fpData = fpRes.data || [];
+
+    setAnalytics(prev => ({
+      ...prev,
+      totalOCRScans: ocrData.length,
+      ocrFlaggedCount: ocrData.filter((o: any) => (o.flagged_terms || []).length > 0).length,
+      falsePositivesPending: fpData.filter((f: any) => f.status === "pending").length,
+      falsePositivesResolved: fpData.filter((f: any) => f.status !== "pending").length,
+    }));
   };
 
   const fetchTrademarkStats = async () => {
@@ -337,6 +361,28 @@ export default function AdminReports() {
           { label: "Scans This Week", value: analytics.scansWeek, icon: TrendingUp, color: "text-success" },
           { label: "Ad Impressions", value: analytics.totalAdImpressions, icon: Eye, color: "text-warning" },
           { label: "Affiliate Clicks", value: analytics.affiliateClicks, icon: MousePointer, color: "text-primary" },
+        ].map((s) => (
+          <Card key={s.label}>
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                <s.icon className={`h-5 w-5 ${s.color}`} />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{s.label}</p>
+                <p className="text-2xl font-bold">{s.value}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* OCR & False Positive Stats */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: "Total OCR Scans", value: analytics.totalOCRScans, icon: ScanText, color: "text-primary" },
+          { label: "OCR Flagged", value: analytics.ocrFlaggedCount, icon: ScanText, color: "text-destructive" },
+          { label: "FP Reports Pending", value: analytics.falsePositivesPending, icon: Flag, color: "text-warning" },
+          { label: "FP Reports Resolved", value: analytics.falsePositivesResolved, icon: Flag, color: "text-success" },
         ].map((s) => (
           <Card key={s.label}>
             <CardContent className="pt-6 flex items-center gap-4">
