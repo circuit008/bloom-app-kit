@@ -368,9 +368,10 @@ export default function Scan() {
         />
       )}
 
-      {phase === "final" && ipResult && reverseImageResult && accessibilityResult && qualityResult && transparencyResult && (
+      {phase === "final" && ipResult && reverseImageResult && ocrResult && accessibilityResult && qualityResult && transparencyResult && (
         <FinalResults
           reverseImageResult={reverseImageResult}
+          ocrResult={ocrResult}
           ipResult={ipResult}
           accessibilityResult={accessibilityResult}
           qualityResult={qualityResult}
