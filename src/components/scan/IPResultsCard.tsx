@@ -239,6 +239,8 @@ export function IPResultsCard({ result, onBack }: IPResultsCardProps) {
                     {m.description && (
                       <p className="text-xs text-muted-foreground">{m.description}</p>
                     )}
+
+                    <FalsePositiveReport flaggedTerm={m.term} />
                   </div>
                 </div>
               ))}
