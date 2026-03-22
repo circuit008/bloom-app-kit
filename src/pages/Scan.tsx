@@ -52,6 +52,7 @@ export default function Scan() {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [phase, setPhase] = useState<Phase>("upload");
   const [reverseImageResult, setReverseImageResult] = useState<ReverseImageResult | null>(null);
+  const [ocrResult, setOcrResult] = useState<OCRResult | null>(null);
   const [ipResult, setIpResult] = useState<IPCheckResult | null>(null);
   const [accessibilityResult, setAccessibilityResult] = useState<AccessibilityResult | null>(null);
   const [qualityResult, setQualityResult] = useState<QualityResult | null>(null);
