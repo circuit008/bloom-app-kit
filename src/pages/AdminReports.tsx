@@ -149,6 +149,24 @@ export default function AdminReports() {
     setAnalytics(prev => ({ ...prev, scansToday, scansWeek, scansMonth, totalAdImpressions, topFlaggedTerms, affiliateClicks }));
   };
 
+  const fetchOCRAndFPStats = async () => {
+    const [ocrRes, fpRes] = await Promise.all([
+      supabase.from("ocr_results").select("id, flagged_terms"),
+      supabase.from("false_positive_reports").select("id, status"),
+    ]);
+
+    const ocrData = ocrRes.data || [];
+    const fpData = fpRes.data || [];
+
+    setAnalytics(prev => ({
+      ...prev,
+      totalOCRScans: ocrData.length,
+      ocrFlaggedCount: ocrData.filter((o: any) => (o.flagged_terms || []).length > 0).length,
+      falsePositivesPending: fpData.filter((f: any) => f.status === "pending").length,
+      falsePositivesResolved: fpData.filter((f: any) => f.status !== "pending").length,
+    }));
+  };
+
   const fetchTrademarkStats = async () => {
     const { data, error } = await supabase
       .from("trademark_database")
