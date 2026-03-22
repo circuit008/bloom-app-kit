@@ -146,7 +146,7 @@ export default function AdminReports() {
     const totalAdImpressions = adRes.data?.length || 0;
     const affiliateClicks = (profilesRes.data || []).reduce((sum: number, p: any) => sum + (p.affiliate_clicks || 0), 0);
 
-    setAnalytics({ scansToday, scansWeek, scansMonth, totalAdImpressions, topFlaggedTerms, affiliateClicks });
+    setAnalytics(prev => ({ ...prev, scansToday, scansWeek, scansMonth, totalAdImpressions, topFlaggedTerms, affiliateClicks }));
   };
 
   const fetchTrademarkStats = async () => {
