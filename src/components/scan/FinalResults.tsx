@@ -161,9 +161,10 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
           </div>
 
           {/* Pass/Fail Summary Row */}
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
+          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
             {[
               { label: "Img Search", score: reverseImageResult.score },
+              { label: "OCR", score: ocrResult.score },
               { label: "IP", score: ipResult.score },
               { label: "Quality", score: qualityResult.score },
               { label: "Access.", score: accessibilityResult.score },
