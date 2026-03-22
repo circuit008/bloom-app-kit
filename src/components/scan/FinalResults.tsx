@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Trophy, AlertTriangle, Download, Share2, Printer, ExternalLink, CheckCircle2, XCircle, Shield, Eye, Ruler, Leaf, RotateCcw, Search } from "lucide-react";
+import { Trophy, AlertTriangle, Download, Share2, Printer, ExternalLink, CheckCircle2, XCircle, Shield, Eye, Ruler, Leaf, RotateCcw, Search, ScanText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,12 +10,14 @@ import { toast } from "sonner";
 import { AdBanner } from "@/components/shared/AdBanner";
 import type { IPCheckResult } from "./IPResultsCard";
 import type { ReverseImageResult } from "./ReverseImageSearch";
+import type { OCRResult } from "./OCRCheck";
 import type { AccessibilityResult } from "./AccessibilityCheck";
 import type { QualityResult } from "./QualityCheck";
 import type { TransparencyResult } from "./TransparencyCheck";
 
 interface FinalResultsProps {
   reverseImageResult: ReverseImageResult;
+  ocrResult: OCRResult;
   ipResult: IPCheckResult;
   accessibilityResult: AccessibilityResult;
   qualityResult: QualityResult;
