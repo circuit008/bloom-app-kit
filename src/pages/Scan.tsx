@@ -263,7 +263,7 @@ export default function Scan() {
 
       <ScanProgress
         currentStep={currentStepInfo.step}
-        totalSteps={5}
+        totalSteps={6}
         stepLabel={currentStepInfo.label}
       />
 
