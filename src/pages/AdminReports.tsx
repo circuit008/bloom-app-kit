@@ -55,6 +55,10 @@ interface AnalyticsData {
   totalAdImpressions: number;
   topFlaggedTerms: { term: string; count: number }[];
   affiliateClicks: number;
+  totalOCRScans: number;
+  ocrFlaggedCount: number;
+  falsePositivesPending: number;
+  falsePositivesResolved: number;
 }
 
 function statusBadge(status: string) {
