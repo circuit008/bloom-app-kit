@@ -11,23 +11,25 @@ import { DesignUpload } from "@/components/scan/DesignUpload";
 import { KeywordInput } from "@/components/scan/KeywordInput";
 import { ScanProgress } from "@/components/scan/ScanProgress";
 import { ReverseImageSearch, type ReverseImageResult } from "@/components/scan/ReverseImageSearch";
+import { OCRCheck, type OCRResult } from "@/components/scan/OCRCheck";
 import { IPResultsCard, type IPCheckResult, type IPMatch } from "@/components/scan/IPResultsCard";
 import { AccessibilityCheck, type AccessibilityResult } from "@/components/scan/AccessibilityCheck";
 import { QualityCheck, type QualityResult } from "@/components/scan/QualityCheck";
 import { TransparencyCheck, type TransparencyResult } from "@/components/scan/TransparencyCheck";
 import { FinalResults } from "@/components/scan/FinalResults";
 
-type Phase = "upload" | "reverse-image" | "checking" | "ip-results" | "accessibility" | "quality" | "transparency" | "final";
+type Phase = "upload" | "reverse-image" | "ocr" | "checking" | "ip-results" | "accessibility" | "quality" | "transparency" | "final";
 
 const stepLabels: Record<Phase, { step: number; label: string }> = {
   upload: { step: 1, label: "Upload" },
   "reverse-image": { step: 2, label: "Image Search" },
-  checking: { step: 3, label: "IP Check" },
-  "ip-results": { step: 3, label: "IP Check" },
-  accessibility: { step: 4, label: "Accessibility" },
-  quality: { step: 5, label: "Quality" },
-  transparency: { step: 5, label: "Transparency" },
-  final: { step: 5, label: "Results" },
+  ocr: { step: 3, label: "OCR Check" },
+  checking: { step: 4, label: "IP Check" },
+  "ip-results": { step: 4, label: "IP Check" },
+  accessibility: { step: 5, label: "Accessibility" },
+  quality: { step: 6, label: "Quality" },
+  transparency: { step: 6, label: "Transparency" },
+  final: { step: 6, label: "Results" },
 };
 
 function getConfidence(source: string | null): "high" | "medium" | "low" {
@@ -50,6 +52,7 @@ export default function Scan() {
   const [keywords, setKeywords] = useState<string[]>([]);
   const [phase, setPhase] = useState<Phase>("upload");
   const [reverseImageResult, setReverseImageResult] = useState<ReverseImageResult | null>(null);
+  const [ocrResult, setOcrResult] = useState<OCRResult | null>(null);
   const [ipResult, setIpResult] = useState<IPCheckResult | null>(null);
   const [accessibilityResult, setAccessibilityResult] = useState<AccessibilityResult | null>(null);
   const [qualityResult, setQualityResult] = useState<QualityResult | null>(null);
@@ -72,8 +75,13 @@ export default function Scan() {
 
   const handleReverseImageComplete = (result: ReverseImageResult) => {
     setReverseImageResult(result);
+    setPhase("ocr");
+  };
+
+  const handleOCRComplete = (result: OCRResult) => {
+    setOcrResult(result);
     setPhase("checking");
-    // Auto-run IP check after reverse image search
+    // Auto-run IP check after OCR
     setTimeout(() => {
       if (keywordInputRef.current) {
         const val = keywordInputRef.current.value?.trim().replace(/,$/, "");
@@ -230,6 +238,7 @@ export default function Scan() {
     setPreview(null);
     setKeywords([]);
     setReverseImageResult(null);
+    setOcrResult(null);
     setIpResult(null);
     setAccessibilityResult(null);
     setQualityResult(null);
@@ -254,7 +263,7 @@ export default function Scan() {
 
       <ScanProgress
         currentStep={currentStepInfo.step}
-        totalSteps={5}
+        totalSteps={6}
         stepLabel={currentStepInfo.label}
       />
 
@@ -299,6 +308,14 @@ export default function Scan() {
           imageUrl={preview}
           onComplete={handleReverseImageComplete}
           onBack={() => setPhase("upload")}
+        />
+      )}
+
+      {phase === "ocr" && preview && (
+        <OCRCheck
+          imageUrl={preview}
+          onComplete={handleOCRComplete}
+          onBack={() => setPhase("reverse-image")}
         />
       )}
 
@@ -351,9 +368,10 @@ export default function Scan() {
         />
       )}
 
-      {phase === "final" && ipResult && reverseImageResult && accessibilityResult && qualityResult && transparencyResult && (
+      {phase === "final" && ipResult && reverseImageResult && ocrResult && accessibilityResult && qualityResult && transparencyResult && (
         <FinalResults
           reverseImageResult={reverseImageResult}
+          ocrResult={ocrResult}
           ipResult={ipResult}
           accessibilityResult={accessibilityResult}
           qualityResult={qualityResult}
