@@ -376,6 +376,28 @@ export default function AdminReports() {
         ))}
       </div>
 
+      {/* OCR & False Positive Stats */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: "Total OCR Scans", value: analytics.totalOCRScans, icon: ScanText, color: "text-primary" },
+          { label: "OCR Flagged", value: analytics.ocrFlaggedCount, icon: ScanText, color: "text-destructive" },
+          { label: "FP Reports Pending", value: analytics.falsePositivesPending, icon: Flag, color: "text-warning" },
+          { label: "FP Reports Resolved", value: analytics.falsePositivesResolved, icon: Flag, color: "text-success" },
+        ].map((s) => (
+          <Card key={s.label}>
+            <CardContent className="pt-6 flex items-center gap-4">
+              <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                <s.icon className={`h-5 w-5 ${s.color}`} />
+              </div>
+              <div>
+                <p className="text-sm text-muted-foreground">{s.label}</p>
+                <p className="text-2xl font-bold">{s.value}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       {/* Top Flagged Terms */}
       {analytics.topFlaggedTerms.length > 0 && (
         <Card>
