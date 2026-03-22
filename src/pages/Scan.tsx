@@ -75,8 +75,13 @@ export default function Scan() {
 
   const handleReverseImageComplete = (result: ReverseImageResult) => {
     setReverseImageResult(result);
+    setPhase("ocr");
+  };
+
+  const handleOCRComplete = (result: OCRResult) => {
+    setOcrResult(result);
     setPhase("checking");
-    // Auto-run IP check after reverse image search
+    // Auto-run IP check after OCR
     setTimeout(() => {
       if (keywordInputRef.current) {
         const val = keywordInputRef.current.value?.trim().replace(/,$/, "");
