@@ -11,23 +11,25 @@ import { DesignUpload } from "@/components/scan/DesignUpload";
 import { KeywordInput } from "@/components/scan/KeywordInput";
 import { ScanProgress } from "@/components/scan/ScanProgress";
 import { ReverseImageSearch, type ReverseImageResult } from "@/components/scan/ReverseImageSearch";
+import { OCRCheck, type OCRResult } from "@/components/scan/OCRCheck";
 import { IPResultsCard, type IPCheckResult, type IPMatch } from "@/components/scan/IPResultsCard";
 import { AccessibilityCheck, type AccessibilityResult } from "@/components/scan/AccessibilityCheck";
 import { QualityCheck, type QualityResult } from "@/components/scan/QualityCheck";
 import { TransparencyCheck, type TransparencyResult } from "@/components/scan/TransparencyCheck";
 import { FinalResults } from "@/components/scan/FinalResults";
 
-type Phase = "upload" | "reverse-image" | "checking" | "ip-results" | "accessibility" | "quality" | "transparency" | "final";
+type Phase = "upload" | "reverse-image" | "ocr" | "checking" | "ip-results" | "accessibility" | "quality" | "transparency" | "final";
 
 const stepLabels: Record<Phase, { step: number; label: string }> = {
   upload: { step: 1, label: "Upload" },
   "reverse-image": { step: 2, label: "Image Search" },
-  checking: { step: 3, label: "IP Check" },
-  "ip-results": { step: 3, label: "IP Check" },
-  accessibility: { step: 4, label: "Accessibility" },
-  quality: { step: 5, label: "Quality" },
-  transparency: { step: 5, label: "Transparency" },
-  final: { step: 5, label: "Results" },
+  ocr: { step: 3, label: "OCR Check" },
+  checking: { step: 4, label: "IP Check" },
+  "ip-results": { step: 4, label: "IP Check" },
+  accessibility: { step: 5, label: "Accessibility" },
+  quality: { step: 6, label: "Quality" },
+  transparency: { step: 6, label: "Transparency" },
+  final: { step: 6, label: "Results" },
 };
 
 function getConfidence(source: string | null): "high" | "medium" | "low" {
