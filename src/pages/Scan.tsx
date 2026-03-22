@@ -238,6 +238,7 @@ export default function Scan() {
     setPreview(null);
     setKeywords([]);
     setReverseImageResult(null);
+    setOcrResult(null);
     setIpResult(null);
     setAccessibilityResult(null);
     setQualityResult(null);
