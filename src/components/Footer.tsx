@@ -1,8 +1,11 @@
 import { Link } from "react-router-dom";
 import { Shield, Github, Linkedin, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/hooks/useLanguage";
 
 export function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="border-t bg-card print:hidden" role="contentinfo">
       <div className="container py-10 space-y-8">
@@ -20,7 +23,7 @@ export function Footer() {
             </p>
             <div className="flex items-center gap-1 text-xs text-muted-foreground">
               <MapPin className="h-3 w-3" aria-hidden="true" />
-              Built in Montréal 🇨🇦
+              {t("builtInMontreal")}
             </div>
           </div>
 
@@ -28,10 +31,11 @@ export function Footer() {
           <div className="space-y-3">
             <h3 className="text-sm font-semibold">Product</h3>
             <nav className="flex flex-col gap-2 text-sm text-muted-foreground" aria-label="Product links">
-              <Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
-              <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
-              <Link to="/dashboard" className="hover:text-foreground transition-colors">Dashboard</Link>
-              <Link to="/scan" className="hover:text-foreground transition-colors">New Scan</Link>
+              <Link to="/pricing" className="hover:text-foreground transition-colors">{t("pricing")}</Link>
+              <Link to="/about" className="hover:text-foreground transition-colors">{t("about")}</Link>
+              <Link to="/dashboard" className="hover:text-foreground transition-colors">{t("dashboard")}</Link>
+              <Link to="/scan" className="hover:text-foreground transition-colors">{t("newScan")}</Link>
+              <Link to="/batch-scan" className="hover:text-foreground transition-colors">{t("batchScan")}</Link>
             </nav>
           </div>
 
@@ -50,22 +54,10 @@ export function Footer() {
           <div className="space-y-3">
             <h3 className="text-sm font-semibold">Connect</h3>
             <div className="flex gap-2">
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center hover:bg-accent transition-colors"
-                aria-label="GitHub"
-              >
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center hover:bg-accent transition-colors" aria-label="GitHub">
                 <Github className="h-4 w-4" />
               </a>
-              <a
-                href="https://linkedin.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center hover:bg-accent transition-colors"
-                aria-label="LinkedIn"
-              >
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="h-9 w-9 rounded-lg bg-muted flex items-center justify-center hover:bg-accent transition-colors" aria-label="LinkedIn">
                 <Linkedin className="h-4 w-4" />
               </a>
             </div>
@@ -78,8 +70,14 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Bill 96 Badge + Copyright */}
         <div className="border-t pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} POD Guard. All rights reserved.</p>
+          <div className="flex items-center gap-3">
+            <p>© {new Date().getFullYear()} POD Guard. All rights reserved.</p>
+            <Badge variant="outline" className="text-xs bg-primary/5 text-primary border-primary/20">
+              {t("bill96Badge")}
+            </Badge>
+          </div>
           <p>A college capstone project — built with ❤️ in Montréal</p>
         </div>
       </div>
