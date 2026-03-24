@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Shield, Upload, BarChart3, Clock, ArrowRight, ShieldCheck, Trophy, TrendingUp, Star, Settings, KeyRound, Trash2 } from "lucide-react";
+import { Shield, Upload, BarChart3, Clock, ArrowRight, ShieldCheck, Trophy, TrendingUp, Star, Settings, KeyRound, Trash2, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfile } from "@/hooks/useProfile";
+import { useLanguage } from "@/hooks/useLanguage";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { AdBanner } from "@/components/shared/AdBanner";
@@ -26,6 +27,7 @@ interface ScanRow {
 export default function Dashboard() {
   const { user } = useAuth();
   const { profile, isPro } = useProfile();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,10 +53,10 @@ export default function Dashboard() {
   const lastScan = scans[0] ? new Date(scans[0].created_at).toLocaleDateString() : "Never";
 
   const stats = [
-    { label: "Total Scans", value: String(totalScans), icon: BarChart3, color: "text-primary" },
-    { label: "Pass Rate", value: `${passRate}%`, icon: Trophy, color: "text-success" },
-    { label: "Avg Score", value: String(avgScore), icon: TrendingUp, color: "text-warning" },
-    { label: "Last Scan", value: lastScan, icon: Clock, color: "text-muted-foreground" },
+    { label: t("totalScans"), value: String(totalScans), icon: BarChart3, color: "text-primary" },
+    { label: t("passRate"), value: `${passRate}%`, icon: Trophy, color: "text-success" },
+    { label: t("avgScore"), value: String(avgScore), icon: TrendingUp, color: "text-warning" },
+    { label: t("lastScan"), value: lastScan, icon: Clock, color: "text-muted-foreground" },
   ];
 
   const isAdmin = user?.email?.includes("admin");
@@ -65,7 +67,7 @@ export default function Dashboard() {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-3xl font-bold">
-              Welcome back, <span className="text-primary">{user?.email?.split("@")[0]}</span>
+              {t("welcomeBack")}, <span className="text-primary">{user?.email?.split("@")[0]}</span>
             </h1>
             {isPro && (
               <Badge className="bg-primary text-primary-foreground">
@@ -113,12 +115,10 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Dashboard Ad */}
       <div className="flex justify-center">
         <AdBanner placement="dashboard" page="dashboard" />
       </div>
 
-      {/* Admin Link */}
       {isAdmin && (
         <Card className="border-primary/30 bg-primary/5">
           <CardContent className="pt-6 flex items-center justify-between">
@@ -136,28 +136,41 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* New Scan CTA */}
-      <Card className="border-dashed">
-        <CardContent className="py-12 flex flex-col items-center text-center gap-4">
-          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
-            <Upload className="h-7 w-7 text-primary" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold">Start a New Scan</h3>
-            <p className="text-sm text-muted-foreground mt-1">Upload a design image to check for compliance issues</p>
-          </div>
-          <Button className="mt-2" onClick={() => navigate("/scan")}>
-            Upload Design <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </CardContent>
-      </Card>
+      {/* Scan CTAs */}
+      <div className="grid sm:grid-cols-2 gap-4">
+        <Card className="border-dashed">
+          <CardContent className="py-10 flex flex-col items-center text-center gap-3">
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Upload className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold">{t("startNewScan")}</h3>
+            <p className="text-sm text-muted-foreground">Upload a single design to check for compliance</p>
+            <Button className="mt-2" onClick={() => navigate("/scan")}>
+              {t("newScan")} <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="border-dashed">
+          <CardContent className="py-10 flex flex-col items-center text-center gap-3">
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Layers className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="text-lg font-semibold">{t("batchScan")}</h3>
+            <p className="text-sm text-muted-foreground">Upload 5-10 images and validate them all at once</p>
+            <Button variant="outline" className="mt-2" onClick={() => navigate("/batch-scan")}>
+              {t("batchScan")} <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Scan History */}
       {scans.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
-              <Clock className="h-5 w-5" /> Recent Scans
+              <Clock className="h-5 w-5" /> {t("recentScans")}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -181,14 +194,19 @@ export default function Dashboard() {
                     </div>
                   </div>
                   <Badge variant={scan.passed ? "default" : "destructive"} className={scan.passed ? "bg-success text-success-foreground" : ""}>
-                    {scan.passed ? "PASS" : "FAIL"}
+                    {scan.passed ? t("pass") : t("fail")}
                   </Badge>
                 </div>
               ))}
             </div>
-            <Button variant="ghost" className="w-full mt-3" onClick={() => navigate("/scan-history")}>
-              View All History <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            <div className="flex gap-3 mt-3">
+              <Button variant="ghost" className="flex-1" onClick={() => navigate("/scan-history")}>
+                {t("viewAllHistory")} <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button variant="ghost" className="flex-1" onClick={() => navigate("/design-history")}>
+                {t("designHistory")} <TrendingUp className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
