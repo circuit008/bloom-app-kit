@@ -10,6 +10,7 @@ interface UserProfile {
   total_scans: number;
   affiliate_clicks: number;
   affiliate_earnings: number;
+  preferred_language: string;
 }
 
 export function useProfile() {
