@@ -594,6 +594,7 @@ export type Database = {
           created_at: string
           display_name: string | null
           id: string
+          preferred_language: string
           privacy_accepted_at: string | null
           subscription_status: string
           terms_accepted_at: string | null
@@ -607,6 +608,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          preferred_language?: string
           privacy_accepted_at?: string | null
           subscription_status?: string
           terms_accepted_at?: string | null
@@ -620,6 +622,7 @@ export type Database = {
           created_at?: string
           display_name?: string | null
           id?: string
+          preferred_language?: string
           privacy_accepted_at?: string | null
           subscription_status?: string
           terms_accepted_at?: string | null
