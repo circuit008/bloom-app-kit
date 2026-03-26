@@ -198,7 +198,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
   const [saved, setSaved] = useState(false);
   const [sortBy, setSortBy] = useState<"price" | "eco">("price");
 
-  const { score: overall, passed, reason: failReason, capped } = calculateOverallScore(
+  const { score: overall, passed, reason: failReason, capped, copyrightScore } = calculateOverallScore(
     ipResult.score,
     accessibilityResult.score,
     qualityResult.score,
