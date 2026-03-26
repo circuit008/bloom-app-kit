@@ -91,6 +91,18 @@ const PRINT_PROVIDERS: PrintProvider[] = [
   },
 ];
 
+function calculateCopyrightScore(ipScore: number, imageSearchScore: number, ocrScore: number) {
+  const lowestCopyright = Math.min(ipScore, imageSearchScore, ocrScore);
+
+  // If reverse image search found match (< 70), copyright automatically caps
+  if (imageSearchScore < 70) {
+    return Math.min(lowestCopyright, 50);
+  }
+
+  // Weighted average of all three
+  return Math.round(ipScore * 0.50 + imageSearchScore * 0.30 + ocrScore * 0.20);
+}
+
 function calculateOverallScore(
   ip: number,
   accessibility: number,
@@ -99,34 +111,33 @@ function calculateOverallScore(
   reverseImage: number,
   ocr: number
 ) {
-  // Weighted average
-  const weighted = Math.round(
-    reverseImage * 0.15 +
-    ocr * 0.15 +
-    ip * 0.40 +
-    accessibility * 0.10 +
-    quality * 0.10 +
-    transparency * 0.10
-  );
+  const copyrightScore = calculateCopyrightScore(ip, reverseImage, ocr);
 
-  // IP score caps the maximum overall score
-  const cappedScore = Math.min(weighted, ip + 10);
-
-  // If IP is high-risk (<50), automatically fail
-  if (ip < 50) {
+  // STEP 1: Copyright gatekeeper
+  if (copyrightScore < 70) {
     return {
-      score: Math.min(cappedScore, 50),
+      score: Math.min(copyrightScore, 50),
       passed: false,
-      reason: "High-risk trademark detected — design cannot be used",
+      reason: "⚠️ Copyright risk detected. Design may infringe existing artwork.",
       capped: true,
+      copyrightScore,
     };
   }
 
+  // STEP 2: Only if copyright passes, calculate rest
+  const weighted = Math.round(
+    copyrightScore * 0.50 +
+    accessibility * 0.20 +
+    quality * 0.15 +
+    transparency * 0.15
+  );
+
   return {
-    score: Math.round(cappedScore),
-    passed: cappedScore >= 70,
-    reason: cappedScore >= 70 ? "All checks passed" : "Some checks need improvement",
-    capped: cappedScore < weighted,
+    score: Math.round(weighted),
+    passed: weighted >= 70,
+    reason: weighted >= 70 ? "All checks passed" : "Some checks need improvement",
+    capped: false,
+    copyrightScore,
   };
 }
 
