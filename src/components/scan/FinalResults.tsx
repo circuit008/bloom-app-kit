@@ -263,10 +263,10 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
 
   // Build issue checklist for failures
   const issues: { label: string; fixed: boolean }[] = [];
-  if (ipResult.score < 50) issues.push({ label: `⛔ CRITICAL: ${ipResult.matches.length} high-risk trademark(s) detected — design cannot be used`, fixed: false });
-  if (reverseImageResult.score < 70) issues.push({ label: `Copyright concern: ${reverseImageResult.matches.length} similar image(s) found`, fixed: false });
-  if (ocrResult.score < 70) issues.push({ label: `OCR detected ${ocrResult.flaggedTerms.length} trademarked text(s)`, fixed: false });
-  if (ipResult.score >= 50 && ipResult.score < 70) issues.push({ label: `Fix IP issues: ${ipResult.matches.length} trademark conflict(s)`, fixed: false });
+  if (copyrightScore < 70) issues.push({ label: `⛔ COPYRIGHT RISK: Combined copyright score ${copyrightScore}/100 — design may infringe existing artwork`, fixed: false });
+  if (ipResult.score < 50) issues.push({ label: `IP: ${ipResult.matches.length} high-risk trademark(s) detected`, fixed: false });
+  if (reverseImageResult.score < 70) issues.push({ label: `Image Search: ${reverseImageResult.matches.length} similar image(s) found`, fixed: false });
+  if (ocrResult.score < 70) issues.push({ label: `OCR: ${ocrResult.flaggedTerms.length} trademarked text(s) in image`, fixed: false });
   if (accessibilityResult.score < 70) issues.push({ label: `Improve accessibility: contrast ratio ${accessibilityResult.contrastRatio.toFixed(1)}:1`, fixed: false });
   if (qualityResult.score < 70) issues.push({ label: `Increase image quality: ${qualityResult.width}×${qualityResult.height}px`, fixed: false });
   if (transparencyResult.score < 70) issues.push({ label: `Explore certified printers in your region`, fixed: false });
