@@ -91,6 +91,18 @@ const PRINT_PROVIDERS: PrintProvider[] = [
   },
 ];
 
+function calculateCopyrightScore(ipScore: number, imageSearchScore: number, ocrScore: number) {
+  const lowestCopyright = Math.min(ipScore, imageSearchScore, ocrScore);
+
+  // If reverse image search found match (< 70), copyright automatically caps
+  if (imageSearchScore < 70) {
+    return Math.min(lowestCopyright, 50);
+  }
+
+  // Weighted average of all three
+  return Math.round(ipScore * 0.50 + imageSearchScore * 0.30 + ocrScore * 0.20);
+}
+
 function calculateOverallScore(
   ip: number,
   accessibility: number,
@@ -99,34 +111,33 @@ function calculateOverallScore(
   reverseImage: number,
   ocr: number
 ) {
-  // Weighted average
-  const weighted = Math.round(
-    reverseImage * 0.15 +
-    ocr * 0.15 +
-    ip * 0.40 +
-    accessibility * 0.10 +
-    quality * 0.10 +
-    transparency * 0.10
-  );
+  const copyrightScore = calculateCopyrightScore(ip, reverseImage, ocr);
 
-  // IP score caps the maximum overall score
-  const cappedScore = Math.min(weighted, ip + 10);
-
-  // If IP is high-risk (<50), automatically fail
-  if (ip < 50) {
+  // STEP 1: Copyright gatekeeper
+  if (copyrightScore < 70) {
     return {
-      score: Math.min(cappedScore, 50),
+      score: Math.min(copyrightScore, 50),
       passed: false,
-      reason: "High-risk trademark detected — design cannot be used",
+      reason: "⚠️ Copyright risk detected. Design may infringe existing artwork.",
       capped: true,
+      copyrightScore,
     };
   }
 
+  // STEP 2: Only if copyright passes, calculate rest
+  const weighted = Math.round(
+    copyrightScore * 0.50 +
+    accessibility * 0.20 +
+    quality * 0.15 +
+    transparency * 0.15
+  );
+
   return {
-    score: Math.round(cappedScore),
-    passed: cappedScore >= 70,
-    reason: cappedScore >= 70 ? "All checks passed" : "Some checks need improvement",
-    capped: cappedScore < weighted,
+    score: Math.round(weighted),
+    passed: weighted >= 70,
+    reason: weighted >= 70 ? "All checks passed" : "Some checks need improvement",
+    capped: false,
+    copyrightScore,
   };
 }
 
@@ -187,7 +198,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
   const [saved, setSaved] = useState(false);
   const [sortBy, setSortBy] = useState<"price" | "eco">("price");
 
-  const { score: overall, passed, reason: failReason, capped } = calculateOverallScore(
+  const { score: overall, passed, reason: failReason, capped, copyrightScore } = calculateOverallScore(
     ipResult.score,
     accessibilityResult.score,
     qualityResult.score,
@@ -252,10 +263,10 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
 
   // Build issue checklist for failures
   const issues: { label: string; fixed: boolean }[] = [];
-  if (ipResult.score < 50) issues.push({ label: `⛔ CRITICAL: ${ipResult.matches.length} high-risk trademark(s) detected — design cannot be used`, fixed: false });
-  if (reverseImageResult.score < 70) issues.push({ label: `Copyright concern: ${reverseImageResult.matches.length} similar image(s) found`, fixed: false });
-  if (ocrResult.score < 70) issues.push({ label: `OCR detected ${ocrResult.flaggedTerms.length} trademarked text(s)`, fixed: false });
-  if (ipResult.score >= 50 && ipResult.score < 70) issues.push({ label: `Fix IP issues: ${ipResult.matches.length} trademark conflict(s)`, fixed: false });
+  if (copyrightScore < 70) issues.push({ label: `⛔ COPYRIGHT RISK: Combined copyright score ${copyrightScore}/100 — design may infringe existing artwork`, fixed: false });
+  if (ipResult.score < 50) issues.push({ label: `IP: ${ipResult.matches.length} high-risk trademark(s) detected`, fixed: false });
+  if (reverseImageResult.score < 70) issues.push({ label: `Image Search: ${reverseImageResult.matches.length} similar image(s) found`, fixed: false });
+  if (ocrResult.score < 70) issues.push({ label: `OCR: ${ocrResult.flaggedTerms.length} trademarked text(s) in image`, fixed: false });
   if (accessibilityResult.score < 70) issues.push({ label: `Improve accessibility: contrast ratio ${accessibilityResult.contrastRatio.toFixed(1)}:1`, fixed: false });
   if (qualityResult.score < 70) issues.push({ label: `Increase image quality: ${qualityResult.width}×${qualityResult.height}px`, fixed: false });
   if (transparencyResult.score < 70) issues.push({ label: `Explore certified printers in your region`, fixed: false });
@@ -285,35 +296,63 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
                   : <Badge variant="destructive" className="text-base px-3 py-1">❌ FAIL</Badge>
                 }
                 {capped && (
-                  <Badge variant="outline" className="text-xs border-destructive text-destructive">Score Capped by IP</Badge>
+                  <Badge variant="outline" className="text-xs border-destructive text-destructive">Score Capped — Copyright Risk</Badge>
                 )}
               </div>
               {!passed && (
                 <p className="text-sm text-destructive font-medium mt-2">{failReason}</p>
               )}
               <p className="text-xs text-muted-foreground mt-1">
-                IP Check (40%) is the gatekeeper — high-risk trademarks cap the overall score
+                Copyright Check (50%) is the gatekeeper — any copyright risk caps the overall score
               </p>
               {saved && <p className="text-xs text-muted-foreground mt-1">✓ Results saved to your account</p>}
             </div>
           </div>
 
+          {/* Combined Copyright Score */}
+          <div className={cn(
+            "rounded-lg border p-4 space-y-2",
+            copyrightScore < 70 ? "border-destructive/50 bg-destructive/5" : "border-success/50 bg-success/5"
+          )}>
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold flex items-center gap-2">
+                <Shield className="h-4 w-4" /> 🛡️ Copyright Check (Combined)
+              </h3>
+              <span className={cn(
+                "text-2xl font-extrabold",
+                copyrightScore >= 70 ? "text-success" : "text-destructive"
+              )}>
+                {copyrightScore}%
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              IP: {ipResult.score}% | Image Search: {reverseImageResult.score}% | OCR: {ocrResult.score}%
+            </p>
+            {copyrightScore < 70 && (
+              <div className="flex items-center gap-2 text-sm text-destructive font-medium mt-1">
+                <AlertTriangle className="h-4 w-4" />
+                ⚠️ Copyright risk detected. This design may infringe existing artwork.
+              </div>
+            )}
+          </div>
+
           {/* Score Breakdown */}
           <div className="space-y-3 py-4 border-y">
-            <ScoreBar label="IP Check" score={ipResult.score} icon={Shield} weight="40%" />
-            <ScoreBar label="Image Search" score={reverseImageResult.score} icon={Search} weight="15%" />
-            <ScoreBar label="OCR Text Check" score={ocrResult.score} icon={ScanText} weight="15%" />
-            <ScoreBar label="Accessibility" score={accessibilityResult.score} icon={Eye} weight="10%" />
-            <ScoreBar label="Quality" score={qualityResult.score} icon={Ruler} weight="10%" />
-            <ScoreBar label="Transparency" score={transparencyResult.score} icon={Leaf} weight="10%" />
+            <ScoreBar label="Copyright (Combined)" score={copyrightScore} icon={Shield} weight="50%" />
+            <div className="pl-4 space-y-2 border-l-2 border-muted">
+              <ScoreBar label="IP Check" score={ipResult.score} icon={Shield} weight="—" />
+              <ScoreBar label="Image Search" score={reverseImageResult.score} icon={Search} weight="—" />
+              <ScoreBar label="OCR Text" score={ocrResult.score} icon={ScanText} weight="—" />
+            </div>
+            <ScoreBar label="Accessibility" score={accessibilityResult.score} icon={Eye} weight="20%" />
+            <ScoreBar label="Quality" score={qualityResult.score} icon={Ruler} weight="15%" />
+            <ScoreBar label="Transparency" score={transparencyResult.score} icon={Leaf} weight="15%" />
           </div>
 
           {/* Pass/Fail Summary Row */}
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {[
-              { label: "IP", score: ipResult.score },
-              { label: "Img Search", score: reverseImageResult.score },
-              { label: "OCR", score: ocrResult.score },
+              { label: "Copyright", score: copyrightScore },
               { label: "Access.", score: accessibilityResult.score },
               { label: "Quality", score: qualityResult.score },
               { label: "Transp.", score: transparencyResult.score },
