@@ -420,11 +420,14 @@ export type Database = {
         Row: {
           accessibility_score: number
           created_at: string
+          fail_reason: string | null
           id: string
           image_url: string | null
           ip_score: number
+          ip_score_raw: number | null
           keywords: string[] | null
           overall_score: number
+          overall_score_capped: boolean | null
           passed: boolean
           quality_score: number
           transparency_score: number
@@ -433,11 +436,14 @@ export type Database = {
         Insert: {
           accessibility_score?: number
           created_at?: string
+          fail_reason?: string | null
           id?: string
           image_url?: string | null
           ip_score?: number
+          ip_score_raw?: number | null
           keywords?: string[] | null
           overall_score?: number
+          overall_score_capped?: boolean | null
           passed?: boolean
           quality_score?: number
           transparency_score?: number
@@ -446,11 +452,14 @@ export type Database = {
         Update: {
           accessibility_score?: number
           created_at?: string
+          fail_reason?: string | null
           id?: string
           image_url?: string | null
           ip_score?: number
+          ip_score_raw?: number | null
           keywords?: string[] | null
           overall_score?: number
+          overall_score_capped?: boolean | null
           passed?: boolean
           quality_score?: number
           transparency_score?: number
