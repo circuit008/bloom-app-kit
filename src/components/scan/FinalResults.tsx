@@ -280,7 +280,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             {passed ? <Trophy className="h-5 w-5 text-success" /> : <AlertTriangle className="h-5 w-5 text-destructive" />}
-            Final Compliance Results
+            {t("finalResults")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
