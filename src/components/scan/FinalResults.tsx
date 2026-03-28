@@ -420,12 +420,12 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Provider</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead className="hidden sm:table-cell">Quality</TableHead>
-                    <TableHead className="hidden sm:table-cell">Shipping</TableHead>
-                    <TableHead className="hidden md:table-cell">Eco-Score</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                     <TableHead>{t("provider")}</TableHead>
+                    <TableHead>{t("price")}</TableHead>
+                    <TableHead className="hidden sm:table-cell">{t("quality")}</TableHead>
+                    <TableHead className="hidden sm:table-cell">{t("shipping")}</TableHead>
+                    <TableHead className="hidden md:table-cell">{t("ecoScore")}</TableHead>
+                    <TableHead className="text-right">{t("action")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
