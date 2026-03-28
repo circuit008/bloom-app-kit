@@ -389,12 +389,12 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Printer className="h-4 w-4 text-success" /> ✅ Your design passed! Ready to print?
+              <Printer className="h-4 w-4 text-success" /> ✅ {t("readyToPrint")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Compare print-on-demand providers and start selling your validated design.
+              {t("compareProviders")}
             </p>
 
             {/* Sort Toggle */}
