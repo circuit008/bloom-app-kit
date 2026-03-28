@@ -333,7 +333,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
             {copyrightScore < 70 && (
               <div className="flex items-center gap-2 text-sm text-destructive font-medium mt-1">
                 <AlertTriangle className="h-4 w-4" />
-                ⚠️ Copyright risk detected. This design may infringe existing artwork.
+                ⚠️ {t("copyrightRiskDetected")}
               </div>
             )}
           </div>
