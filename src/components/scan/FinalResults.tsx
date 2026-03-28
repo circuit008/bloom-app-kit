@@ -298,7 +298,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
                   : <Badge variant="destructive" className="text-base px-3 py-1">❌ FAIL</Badge>
                 }
                 {capped && (
-                  <Badge variant="outline" className="text-xs border-destructive text-destructive">Score Capped — Copyright Risk</Badge>
+                  <Badge variant="outline" className="text-xs border-destructive text-destructive">{t("scoreCappedCopyright")}</Badge>
                 )}
               </div>
               {!passed && (
