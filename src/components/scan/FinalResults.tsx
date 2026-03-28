@@ -372,13 +372,13 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
           {/* Actions */}
           <div className="flex flex-wrap gap-3 pt-2 print:hidden">
             <Button variant="outline" size="sm" onClick={handleShare}>
-              <Share2 className="h-4 w-4 mr-1" /> Share Results
+              <Share2 className="h-4 w-4 mr-1" /> {t("shareResults")}
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportPDF}>
-              <Download className="h-4 w-4 mr-1" /> Export PDF
+              <Download className="h-4 w-4 mr-1" /> {t("exportPDF")}
             </Button>
             <Button variant="outline" size="sm" onClick={() => window.print()}>
-              <Printer className="h-4 w-4 mr-1" /> Print
+              <Printer className="h-4 w-4 mr-1" /> {t("print")}
             </Button>
           </div>
         </CardContent>
