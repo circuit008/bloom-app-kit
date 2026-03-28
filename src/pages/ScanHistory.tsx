@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface ScanRow {
   id: string;
@@ -24,6 +25,7 @@ interface ScanRow {
 export default function ScanHistory() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [scans, setScans] = useState<ScanRow[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -32,10 +34,7 @@ export default function ScanHistory() {
     if (!user) return;
     (async () => {
       const { data } = await supabase
-        .from("scan_results")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .from("scan_results").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
       if (data) setScans(data as ScanRow[]);
       setLoading(false);
     })();
@@ -49,12 +48,12 @@ export default function ScanHistory() {
     <div className="container py-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Scan History</h1>
-          <p className="text-muted-foreground mt-1">Review your past design compliance scans.</p>
+          <h1 className="text-3xl font-bold">{t("scanHistoryTitle")}</h1>
+          <p className="text-muted-foreground mt-1">{t("scanHistoryDesc")}</p>
         </div>
         <div className="relative w-full sm:w-72">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input placeholder="Search by keyword..." className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input placeholder={t("searchByKeyword")} className="pl-10" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
       </div>
 
@@ -64,15 +63,13 @@ export default function ScanHistory() {
             <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center">
               <History className="h-6 w-6 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold">{scans.length === 0 ? "No scans yet" : "No matching scans"}</h3>
+            <h3 className="text-lg font-semibold">{scans.length === 0 ? t("noScansYet") : t("noMatchingScans")}</h3>
             <p className="text-sm text-muted-foreground max-w-sm">
-              {scans.length === 0
-                ? "Once you run your first design scan, it will appear here with a full compliance report."
-                : "Try a different search term."}
+              {scans.length === 0 ? t("firstScanDesc") : t("tryDifferentSearch")}
             </p>
             {scans.length === 0 && (
               <Button onClick={() => navigate("/scan")} className="mt-2">
-                Start Your First Scan <ArrowRight className="ml-2 h-4 w-4" />
+                {t("startFirstScan")} <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             )}
           </CardContent>
@@ -90,14 +87,14 @@ export default function ScanHistory() {
                     {scan.overall_score}
                   </div>
                   <div>
-                    <p className="font-medium">{scan.keywords?.slice(0, 4).join(", ") || "Design Scan"}</p>
+                    <p className="font-medium">{scan.keywords?.slice(0, 4).join(", ") || t("designScan")}</p>
                     <p className="text-sm text-muted-foreground">
                       {new Date(scan.created_at).toLocaleDateString()} · IP:{scan.ip_score} Q:{scan.quality_score} A:{scan.accessibility_score} T:{scan.transparency_score}
                     </p>
                   </div>
                 </div>
                 <Badge variant={scan.passed ? "default" : "destructive"} className={scan.passed ? "bg-success text-success-foreground" : ""}>
-                  {scan.passed ? "PASS" : "FAIL"}
+                  {scan.passed ? t("pass") : t("fail")}
                 </Badge>
               </CardContent>
             </Card>
