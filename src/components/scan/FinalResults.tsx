@@ -318,7 +318,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
           )}>
             <div className="flex items-center justify-between">
               <h3 className="font-semibold flex items-center gap-2">
-                <Shield className="h-4 w-4" /> 🛡️ Copyright Check (Combined)
+                <Shield className="h-4 w-4" /> 🛡️ {t("copyrightCheck")}
               </h3>
               <span className={cn(
                 "text-2xl font-extrabold",
