@@ -484,7 +484,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
             </div>
 
             <p className="text-xs text-muted-foreground italic">
-              💡 We may earn a commission from partner links at no cost to you. Prices and availability subject to change.
+              💡 {t("affiliateDisclaimer")}
             </p>
           </CardContent>
         </Card>
