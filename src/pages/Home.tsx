@@ -5,42 +5,44 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useState } from "react";
 import { AuthModal } from "@/components/AuthModal";
-
-const features = [
-  {
-    icon: Search,
-    title: "IP Check",
-    description: "Detect potential intellectual property conflicts including trademarks, copyrighted characters, and brand logos before listing.",
-    color: "text-primary",
-    bg: "bg-primary/10",
-  },
-  {
-    icon: Eye,
-    title: "Accessibility",
-    description: "Validate color contrast ratios, readability, and visual accessibility to ensure your designs reach every customer.",
-    color: "text-success",
-    bg: "bg-success/10",
-  },
-  {
-    icon: CheckCircle,
-    title: "Quality",
-    description: "Check resolution, DPI requirements, bleed areas, and print-readiness to avoid costly reprints and returns.",
-    color: "text-warning",
-    bg: "bg-warning/10",
-  },
-  {
-    icon: FileText,
-    title: "Transparency",
-    description: "Ensure listing compliance with platform guidelines, accurate descriptions, and proper content disclosures.",
-    color: "text-destructive",
-    bg: "bg-destructive/10",
-  },
-];
+import { useLanguage } from "@/hooks/useLanguage";
 
 export default function Home() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [authOpen, setAuthOpen] = useState(false);
+
+  const features = [
+    {
+      icon: Search,
+      title: t("featureIPTitle"),
+      description: t("featureIPDesc"),
+      color: "text-primary",
+      bg: "bg-primary/10",
+    },
+    {
+      icon: Eye,
+      title: t("featureAccessTitle"),
+      description: t("featureAccessDesc"),
+      color: "text-success",
+      bg: "bg-success/10",
+    },
+    {
+      icon: CheckCircle,
+      title: t("featureQualityTitle"),
+      description: t("featureQualityDesc"),
+      color: "text-warning",
+      bg: "bg-warning/10",
+    },
+    {
+      icon: FileText,
+      title: t("featureTransTitle"),
+      description: t("featureTransDesc"),
+      color: "text-destructive",
+      bg: "bg-destructive/10",
+    },
+  ];
 
   const handleCTA = () => {
     if (user) {
@@ -58,31 +60,30 @@ export default function Home() {
         <div className="container relative py-24 md:py-36 flex flex-col items-center text-center gap-6">
           <div className="inline-flex items-center gap-2 rounded-full border bg-background px-4 py-1.5 text-sm font-medium text-muted-foreground animate-fade-in">
             <Shield className="h-4 w-4 text-primary" />
-            POD Compliance Validation Platform
+            {t("heroBadge")}
           </div>
 
           <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight max-w-3xl leading-[1.1] animate-slide-up">
-            Validate Your POD Designs{" "}
-            <span className="text-primary">Before Selling</span>
+            {t("heroTitle")}{" "}
+            <span className="text-primary">{t("heroTitleHighlight")}</span>
           </h1>
 
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl animate-slide-up" style={{ animationDelay: "0.1s" }}>
-            Scan your print-on-demand designs for IP issues, accessibility problems,
-            quality defects, and listing compliance — all in one place.
+            {t("heroSubtitle")}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-3 mt-4 animate-slide-up" style={{ animationDelay: "0.2s" }}>
             <Button size="lg" className="text-base px-8 h-12" onClick={handleCTA}>
-              Start Free Scan
+              {t("startFreeScan")}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             <Button size="lg" variant="outline" className="text-base px-8 h-12" onClick={() => navigate("/about")}>
-              Learn More
+              {t("learnMore")}
             </Button>
           </div>
 
           <p className="text-xs text-muted-foreground mt-2 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-            No credit card required · 5 free scans per month
+            {t("noCreditCard")}
           </p>
         </div>
       </section>
@@ -91,18 +92,18 @@ export default function Home() {
       <section className="container py-20">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold">
-            Four pillars of{" "}
-            <span className="text-primary">compliance</span>
+            {t("fourPillars")}{" "}
+            <span className="text-primary">{t("compliance")}</span>
           </h2>
           <p className="text-muted-foreground mt-3 max-w-xl mx-auto">
-            Comprehensive validation covering every aspect of POD design compliance.
+            {t("fourPillarsDesc")}
           </p>
         </div>
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((f, i) => (
             <Card
-              key={f.title}
+              key={i}
               className="border bg-card hover:shadow-md transition-shadow animate-slide-up"
               style={{ animationDelay: `${i * 0.1}s` }}
             >
@@ -121,12 +122,12 @@ export default function Home() {
       {/* CTA section */}
       <section className="border-t bg-muted/50">
         <div className="container py-16 flex flex-col items-center text-center gap-4">
-          <h2 className="text-2xl md:text-3xl font-bold">Ready to protect your business?</h2>
+          <h2 className="text-2xl md:text-3xl font-bold">{t("readyToProtect")}</h2>
           <p className="text-muted-foreground max-w-lg">
-            Join thousands of POD sellers who validate their designs before listing.
+            {t("joinSellers")}
           </p>
           <Button size="lg" className="mt-2" onClick={handleCTA}>
-            Start Free Scan
+            {t("startFreeScan")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </div>

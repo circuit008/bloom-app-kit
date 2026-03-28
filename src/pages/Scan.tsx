@@ -17,20 +17,9 @@ import { AccessibilityCheck, type AccessibilityResult } from "@/components/scan/
 import { QualityCheck, type QualityResult } from "@/components/scan/QualityCheck";
 import { TransparencyCheck, type TransparencyResult } from "@/components/scan/TransparencyCheck";
 import { FinalResults } from "@/components/scan/FinalResults";
+import { useLanguage } from "@/hooks/useLanguage";
 
 type Phase = "upload" | "reverse-image" | "ocr" | "checking" | "ip-results" | "accessibility" | "quality" | "transparency" | "final";
-
-const stepLabels: Record<Phase, { step: number; label: string }> = {
-  upload: { step: 1, label: "Upload" },
-  "reverse-image": { step: 2, label: "Image Search" },
-  ocr: { step: 3, label: "OCR Check" },
-  checking: { step: 4, label: "IP Check" },
-  "ip-results": { step: 4, label: "IP Check" },
-  accessibility: { step: 5, label: "Accessibility" },
-  quality: { step: 6, label: "Quality" },
-  transparency: { step: 6, label: "Transparency" },
-  final: { step: 6, label: "Results" },
-};
 
 function getConfidence(source: string | null): "high" | "medium" | "low" {
   const official = ["USPTO", "EUIPO", "CIPO"];
@@ -47,6 +36,7 @@ function getRiskDeduction(riskLevel: string): number {
 
 export default function Scan() {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -59,6 +49,18 @@ export default function Scan() {
   const [transparencyResult, setTransparencyResult] = useState<TransparencyResult | null>(null);
   const [scanConfirmed, setScanConfirmed] = useState(false);
   const keywordInputRef = useRef<HTMLInputElement>(null);
+
+  const stepLabels: Record<Phase, { step: number; label: string }> = {
+    upload: { step: 1, label: t("upload") },
+    "reverse-image": { step: 2, label: t("imageSearch") },
+    ocr: { step: 3, label: t("ocrCheck") },
+    checking: { step: 4, label: t("ipCheck") },
+    "ip-results": { step: 4, label: t("ipCheck") },
+    accessibility: { step: 5, label: t("accessibility") },
+    quality: { step: 6, label: t("quality") },
+    transparency: { step: 6, label: t("transparency") },
+    final: { step: 6, label: t("results") },
+  };
 
   const handleFileChange = useCallback((f: File | null, p: string | null) => {
     setFile(f);
@@ -81,7 +83,6 @@ export default function Scan() {
   const handleOCRComplete = (result: OCRResult) => {
     setOcrResult(result);
     setPhase("checking");
-    // Auto-run IP check after OCR
     setTimeout(() => {
       if (keywordInputRef.current) {
         const val = keywordInputRef.current.value?.trim().replace(/,$/, "");
@@ -119,12 +120,8 @@ export default function Scan() {
     setPhase("checking");
 
     try {
-      const { data: trademarks, error } = await supabase
-        .from("trademark_database")
-        .select("*");
-
+      const { data: trademarks, error } = await supabase.from("trademark_database").select("*");
       if (error) throw error;
-
       if (!trademarks || trademarks.length === 0) {
         toast.error("Could not load trademark database. Please try again.");
         setPhase("upload");
@@ -139,14 +136,12 @@ export default function Scan() {
       }, null);
 
       const matches: IPMatch[] = [];
-
       for (const kw of kws) {
         const kwLower = kw.toLowerCase();
         for (const tm of trademarks) {
           const termLower = tm.term.toLowerCase();
           if (kwLower.includes(termLower) || termLower.includes(kwLower)) {
             if (!matches.find((m) => m.term === tm.term && m.matchedKeyword === kw)) {
-              const confidence = getConfidence(tm.source);
               matches.push({
                 term: tm.term,
                 matchedKeyword: kw,
@@ -158,7 +153,7 @@ export default function Scan() {
                 ownerName: tm.owner_name,
                 registrationNumber: tm.registration_number,
                 lastVerified: tm.last_verified,
-                confidence,
+                confidence: getConfidence(tm.source),
               });
             }
           }
@@ -172,29 +167,22 @@ export default function Scan() {
       let riskLabel: string;
       let riskEmoji: string;
       if (hasHighRisk || score < 50) {
-        riskLabel = "CRITICAL - Do Not Use";
+        riskLabel = t("critical");
         riskEmoji = "🔴";
       } else if (score < 70) {
-        riskLabel = "High Risk - Not Recommended";
+        riskLabel = t("highRisk");
         riskEmoji = "🟠";
       } else if (score < 90) {
-        riskLabel = "Caution - Review Required";
+        riskLabel = t("caution");
         riskEmoji = "🟡";
       } else {
-        riskLabel = "Safe to Use";
+        riskLabel = t("safe");
         riskEmoji = "🟢";
       }
 
       setIpResult({
-        score,
-        matches,
-        riskLabel,
-        riskEmoji,
-        dbStats: {
-          total: trademarks.length,
-          sources: uniqueSources.size,
-          lastUpdated,
-        },
+        score, matches, riskLabel, riskEmoji,
+        dbStats: { total: trademarks.length, sources: uniqueSources.size, lastUpdated },
       });
       setPhase("ip-results");
     } catch (err: any) {
@@ -204,47 +192,19 @@ export default function Scan() {
     }
   };
 
-  const handleIPBack = () => {
-    setPhase("upload");
-    setIpResult(null);
-  };
-
+  const handleIPBack = () => { setPhase("upload"); setIpResult(null); };
   const handleIPContinue = () => {
-    if (!preview) {
-      toast.error("Please upload an image to continue with accessibility check.");
-      setPhase("upload");
-      return;
-    }
+    if (!preview) { toast.error("Please upload an image to continue."); setPhase("upload"); return; }
     setPhase("accessibility");
   };
-
-  const handleAccessibilityComplete = (result: AccessibilityResult) => {
-    setAccessibilityResult(result);
-    setPhase("quality");
-  };
-
-  const handleQualityComplete = (result: QualityResult) => {
-    setQualityResult(result);
-    setPhase("transparency");
-  };
-
-  const handleTransparencyComplete = (result: TransparencyResult) => {
-    setTransparencyResult(result);
-    setPhase("final");
-  };
+  const handleAccessibilityComplete = (result: AccessibilityResult) => { setAccessibilityResult(result); setPhase("quality"); };
+  const handleQualityComplete = (result: QualityResult) => { setQualityResult(result); setPhase("transparency"); };
+  const handleTransparencyComplete = (result: TransparencyResult) => { setTransparencyResult(result); setPhase("final"); };
 
   const handleRestart = () => {
-    setFile(null);
-    setPreview(null);
-    setKeywords([]);
-    setReverseImageResult(null);
-    setOcrResult(null);
-    setIpResult(null);
-    setAccessibilityResult(null);
-    setQualityResult(null);
-    setTransparencyResult(null);
-    setPhase("upload");
-    setScanConfirmed(false);
+    setFile(null); setPreview(null); setKeywords([]); setReverseImageResult(null);
+    setOcrResult(null); setIpResult(null); setAccessibilityResult(null);
+    setQualityResult(null); setTransparencyResult(null); setPhase("upload"); setScanConfirmed(false);
   };
 
   const currentStepInfo = stepLabels[phase];
@@ -256,46 +216,36 @@ export default function Scan() {
           <ArrowLeft className="h-4 w-4" />
         </Button>
         <div>
-          <h1 className="text-2xl font-bold">New Design Scan</h1>
-          <p className="text-sm text-muted-foreground">Upload your design and check for compliance issues</p>
+          <h1 className="text-2xl font-bold">{t("newDesignScan")}</h1>
+          <p className="text-sm text-muted-foreground">{t("uploadDesignDesc")}</p>
         </div>
       </div>
 
-      <ScanProgress
-        currentStep={currentStepInfo.step}
-        totalSteps={6}
-        stepLabel={currentStepInfo.label}
-      />
+      <ScanProgress currentStep={currentStepInfo.step} totalSteps={6} stepLabel={currentStepInfo.label} />
 
       {phase === "upload" && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <Shield className="h-5 w-5 text-primary" />
-              Step 1: Upload Design & Keywords
+              {t("step1Title")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <DesignUpload file={file} preview={preview} onFileChange={handleFileChange} />
             <KeywordInput keywords={keywords} onKeywordsChange={setKeywords} inputRef={keywordInputRef} />
-
             <div className="rounded-lg border border-muted bg-muted/30 p-3 space-y-2">
               <div className="flex items-start gap-3">
-                <Checkbox
-                  id="scan-confirm"
-                  checked={scanConfirmed}
-                  onCheckedChange={(v) => setScanConfirmed(v === true)}
-                />
+                <Checkbox id="scan-confirm" checked={scanConfirmed} onCheckedChange={(v) => setScanConfirmed(v === true)} />
                 <Label htmlFor="scan-confirm" className="text-xs text-muted-foreground leading-relaxed cursor-pointer">
-                  I confirm that I have the right to scan this design and understand that results are informational only, not legal advice. See our{" "}
-                  <a href="/terms" target="_blank" className="text-primary underline">Terms</a>.
+                  {t("scanConfirmLabel")}{" "}
+                  <a href="/terms" target="_blank" className="text-primary underline">{t("seeTerms")}</a>.
                 </Label>
               </div>
             </div>
-
             <div className="pt-2">
               <Button onClick={handleStartScan} className="w-full sm:w-auto" disabled={!scanConfirmed || !preview || keywords.length === 0}>
-                Start Scan
+                {t("startScan")}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
@@ -304,19 +254,11 @@ export default function Scan() {
       )}
 
       {phase === "reverse-image" && preview && (
-        <ReverseImageSearch
-          imageUrl={preview}
-          onComplete={handleReverseImageComplete}
-          onBack={() => setPhase("upload")}
-        />
+        <ReverseImageSearch imageUrl={preview} onComplete={handleReverseImageComplete} onBack={() => setPhase("upload")} />
       )}
 
       {phase === "ocr" && preview && (
-        <OCRCheck
-          imageUrl={preview}
-          onComplete={handleOCRComplete}
-          onBack={() => setPhase("reverse-image")}
-        />
+        <OCRCheck imageUrl={preview} onComplete={handleOCRComplete} onBack={() => setPhase("reverse-image")} />
       )}
 
       {phase === "checking" && (
@@ -324,9 +266,9 @@ export default function Scan() {
           <CardContent className="py-16 flex flex-col items-center gap-4">
             <Loader2 className="h-10 w-10 animate-spin text-primary" />
             <div className="text-center">
-              <p className="font-semibold">Running IP Copyright Check...</p>
+              <p className="font-semibold">{t("runningIPCheck")}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Comparing {keywords.length} keyword{keywords.length !== 1 ? "s" : ""} against trademark database
+                {t("comparingKeywords")} ({keywords.length})
               </p>
             </div>
           </CardContent>
@@ -338,7 +280,7 @@ export default function Scan() {
           <IPResultsCard result={ipResult} onBack={handleIPBack} />
           <div className="flex justify-end">
             <Button onClick={handleIPContinue}>
-              Continue to Accessibility Check
+              {t("continueAccessibility")}
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
@@ -346,38 +288,22 @@ export default function Scan() {
       )}
 
       {phase === "accessibility" && preview && (
-        <AccessibilityCheck
-          imageUrl={preview}
-          onComplete={handleAccessibilityComplete}
-          onBack={() => setPhase("ip-results")}
-        />
+        <AccessibilityCheck imageUrl={preview} onComplete={handleAccessibilityComplete} onBack={() => setPhase("ip-results")} />
       )}
 
       {phase === "quality" && preview && (
-        <QualityCheck
-          imageUrl={preview}
-          onComplete={handleQualityComplete}
-          onBack={() => setPhase("accessibility")}
-        />
+        <QualityCheck imageUrl={preview} onComplete={handleQualityComplete} onBack={() => setPhase("accessibility")} />
       )}
 
       {phase === "transparency" && (
-        <TransparencyCheck
-          onComplete={handleTransparencyComplete}
-          onBack={() => setPhase("quality")}
-        />
+        <TransparencyCheck onComplete={handleTransparencyComplete} onBack={() => setPhase("quality")} />
       )}
 
       {phase === "final" && ipResult && reverseImageResult && ocrResult && accessibilityResult && qualityResult && transparencyResult && (
         <FinalResults
-          reverseImageResult={reverseImageResult}
-          ocrResult={ocrResult}
-          ipResult={ipResult}
-          accessibilityResult={accessibilityResult}
-          qualityResult={qualityResult}
-          transparencyResult={transparencyResult}
-          keywords={keywords}
-          onRestart={handleRestart}
+          reverseImageResult={reverseImageResult} ocrResult={ocrResult} ipResult={ipResult}
+          accessibilityResult={accessibilityResult} qualityResult={qualityResult}
+          transparencyResult={transparencyResult} keywords={keywords} onRestart={handleRestart}
         />
       )}
     </div>
