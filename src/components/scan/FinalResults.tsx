@@ -305,7 +305,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
                 <p className="text-sm text-destructive font-medium mt-2">{failReason}</p>
               )}
               <p className="text-xs text-muted-foreground mt-1">
-                Copyright Check (50%) is the gatekeeper — any copyright risk caps the overall score
+                {t("copyrightGatekeeper")}
               </p>
               {saved && <p className="text-xs text-muted-foreground mt-1">✓ Results saved to your account</p>}
             </div>
