@@ -307,7 +307,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
               <p className="text-xs text-muted-foreground mt-1">
                 {t("copyrightGatekeeper")}
               </p>
-              {saved && <p className="text-xs text-muted-foreground mt-1">✓ Results saved to your account</p>}
+              {saved && <p className="text-xs text-muted-foreground mt-1">✓ {t("resultsSaved")}</p>}
             </div>
           </div>
 
