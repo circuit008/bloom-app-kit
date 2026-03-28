@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { AdBanner } from "@/components/shared/AdBanner";
+import { useLanguage } from "@/hooks/useLanguage";
 import type { IPCheckResult } from "./IPResultsCard";
 import type { ReverseImageResult } from "./ReverseImageSearch";
 import type { OCRResult } from "./OCRCheck";
@@ -195,6 +196,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessibilityResult, qualityResult, transparencyResult, keywords, onRestart }: FinalResultsProps) {
+  const { t } = useLanguage();
   const [saved, setSaved] = useState(false);
   const [sortBy, setSortBy] = useState<"price" | "eco">("price");
 
@@ -278,7 +280,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
         <CardHeader className="pb-4">
           <CardTitle className="flex items-center gap-2 text-lg">
             {passed ? <Trophy className="h-5 w-5 text-success" /> : <AlertTriangle className="h-5 w-5 text-destructive" />}
-            Final Compliance Results
+            {t("finalResults")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
@@ -296,16 +298,16 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
                   : <Badge variant="destructive" className="text-base px-3 py-1">❌ FAIL</Badge>
                 }
                 {capped && (
-                  <Badge variant="outline" className="text-xs border-destructive text-destructive">Score Capped — Copyright Risk</Badge>
+                  <Badge variant="outline" className="text-xs border-destructive text-destructive">{t("scoreCappedCopyright")}</Badge>
                 )}
               </div>
               {!passed && (
                 <p className="text-sm text-destructive font-medium mt-2">{failReason}</p>
               )}
               <p className="text-xs text-muted-foreground mt-1">
-                Copyright Check (50%) is the gatekeeper — any copyright risk caps the overall score
+                {t("copyrightGatekeeper")}
               </p>
-              {saved && <p className="text-xs text-muted-foreground mt-1">✓ Results saved to your account</p>}
+              {saved && <p className="text-xs text-muted-foreground mt-1">✓ {t("resultsSaved")}</p>}
             </div>
           </div>
 
@@ -316,7 +318,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
           )}>
             <div className="flex items-center justify-between">
               <h3 className="font-semibold flex items-center gap-2">
-                <Shield className="h-4 w-4" /> 🛡️ Copyright Check (Combined)
+                <Shield className="h-4 w-4" /> 🛡️ {t("copyrightCheck")}
               </h3>
               <span className={cn(
                 "text-2xl font-extrabold",
@@ -331,7 +333,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
             {copyrightScore < 70 && (
               <div className="flex items-center gap-2 text-sm text-destructive font-medium mt-1">
                 <AlertTriangle className="h-4 w-4" />
-                ⚠️ Copyright risk detected. This design may infringe existing artwork.
+                ⚠️ {t("copyrightRiskDetected")}
               </div>
             )}
           </div>
@@ -370,13 +372,13 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
           {/* Actions */}
           <div className="flex flex-wrap gap-3 pt-2 print:hidden">
             <Button variant="outline" size="sm" onClick={handleShare}>
-              <Share2 className="h-4 w-4 mr-1" /> Share Results
+              <Share2 className="h-4 w-4 mr-1" /> {t("shareResults")}
             </Button>
             <Button variant="outline" size="sm" onClick={handleExportPDF}>
-              <Download className="h-4 w-4 mr-1" /> Export PDF
+              <Download className="h-4 w-4 mr-1" /> {t("exportPDF")}
             </Button>
             <Button variant="outline" size="sm" onClick={() => window.print()}>
-              <Printer className="h-4 w-4 mr-1" /> Print
+              <Printer className="h-4 w-4 mr-1" /> {t("print")}
             </Button>
           </div>
         </CardContent>
@@ -387,12 +389,12 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <Printer className="h-4 w-4 text-success" /> ✅ Your design passed! Ready to print?
+              <Printer className="h-4 w-4 text-success" /> ✅ {t("readyToPrint")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              Compare print-on-demand providers and start selling your validated design.
+              {t("compareProviders")}
             </p>
 
             {/* Sort Toggle */}
@@ -402,14 +404,14 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
                 size="sm"
                 onClick={() => setSortBy("price")}
               >
-                <DollarSign className="h-3.5 w-3.5 mr-1" /> Sort by Price
+                <DollarSign className="h-3.5 w-3.5 mr-1" /> {t("sortByPrice")}
               </Button>
               <Button
                 variant={sortBy === "eco" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSortBy("eco")}
               >
-                <Leaf className="h-3.5 w-3.5 mr-1" /> Sort by Eco-Score
+                <Leaf className="h-3.5 w-3.5 mr-1" /> {t("sortByEco")}
               </Button>
             </div>
 
@@ -418,12 +420,12 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Provider</TableHead>
-                    <TableHead>Price</TableHead>
-                    <TableHead className="hidden sm:table-cell">Quality</TableHead>
-                    <TableHead className="hidden sm:table-cell">Shipping</TableHead>
-                    <TableHead className="hidden md:table-cell">Eco-Score</TableHead>
-                    <TableHead className="text-right">Action</TableHead>
+                     <TableHead>{t("provider")}</TableHead>
+                    <TableHead>{t("price")}</TableHead>
+                    <TableHead className="hidden sm:table-cell">{t("quality")}</TableHead>
+                    <TableHead className="hidden sm:table-cell">{t("shipping")}</TableHead>
+                    <TableHead className="hidden md:table-cell">{t("ecoScore")}</TableHead>
+                    <TableHead className="text-right">{t("action")}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -471,7 +473,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
                           onClick={() => handleAffiliateClick(provider.name)}
                         >
                           <Button size="sm" variant="outline">
-                            Order <ExternalLink className="h-3 w-3 ml-1" />
+                             {t("orderNow")} <ExternalLink className="h-3 w-3 ml-1" />
                           </Button>
                         </a>
                       </TableCell>
@@ -482,7 +484,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
             </div>
 
             <p className="text-xs text-muted-foreground italic">
-              💡 We may earn a commission from partner links at no cost to you. Prices and availability subject to change.
+              💡 {t("affiliateDisclaimer")}
             </p>
           </CardContent>
         </Card>
@@ -493,7 +495,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-destructive" /> Fix These Issues
+              <AlertTriangle className="h-4 w-4 text-destructive" /> {t("fixIssues")}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -539,7 +541,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
 
       {/* Restart */}
       <div className="flex gap-3 print:hidden">
-        <Button variant="outline" onClick={onRestart}>Scan Another Design</Button>
+        <Button variant="outline" onClick={onRestart}>{t("scanAnother")}</Button>
       </div>
     </div>
   );
