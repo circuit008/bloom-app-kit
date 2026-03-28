@@ -196,6 +196,7 @@ function StarRating({ rating }: { rating: number }) {
 }
 
 export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessibilityResult, qualityResult, transparencyResult, keywords, onRestart }: FinalResultsProps) {
+  const { t } = useLanguage();
   const [saved, setSaved] = useState(false);
   const [sortBy, setSortBy] = useState<"price" | "eco">("price");
 
