@@ -541,7 +541,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
 
       {/* Restart */}
       <div className="flex gap-3 print:hidden">
-        <Button variant="outline" onClick={onRestart}>Scan Another Design</Button>
+        <Button variant="outline" onClick={onRestart}>{t("scanAnother")}</Button>
       </div>
     </div>
   );
