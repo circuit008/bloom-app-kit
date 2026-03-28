@@ -473,7 +473,7 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
                           onClick={() => handleAffiliateClick(provider.name)}
                         >
                           <Button size="sm" variant="outline">
-                            Order <ExternalLink className="h-3 w-3 ml-1" />
+                             {t("orderNow")} <ExternalLink className="h-3 w-3 ml-1" />
                           </Button>
                         </a>
                       </TableCell>
