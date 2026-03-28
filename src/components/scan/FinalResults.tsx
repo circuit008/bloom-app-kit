@@ -404,14 +404,14 @@ export function FinalResults({ reverseImageResult, ocrResult, ipResult, accessib
                 size="sm"
                 onClick={() => setSortBy("price")}
               >
-                <DollarSign className="h-3.5 w-3.5 mr-1" /> Sort by Price
+                <DollarSign className="h-3.5 w-3.5 mr-1" /> {t("sortByPrice")}
               </Button>
               <Button
                 variant={sortBy === "eco" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSortBy("eco")}
               >
-                <Leaf className="h-3.5 w-3.5 mr-1" /> Sort by Eco-Score
+                <Leaf className="h-3.5 w-3.5 mr-1" /> {t("sortByEco")}
               </Button>
             </div>
 
