@@ -11,6 +11,7 @@ import { ThemeProvider } from "./hooks/useTheme";
 import { LanguageProvider } from "./hooks/useLanguage";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Skeleton } from "./components/ui/skeleton";
+import { Analytics } from "@vercel/analytics/react";
 
 const Home = lazy(() => import("./pages/Home"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -60,6 +61,7 @@ const App = () => (
             <ErrorBoundary>
               <Toaster />
               <Sonner />
+              <Analytics />
               <BrowserRouter>
                 <Layout>
                   <Suspense fallback={<PageLoader />}>
