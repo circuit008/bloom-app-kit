@@ -1,55 +1,51 @@
-# Plan: Move database to your own Supabase account
+# Plan: Remix this project and connect it to your Supabase
 
-This project currently runs on **Lovable Cloud** (a managed Supabase instance owned by Lovable). Cloud cannot be detached from this project once enabled — so the move requires a **remix into a fresh project** that you connect to your own Supabase account.
+You have your Supabase ready with the schema. Here's exactly what to do — no code changes are needed in *this* project (it stays on Lovable Cloud). All wiring happens in the new remixed project.
 
-## What you'll do (high level)
+## Step 1 — Disable Lovable Cloud workspace-wide (so the remix starts clean)
 
-1. **Prepare your Supabase project**
-   - Create a new project at supabase.com (or pick an existing empty one).
-   - Note the Project URL and anon key — you'll need them later.
+- Sidebar → **Connectors** → **Lovable Cloud** → **Disable Cloud**
+- This only affects *new* projects you create. This current project keeps working.
 
-2. **Recreate the schema in your Supabase**
-   - I'll generate a single `schema.sql` file containing all 18 tables, RLS policies, the `update_updated_at_column` function, indexes, and storage setup that exists today.
-   - You paste it into your Supabase SQL Editor and run it.
+## Step 2 — Remix this project
 
-3. **Export and import data**
-   - I'll export every table from Lovable Cloud as CSV (anon-safe — no auth.users rows).
-   - You import each CSV via your Supabase Table Editor → Import.
-   - Order matters for foreign keys: `user_profiles` first, then dependent tables.
+- Top-left project name → **Settings** → **Remix this project**
+- Open the new remixed project. Confirm it does NOT show Lovable Cloud as enabled. If it does, disable Cloud on the new project too before continuing.
 
-4. **Disable Lovable Cloud for new projects**
-   - Connectors → Lovable Cloud → Disable Cloud (workspace-level toggle).
+## Step 3 — Connect your Supabase to the remix
 
-5. **Remix this project**
-   - Project name (top-left) → Settings → Remix this project.
-   - The remix will start without Cloud since you disabled it in step 4.
+- In the new project: **Connectors** → **Supabase** → authorize → pick your Supabase project
+- Lovable will auto-generate `src/integrations/supabase/client.ts`, `types.ts`, and `.env` pointing at your Supabase. The existing app code already uses `@/integrations/supabase/client`, so most things will just work.
 
-6. **Connect your Supabase to the remix**
-   - In the new project: Connectors → Supabase → authorize and select your project.
-   - The remix will get a new auto-generated `src/integrations/supabase/client.ts` and `types.ts` pointing at your Supabase.
+## Step 4 — Configure auth in your Supabase
 
-7. **Recreate auth + secrets in your Supabase**
-   - Enable Email/Password and Google provider in your Supabase Auth settings.
-   - Re-add edge function secrets you use today: `SHOPIFY_ACCESS_TOKEN`, `SHOPIFY_STOREFRONT_ACCESS_TOKEN`, `LOVABLE_API_KEY` (if used by edge functions).
-   - Edge functions (`sync-cipo`, `sync-euipo`, `sync-uspto`) will redeploy automatically in the new project.
+In your Supabase dashboard → **Authentication → Providers**:
+- Enable **Email** (password sign-in)
+- Enable **Google**: paste your Google OAuth Client ID + Secret
+- **Authentication → URL Configuration**: add the new project's preview URL and any custom domain to **Redirect URLs** and **Site URL**
 
-8. **Verify**
-   - Sign up a test user, run a scan, check that data lands in your Supabase tables.
+## Step 5 — Add edge function secrets in your Supabase
 
-## What you need to know
+Project Settings → **Edge Functions → Secrets**, add only what your functions actually use:
+- `SHOPIFY_ACCESS_TOKEN`
+- `SHOPIFY_STOREFRONT_ACCESS_TOKEN`
+- `LOVABLE_API_KEY` (only if edge functions call Lovable AI Gateway)
 
-- **Users will not transfer.** `auth.users` rows live inside Supabase Auth and cannot be exported as CSV. Existing users must sign up again on the new project. If keeping users matters, tell me and I can outline the (more involved) Supabase Auth admin import path.
-- **Storage buckets:** none currently exist in this project, so nothing to migrate there.
-- **Edge functions:** code carries over automatically with the remix.
+The 3 edge functions (`sync-cipo`, `sync-euipo`, `sync-uspto`) deploy automatically with the remix.
 
-## What I'll deliver in the next step (once you say go)
+## Step 6 — In the remixed project, tell me to verify
 
-- `lovable-cloud-export/schema.sql` — complete schema + RLS + functions, ready to paste.
-- `lovable-cloud-export/data/*.csv` — one CSV per table, in import order, with a short README listing the order.
-- A short checklist you can follow end-to-end.
+Open the chat in the remix and say: *"Verify the Supabase connection and run a smoke test."* I will:
+- Confirm tables are reachable from the client
+- Run a test signup + scan write
+- Fix any RLS or column mismatch found
 
-## Decision needed before I generate files
+## Notes
 
-- Do you want to **keep existing user accounts** (more work — auth admin import) or is **users re-signing up** acceptable (simple)?
+- **Existing users won't carry over** — `auth.users` cannot be CSV-imported. New signups will work normally.
+- **Data:** you said schema only — that's fine. Public reference tables (`accessibility_rules`, `eco_printers`, `events_calendar`, `print_requirements`, `trademark_database`, `copyrighted_images`) need rows for the app to function fully. Import those CSVs from the export bundle via Supabase Table Editor → Insert → Import data from CSV.
+- **Don't** import `user_profiles`, `scan_results`, etc. — those reference `auth.users` ids that no longer exist.
 
-Reply "go" (and tell me the user-accounts choice) and I'll generate the export bundle.
+---
+
+Reply "go" to mark this approved. Then perform Steps 1–5 yourself (I can't click those buttons for you), and ping me from the new project for Step 6.
