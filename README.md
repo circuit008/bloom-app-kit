@@ -56,7 +56,7 @@ Supabase Dashboard → Settings → API
 
 ## 🗄️ Supabase Setup
 
-1. Create a new Supabase project
+1. Create a new Supabase project (Check the Supabase_setting folder for the database setup)
 2. Run the required SQL schema/migrations
 3. Enable Authentication providers if needed (Google OAuth, Email, etc.)
 4. Add localhost URL in:
