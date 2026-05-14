@@ -27,9 +27,56 @@ A comprehensive validation platform for Print-on-Demand sellers to check designs
 
 ## 🚀 Local Setup
 
+
+Clone the repository:
+
 ```bash
 git clone https://github.com/YOUR_USERNAME/pod-guard-compliance.git
 cd pod-guard-compliance
+```
+
+Install dependencies:
+
+```bash
 npm install
-cp .env.example .env  # Add your Supabase credentials
+```
+
+## 🔑 Environment Variables
+
+Create a `.env` file in the root directory and add your Supabase credentials:
+
+```env
+VITE_SUPABASE_URL=your_supabase_project_url
+VITE_SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+```
+
+You can get these values from:
+
+Supabase Dashboard → Settings → API
+
+## 🗄️ Supabase Setup
+
+1. Create a new Supabase project
+2. Run the required SQL schema/migrations
+3. Enable Authentication providers if needed (Google OAuth, Email, etc.)
+4. Add localhost URL in:
+
+Authentication → URL Configuration
+
+Example:
+
+```txt
+http://localhost:5173/**
+```
+
+## ▶️ Run the Development Server
+
+```bash
 npm run dev
+```
+
+Open:
+
+```txt
+http://localhost:5173
+```
