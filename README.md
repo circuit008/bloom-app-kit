@@ -23,7 +23,7 @@ A comprehensive validation platform for Print-on-Demand sellers to check designs
 - **Frontend:** React, Vite, Tailwind CSS, Shadcn UI
 - **Backend:** Supabase (Auth, Database, Storage)
 - **Image Processing:** HTML5 Canvas API (Client-Side)
-- **Deployment:** Localhost + GitHub
+- **Deployment:** Localhost + GitHub + Vercel
 
 ## 🚀 Local Setup
 
