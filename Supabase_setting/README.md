@@ -39,14 +39,5 @@ In your Supabase project → Authentication → Providers:
 - Enable Email/Password
 - Enable Google (paste your Google OAuth client ID + secret)
 
-## Step 4 — Edge function secrets
-Add these in Project Settings → Edge Functions → Secrets, if your
-edge functions use them:
-- SHOPIFY_ACCESS_TOKEN
-- SHOPIFY_STOREFRONT_ACCESS_TOKEN
-- LOVABLE_API_KEY (only if you use Lovable AI Gateway from edge functions)
 
-## Step 5 — Disable Lovable Cloud + remix
-- Connectors → Lovable Cloud → Disable Cloud (workspace-level)
-- Open this project → name (top-left) → Settings → Remix this project
-- In the new project: Connectors → Supabase → connect your account → pick the project
+
