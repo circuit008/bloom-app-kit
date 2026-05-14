@@ -1,0 +1,5 @@
+id,rule_name,description,min_contrast_ratio,wcag_level,category,created_at
+66b03945-6a33-4157-93ca-c811a2697a95,Normal Text AA,Minimum contrast for normal text at WCAG AA,4.5,AA,contrast,2026-03-08 18:03:23.019915+00
+078aaa32-c1e2-49ff-bc0d-03d791ad0e0b,Large Text AA,Minimum contrast for large text at WCAG AA,3.0,AA,contrast,2026-03-08 18:03:23.019915+00
+c3f9a041-0776-4e9a-a4eb-02331b9d6ad9,Normal Text AAA,Enhanced contrast for normal text at WCAG AAA,7.0,AAA,contrast,2026-03-08 18:03:23.019915+00
+b717b110-d91b-48db-82ed-dca1cff56713,Large Text AAA,Enhanced contrast for large text at WCAG AAA,4.5,AAA,contrast,2026-03-08 18:03:23.019915+00

@@ -1,0 +1,21 @@
+id,name,event_date,country,category,description,suggested_themes,created_at
+e879d00c-032b-45af-8f27-5c93a0496718,Christmas,2025-12-25,USA/Canada,Holiday,Christmas celebration,"{santa,reindeer,snowman,gifts,""christmas tree""}",2025-11-19 19:30:10.27788+00
+46c27bbf-0f34-4191-a1a0-a6cc115c73e7,New Year,2026-01-01,USA/Canada,Holiday,New Year celebration,"{fireworks,champagne,countdown,party}",2025-11-19 19:30:10.27788+00
+ccd7551a-7e58-4015-890a-99b27651ae2f,Valentine's Day,2026-02-14,USA/Canada,Holiday,Day of love and romance,"{hearts,love,cupid,roses,romance}",2025-11-19 19:30:10.27788+00
+bf7a6f0e-c2cf-4f5e-8797-03ebd2c7e51c,St. Patrick's Day,2026-03-17,USA/Canada,Holiday,Irish celebration,"{shamrock,leprechaun,green,lucky}",2025-11-19 19:30:10.27788+00
+1e828cdb-2786-4b12-846e-6f6742097c31,Easter,2026-04-05,USA/Canada,Holiday,Easter celebration,"{bunny,eggs,spring,chicks}",2025-11-19 19:30:10.27788+00
+ce8f61e8-304b-4978-bba3-80532916e291,Mother's Day,2026-05-10,USA/Canada,Holiday,Celebrating mothers,"{mom,flowers,family,love}",2025-11-19 19:30:10.27788+00
+b4ba328b-b182-4911-9976-a4f4abc6d870,Father's Day,2026-06-21,USA/Canada,Holiday,Celebrating fathers,"{dad,family,tools,grilling}",2025-11-19 19:30:10.27788+00
+6dbec2f7-1206-4ce1-a9ad-1cb3de44caeb,Independence Day,2026-07-04,USA,Holiday,American Independence Day,"{flag,fireworks,patriotic,eagle}",2025-11-19 19:30:10.27788+00
+cd72049e-a591-4097-892a-f5d3a7217006,Canada Day,2026-07-01,Canada,Holiday,Canadian national day,"{""maple leaf"",flag,patriotic,beaver}",2025-11-19 19:30:10.27788+00
+2c5ad196-1d4b-4e98-83d2-ba26d4756f6b,Halloween,2025-10-31,USA/Canada,Holiday,Spooky celebration,"{pumpkin,ghost,witch,skeleton,candy}",2025-11-19 19:30:10.27788+00
+0572d056-c98e-41ea-b231-c86225a123ba,Thanksgiving,2025-11-27,USA,Holiday,Thanksgiving Day,"{turkey,pie,gratitude,family,autumn}",2025-11-19 19:30:10.27788+00
+47eb0d68-fed0-47d0-a88a-b95c31550e9a,Black Friday,2025-11-28,USA/Canada,Shopping,Shopping event,"{sale,shopping,deals,discount}",2025-11-19 19:30:10.27788+00
+b70e4e83-6160-4659-8e5c-2eb824210cf6,Back to School,2025-09-01,USA/Canada,Seasonal,School season starts,"{backpack,pencil,books,student,teacher}",2025-11-19 19:30:10.27788+00
+066adae3-a1c4-4458-a706-577482a8089f,Summer,2025-06-21,USA/Canada,Seasonal,Summer season,"{beach,sun,vacation,""ice cream"",swimming}",2025-11-19 19:30:10.27788+00
+aad806d9-272c-44b0-a1d7-071b33651110,Fall,2025-09-23,USA/Canada,Seasonal,Autumn season,"{leaves,""pumpkin spice"",cozy,sweater}",2025-11-19 19:30:10.27788+00
+2529a5e4-d537-42e1-b8f9-6670447bafcd,Winter,2025-12-21,USA/Canada,Seasonal,Winter season,"{snow,skiing,""hot chocolate"",cozy}",2025-11-19 19:30:10.27788+00
+d4509835-69f1-4902-9249-43ee7854f4b2,Spring,2026-03-20,USA/Canada,Seasonal,Spring season,"{flowers,birds,rain,growth}",2025-11-19 19:30:10.27788+00
+2486780d-b510-4857-90e6-e8e9604a9f24,Super Bowl,2026-02-01,USA,Sports,NFL Championship,"{football,sports,team,championship}",2025-11-19 19:30:10.27788+00
+5ea0a42c-4008-47a8-a7aa-6ea5140dfee1,Pride Month,2026-06-01,USA/Canada,Cultural,LGBTQ+ Pride Month,"{rainbow,pride,love,equality}",2025-11-19 19:30:10.27788+00
+f189bec2-051b-451b-9280-34283bb630a4,Earth Day,2026-04-22,USA/Canada,Environmental,Environmental awareness,"{earth,nature,green,recycle}",2025-11-19 19:30:10.27788+00

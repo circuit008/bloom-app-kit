@@ -1,0 +1,8 @@
+id,product_type,min_width_px,min_height_px,recommended_dpi,description,created_at
+32ded89a-8e5e-4ef7-9f83-83702442dd93,T-Shirt (Standard),2400,3200,300,Standard front print area,2026-03-08 18:03:23.019915+00
+aeea42a2-e0b9-4b15-b7a3-2a77e3419d29,T-Shirt (All-Over),4500,5400,150,All-over sublimation print,2026-03-08 18:03:23.019915+00
+fdf1f7b3-1af5-4906-8a32-c8933afbbddf,Mug (11oz),2700,1100,300,Standard 11oz mug wrap,2026-03-08 18:03:23.019915+00
+f4369bf3-fdaa-4ab9-86a4-ec988577909c,Poster (18x24),5400,7200,300,18x24 inch poster,2026-03-08 18:03:23.019915+00
+2962c616-3491-491a-9e4e-af7f0b4243ba,Phone Case,1800,3200,300,Standard phone case print,2026-03-08 18:03:23.019915+00
+6299da72-cc4d-4861-b9ec-26915d4d101e,Tote Bag,3600,3600,300,Standard tote bag print area,2026-03-08 18:03:23.019915+00
+d90b81da-72ee-4a25-89b1-1837fce11b00,Hoodie,3000,3500,300,Standard hoodie front print,2026-03-08 18:03:23.019915+00

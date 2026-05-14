@@ -1,0 +1,56 @@
+id,image_hash,term,owner,category,source_url,created_at
+aa91b0cb-1cb0-4821-a750-16a663199d30,a1b2c3d4e5f60001,Mickey Mouse,Disney,character,https://disney.com,2026-03-12 17:28:41.329869+00
+c5c6379a-de53-479d-afd6-409ed7404cb4,a1b2c3d4e5f60002,Donald Duck,Disney,character,https://disney.com,2026-03-12 17:28:41.329869+00
+9497558c-4712-4ce2-8e8f-d849853a7049,a1b2c3d4e5f60003,Goofy,Disney,character,https://disney.com,2026-03-12 17:28:41.329869+00
+1b71d52b-0b11-49a6-9f8b-354c640c8954,a1b2c3d4e5f60004,Minnie Mouse,Disney,character,https://disney.com,2026-03-12 17:28:41.329869+00
+46565077-2476-45fe-889f-2d5ee10dfe08,a1b2c3d4e5f60005,Elsa (Frozen),Disney,character,https://disney.com,2026-03-12 17:28:41.329869+00
+3dbd8eea-66f7-484d-a1d4-a27334815055,a1b2c3d4e5f60006,Simba (Lion King),Disney,character,https://disney.com,2026-03-12 17:28:41.329869+00
+45b96ef8-0b7d-4e92-b920-6604b51f3067,a1b2c3d4e5f60007,Buzz Lightyear,Disney/Pixar,character,https://disney.com,2026-03-12 17:28:41.329869+00
+c8a66570-36ff-455e-8d9e-b103e9644e53,a1b2c3d4e5f60008,Spider-Man,Marvel/Disney,character,https://marvel.com,2026-03-12 17:28:41.329869+00
+b40d3f04-a83f-400a-9ec4-7d886b19ee75,a1b2c3d4e5f60009,Iron Man,Marvel/Disney,character,https://marvel.com,2026-03-12 17:28:41.329869+00
+b027a994-8abf-4c78-bbfa-77c52bada220,a1b2c3d4e5f60010,Captain America Shield,Marvel/Disney,logo,https://marvel.com,2026-03-12 17:28:41.329869+00
+8f4e7c45-8708-471e-89b6-92f914a6096c,a1b2c3d4e5f60011,Hulk,Marvel/Disney,character,https://marvel.com,2026-03-12 17:28:41.329869+00
+9e80f213-b277-4547-b118-e385e8fb6608,a1b2c3d4e5f60012,Thor Hammer,Marvel/Disney,symbol,https://marvel.com,2026-03-12 17:28:41.329869+00
+9025b526-1a17-4d6d-a377-d76c9b0da376,a1b2c3d4e5f60013,Black Panther,Marvel/Disney,character,https://marvel.com,2026-03-12 17:28:41.329869+00
+c427fa5f-49d1-4a50-9f4f-9badb21ce15f,a1b2c3d4e5f60014,Deadpool,Marvel/Disney,character,https://marvel.com,2026-03-12 17:28:41.329869+00
+87502bea-9ca2-4e69-a252-cf41d7482d36,a1b2c3d4e5f60015,Nike Swoosh,Nike Inc.,logo,https://nike.com,2026-03-12 17:28:41.329869+00
+f01bcd40-5de3-4e95-a631-148d119adaea,a1b2c3d4e5f60016,Air Jordan Jumpman,Nike Inc.,logo,https://nike.com,2026-03-12 17:28:41.329869+00
+fb593189-c4ab-4342-bc87-9ec480137bb5,a1b2c3d4e5f60017,Adidas Three Stripes,Adidas AG,logo,https://adidas.com,2026-03-12 17:28:41.329869+00
+32cc172d-fc5a-43a5-8cea-198b5a012b49,a1b2c3d4e5f60018,Adidas Trefoil,Adidas AG,logo,https://adidas.com,2026-03-12 17:28:41.329869+00
+adab1c1a-91d7-4bd1-9d43-16db6f104d59,a1b2c3d4e5f60019,Apple Logo,Apple Inc.,logo,https://apple.com,2026-03-12 17:28:41.329869+00
+8b532d7b-1775-4309-9d58-4490b2966cb4,a1b2c3d4e5f60020,Google Logo,Google LLC,logo,https://google.com,2026-03-12 17:28:41.329869+00
+917503f0-5477-43ca-bb69-1f18e7093732,a1b2c3d4e5f60021,Batman Symbol,DC Comics/Warner Bros.,logo,https://dc.com,2026-03-12 17:28:41.329869+00
+151dabd3-5a99-4605-8da7-2879e9b45ab2,a1b2c3d4e5f60022,Superman S,DC Comics/Warner Bros.,logo,https://dc.com,2026-03-12 17:28:41.329869+00
+15bb35b6-5a36-4143-ab79-c890ee9a1cd0,a1b2c3d4e5f60023,Wonder Woman,DC Comics/Warner Bros.,character,https://dc.com,2026-03-12 17:28:41.329869+00
+484c6732-fc07-4536-a46a-6f06996eb113,a1b2c3d4e5f60024,Pikachu,Nintendo/The Pokémon Company,character,https://pokemon.com,2026-03-12 17:28:41.329869+00
+6282cc5b-67f8-4206-8dbf-9d57bc9c1ebe,a1b2c3d4e5f60025,Mario,Nintendo,character,https://nintendo.com,2026-03-12 17:28:41.329869+00
+60239135-b7ca-40ce-8fa6-4e01b31bb11c,a1b2c3d4e5f60026,Link (Zelda),Nintendo,character,https://nintendo.com,2026-03-12 17:28:41.329869+00
+11114fd1-d2fb-4a70-a2b7-9c9899c732f1,a1b2c3d4e5f60027,Sonic the Hedgehog,Sega,character,https://sega.com,2026-03-12 17:28:41.329869+00
+b945f715-9f01-4800-84d7-49690f14ca3d,a1b2c3d4e5f60028,Hello Kitty,Sanrio,character,https://sanrio.com,2026-03-12 17:28:41.329869+00
+f19ddd8f-935b-4321-af22-43ab43f70243,a1b2c3d4e5f60029,Spongebob,Nickelodeon/Paramount,character,https://nick.com,2026-03-12 17:28:41.329869+00
+c786a3d4-29a3-4a47-884c-8ae1350f0e2a,a1b2c3d4e5f60030,Peppa Pig,Hasbro/eOne,character,https://peppapig.com,2026-03-12 17:28:41.329869+00
+026f15f5-ad5a-49de-a1ab-b0d85372c608,a1b2c3d4e5f60031,Coca-Cola Logo,The Coca-Cola Company,logo,https://coca-cola.com,2026-03-12 17:28:41.329869+00
+9f06d2f6-d967-42c7-b484-30f802c50b6f,a1b2c3d4e5f60032,Pepsi Globe,PepsiCo,logo,https://pepsi.com,2026-03-12 17:28:41.329869+00
+35ab048a-3eb4-4ebb-9f4c-bbea1bfbebdf,a1b2c3d4e5f60033,McDonald's Golden Arches,McDonald's Corp.,logo,https://mcdonalds.com,2026-03-12 17:28:41.329869+00
+bca154bc-2b65-4c95-b278-2a4dc783def5,a1b2c3d4e5f60034,Starbucks Siren,Starbucks Corp.,logo,https://starbucks.com,2026-03-12 17:28:41.329869+00
+446fa12c-1bf5-4926-8bbe-6eb5a09c43ad,a1b2c3d4e5f60035,Ferrari Prancing Horse,Ferrari N.V.,logo,https://ferrari.com,2026-03-12 17:28:41.329869+00
+c65467d2-8e1a-4dc5-ac2f-4ac546942d62,a1b2c3d4e5f60036,Louis Vuitton Monogram,LVMH,pattern,https://louisvuitton.com,2026-03-12 17:28:41.329869+00
+660d9135-f68d-4772-80d0-7a8556c577b5,a1b2c3d4e5f60037,Gucci GG Pattern,Kering/Gucci,pattern,https://gucci.com,2026-03-12 17:28:41.329869+00
+afb6b450-fe2e-4184-bd1f-6771ebebc452,a1b2c3d4e5f60038,Chanel CC Logo,Chanel S.A.,logo,https://chanel.com,2026-03-12 17:28:41.329869+00
+88808dcf-adfa-4077-8617-df4e054c0ca9,a1b2c3d4e5f60039,Supreme Box Logo,Supreme,logo,https://supremenewyork.com,2026-03-12 17:28:41.329869+00
+02025d05-f2eb-4b31-a97b-94c1d9ed0732,a1b2c3d4e5f60040,Star Wars Logo,Lucasfilm/Disney,logo,https://starwars.com,2026-03-12 17:28:41.329869+00
+bd7fd688-1b21-4d0c-a5b5-4d41e42bd315,a1b2c3d4e5f60041,Darth Vader,Lucasfilm/Disney,character,https://starwars.com,2026-03-12 17:28:41.329869+00
+237f1e34-297c-4f25-8f2e-e60ab85731c3,a1b2c3d4e5f60042,Baby Yoda (Grogu),Lucasfilm/Disney,character,https://starwars.com,2026-03-12 17:28:41.329869+00
+e9829159-9069-46c0-b3ff-112b24e1ed95,a1b2c3d4e5f60043,Harry Potter Logo,Warner Bros.,logo,https://wizardingworld.com,2026-03-12 17:28:41.329869+00
+7f6ddd4a-da5f-4e9e-ab7e-6877be620b8f,a1b2c3d4e5f60044,Hogwarts Crest,Warner Bros.,logo,https://wizardingworld.com,2026-03-12 17:28:41.329869+00
+78b61aa8-ec86-461d-a3af-c7240c8f6f6e,a1b2c3d4e5f60045,Naruto,Shueisha/VIZ Media,character,https://naruto.com,2026-03-12 17:28:41.329869+00
+cef29c4e-2d97-4862-98c9-4fda8a5f5f81,a1b2c3d4e5f60046,Goku (Dragon Ball),Toei Animation/Shueisha,character,https://dragonball.com,2026-03-12 17:28:41.329869+00
+364204ae-c469-4e14-b0aa-0cd24554e623,a1b2c3d4e5f60047,One Piece Jolly Roger,Toei Animation/Shueisha,logo,https://onepiece.com,2026-03-12 17:28:41.329869+00
+e72ba85b-54e7-40a9-a59e-33da6cf65722,a1b2c3d4e5f60048,Puma Logo,Puma SE,logo,https://puma.com,2026-03-12 17:28:41.329869+00
+04749ef9-9b06-4384-acc7-9f708ed4cd00,a1b2c3d4e5f60049,Under Armour Logo,Under Armour Inc.,logo,https://underarmour.com,2026-03-12 17:28:41.329869+00
+f9d8bd06-54dc-4e56-9ebc-d49ed8d9f664,a1b2c3d4e5f60050,Versace Medusa,Versace/Capri Holdings,logo,https://versace.com,2026-03-12 17:28:41.329869+00
+e4b52b85-41fb-4ce1-bf0a-5150d3754b2e,a1b2c3d4e5f60051,Playboy Bunny,PLBY Group,logo,https://playboy.com,2026-03-12 17:28:41.329869+00
+18a240ae-8db2-4f84-aeda-723b1906f366,a1b2c3d4e5f60052,Rolling Stones Tongue,Musidor B.V.,logo,https://rollingstones.com,2026-03-12 17:28:41.329869+00
+37c030cc-9b12-4756-bf04-76a36163f73e,a1b2c3d4e5f60053,Transformers Logo,Hasbro,logo,https://transformers.com,2026-03-12 17:28:41.329869+00
+e4923eb7-3d8d-4e1a-878f-93b1ff0f4e50,a1b2c3d4e5f60054,Minecraft Creeper,Mojang/Microsoft,character,https://minecraft.net,2026-03-12 17:28:41.329869+00
+7472398a-8679-4c2c-834e-2ddc86d90c68,a1b2c3d4e5f60055,Roblox Logo,Roblox Corp.,logo,https://roblox.com,2026-03-12 17:28:41.329869+00
