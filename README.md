@@ -31,8 +31,8 @@ A comprehensive validation platform for Print-on-Demand sellers to check designs
 Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/pod-guard-compliance.git
-cd pod-guard-compliance
+git clone https://github.com/circuit008/bloom-app-kit.git
+cd bloom-app-kit
 ```
 
 Install dependencies:
