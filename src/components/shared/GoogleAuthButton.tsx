@@ -1,19 +1,39 @@
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useState } from "react";
 
 interface GoogleAuthButtonProps {
-  loading: boolean;
-  onClick: () => void;
   label?: string;
 }
 
-export function GoogleAuthButton({ loading, onClick, label = "Continue with Google" }: GoogleAuthButtonProps) {
+export function GoogleAuthButton({ label = "Continue with Google" }: GoogleAuthButtonProps) {
+  const [loading, setLoading] = useState(false);
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`,
+        },
+      });
+      if (error) throw error;
+    } catch (err: any) {
+      console.error("Google sign-in error:", err);
+      toast.error("Failed to sign in with Google: " + (err.message || "Unknown error"));
+      setLoading(false);
+    }
+  };
+
   return (
     <Button
       type="button"
       variant="outline"
       className="w-full h-11 gap-2.5 font-medium"
-      onClick={onClick}
+      onClick={handleGoogleSignIn}
       disabled={loading}
     >
       {loading ? (
