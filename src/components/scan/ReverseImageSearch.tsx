@@ -214,11 +214,15 @@ export function ReverseImageSearch({ imageUrl, onComplete, onBack }: ReverseImag
       // Step 4: Store hash in uploaded_images for duplicate detection
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from("uploaded_images").insert({
-          user_id: user.id,
-          image_hash: imageHash,
-          is_copyrighted: allMatches.length > 0,
-        }).catch(() => {}); // Ignore errors if table doesn't exist yet
+        try {
+          await supabase.from("uploaded_images").insert({
+            user_id: user.id,
+            image_hash: imageHash,
+            is_copyrighted: allMatches.length > 0,
+          });
+        } catch {
+          // Ignore errors if table doesn't exist yet
+        }
       }
 
       const res: ReverseImageResult = { score: finalScore, matches: allMatches, imageHash };
