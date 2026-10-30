@@ -155,7 +155,7 @@ export function ReverseImageSearch({ imageUrl, onComplete, onBack }: ReverseImag
       );
 
       // 🚨 THIS IS THE LINE THAT PROVES IT WORKS! Look for this in F12 Console 🚨
-      console.log("🤖 AI says:", aiData);
+      console.log("🤖 AI says:", aiData, "ERROR:", aiError);
 
       let aiMatches: ReverseImageMatch[] = [];
       let aiScore = 100;
