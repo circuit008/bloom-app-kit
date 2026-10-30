@@ -148,7 +148,7 @@ export function ReverseImageSearch({ imageUrl, onComplete, onBack }: ReverseImag
       // ---------------------------------------------------------
       console.log("🤖 Calling AI to check image...");
       const { data: aiData, error: aiError } = await supabase.functions.invoke(
-        "check-image-copyright",
+        "rapid-function",
         {
           body: { imageBase64: base64Image, mimeType: mimeType },
         }
