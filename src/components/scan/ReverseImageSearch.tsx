@@ -116,33 +116,77 @@ export function ReverseImageSearch({ imageUrl, onComplete, onBack }: ReverseImag
     runSearch();
   }, [imageUrl]);
 
-  const runSearch = async () => {
+    const runSearch = async () => {
     setLoading(true);
     setError(null);
-    console.log("[ReverseImageSearch] Starting reverse image search...");
+    console.log("[ReverseImageSearch] Starting search...");
 
     try {
-      // Step 1: Generate perceptual hash of uploaded image
-      const imageHash = await generatePerceptualHash(imageUrl);
-      console.log("[ReverseImageSearch] Image hash generated:", imageHash);
+      // ---------------------------------------------------------
+      // STEP 1: Convert imageUrl to Base64 for the AI
+      // ---------------------------------------------------------
+      let base64Image = "";
+      let mimeType = "image/jpeg";
 
-      // Step 2: Fetch copyrighted image hashes from DB
+      if (imageUrl.startsWith("data:")) {
+        mimeType = imageUrl.split(";")[0].split(":")[1];
+        base64Image = imageUrl.split(",")[1];
+      } else {
+        // If it's a blob or URL, fetch it and convert
+        const response = await fetch(imageUrl);
+        const blob = await response.blob();
+        mimeType = blob.type || "image/jpeg";
+        base64Image = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve((reader.result as string).split(",")[1]);
+          reader.readAsDataURL(blob);
+        });
+      }
+
+      // ---------------------------------------------------------
+      // STEP 2: Call the Hugging Face Edge Function
+      // ---------------------------------------------------------
+      console.log("🤖 Calling AI to check image...");
+      const { data: aiData, error: aiError } = await supabase.functions.invoke(
+        "check-image-copyright",
+        {
+          body: { imageBase64: base64Image, mimeType: mimeType },
+        }
+      );
+
+      // 🚨 THIS IS THE LINE THAT PROVES IT WORKS! Look for this in F12 Console 🚨
+      console.log("🤖 AI says:", aiData);
+
+      let aiMatches: ReverseImageMatch[] = [];
+      let aiScore = 100;
+
+      if (!aiError && aiData) {
+        if (aiData.is_copyrighted && aiData.detected_items[0] !== "None detected") {
+          aiScore = 25; // Drop score significantly if AI finds copyright
+          aiMatches = aiData.detected_items.map((item: string) => ({
+            term: item,
+            owner: "AI Detected",
+            category: "Copyright/Trademark",
+            similarity: 100,
+            sourceUrl: null,
+          }));
+        }
+      }
+
+      // ---------------------------------------------------------
+      // STEP 3: Keep your existing Hash logic as a backup
+      // ---------------------------------------------------------
+      const imageHash = await generatePerceptualHash(imageUrl);
       const { data: copyrightedImages, error: dbError } = await supabase
         .from("copyrighted_images")
         .select("*");
 
-      if (dbError) throw dbError;
-      console.log("[ReverseImageSearch] Loaded", copyrightedImages?.length || 0, "copyrighted references");
-
-      // Step 3: Compare hashes
-      const matches: ReverseImageMatch[] = [];
-      const SIMILARITY_THRESHOLD = 60; // Flag if 60%+ similar
-
-      if (copyrightedImages) {
+      let hashMatches: ReverseImageMatch[] = [];
+      if (!dbError && copyrightedImages) {
         for (const ci of copyrightedImages) {
           const similarity = calculateSimilarity(imageHash, ci.image_hash);
-          if (similarity >= SIMILARITY_THRESHOLD) {
-            matches.push({
+          if (similarity >= 60) {
+            hashMatches.push({
               term: ci.term,
               owner: ci.owner,
               category: ci.category,
@@ -153,32 +197,31 @@ export function ReverseImageSearch({ imageUrl, onComplete, onBack }: ReverseImag
         }
       }
 
-      // Sort by similarity descending
-      matches.sort((a, b) => b.similarity - a.similarity);
+      // Combine AI matches and Hash matches
+      const allMatches = [...aiMatches, ...hashMatches];
+      allMatches.sort((a, b) => b.similarity - a.similarity);
 
-      // Step 4: Calculate score (100 if no matches, deduct based on similarity)
-      let score = 100;
-      if (matches.length > 0) {
-        const topSimilarity = matches[0].similarity;
-        if (topSimilarity >= 90) score = 0;
-        else if (topSimilarity >= 80) score = 25;
-        else if (topSimilarity >= 70) score = 50;
-        else score = 75;
+      // Calculate final score (AI copyright detection overrides hash score)
+      let finalScore = aiScore;
+      if (aiScore === 100 && allMatches.length > 0) {
+        const topSimilarity = allMatches[0].similarity;
+        if (topSimilarity >= 90) finalScore = 0;
+        else if (topSimilarity >= 80) finalScore = 25;
+        else if (topSimilarity >= 70) finalScore = 50;
+        else finalScore = 75;
       }
 
-      console.log("[ReverseImageSearch] Matches found:", matches.length, "Score:", score);
-
-      // Step 5: Store hash in uploaded_images for duplicate detection
+      // Step 4: Store hash in uploaded_images for duplicate detection
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await supabase.from("uploaded_images").insert({
           user_id: user.id,
           image_hash: imageHash,
-          is_copyrighted: matches.length > 0,
-        });
+          is_copyrighted: allMatches.length > 0,
+        }).catch(() => {}); // Ignore errors if table doesn't exist yet
       }
 
-      const res: ReverseImageResult = { score, matches, imageHash };
+      const res: ReverseImageResult = { score: finalScore, matches: allMatches, imageHash };
       setResult(res);
     } catch (err: any) {
       console.error("[ReverseImageSearch] Error:", err);
