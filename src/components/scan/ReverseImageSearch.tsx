@@ -1,6 +1,20 @@
+
 import { useState, useEffect } from "react";
-import { Search, Loader2, AlertTriangle, CheckCircle2, ShieldCheck } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Search,
+  Loader2,
+  AlertTriangle,
+  CheckCircle2,
+  ShieldCheck,
+} from "lucide-react";
+
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,104 +41,96 @@ interface ReverseImageSearchProps {
   onBack: () => void;
 }
 
-/**
- * Generate a simple perceptual hash from image pixel data.
- * Uses average hash (aHash): resize to 16x16, grayscale, compare to mean.
- */
+// Generate a perceptual image fingerprint.
 function generatePerceptualHash(imageUrl: string): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
+
     if (!imageUrl.startsWith("data:") && !imageUrl.startsWith("blob:")) {
       img.crossOrigin = "anonymous";
     }
+
     img.onload = () => {
       try {
         const canvas = document.createElement("canvas");
         const size = 16;
+
         canvas.width = size;
         canvas.height = size;
+
         const ctx = canvas.getContext("2d");
-        if (!ctx) { reject(new Error("Canvas not supported")); return; }
 
-        ctx.drawImage(img, 0, 0, size, size);
-        const data = ctx.getImageData(0, 0, size, size).data;
-
-        // Convert to grayscale values
-        const grays: number[] = [];
-        for (let i = 0; i < data.length; i += 4) {
-          grays.push(0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]);
+        if (!ctx) {
+          reject(new Error("Canvas not supported"));
+          return;
         }
 
-        // Calculate average
-        const avg = grays.reduce((a, b) => a + b, 0) / grays.length;
+        ctx.drawImage(img, 0, 0, size, size);
 
-        // Build hash: 1 if above average, 0 if below
+        const data = ctx.getImageData(0, 0, size, size).data;
+        const grays: number[] = [];
+
+        for (let i = 0; i < data.length; i += 4) {
+          grays.push(
+            0.299 * data[i] +
+            0.587 * data[i + 1] +
+            0.114 * data[i + 2]
+          );
+        }
+
+        const avg =
+          grays.reduce((a, b) => a + b, 0) / grays.length;
+
         let hash = "";
+
         for (const g of grays) {
           hash += g >= avg ? "1" : "0";
         }
 
-        // Convert binary to hex
         let hexHash = "";
+
         for (let i = 0; i < hash.length; i += 4) {
-          hexHash += parseInt(hash.substring(i, i + 4), 2).toString(16);
+          hexHash += parseInt(
+            hash.substring(i, i + 4),
+            2
+          ).toString(16);
         }
 
         console.log("[ReverseImageSearch] Generated hash:", hexHash);
+
         resolve(hexHash);
       } catch (err) {
         reject(err);
       }
     };
-    img.onerror = () => reject(new Error("Failed to load image for hashing"));
+
+    img.onerror = () => {
+      reject(new Error("Failed to load image for hashing"));
+    };
+
     img.src = imageUrl;
   });
 }
 
-/**
- * Calculate Hamming distance between two hex hashes (similarity).
- * Returns similarity as a percentage (0-100).
- */
-function calculateSimilarity(hash1: string, hash2: string): number {
-  const maxLen = Math.max(hash1.length, hash2.length);
-  const h1 = hash1.padEnd(maxLen, "0");
-  const h2 = hash2.padEnd(maxLen, "0");
-
-  // Convert hex to binary and compare bits
-  let totalBits = 0;
-  let matchingBits = 0;
-
-  for (let i = 0; i < maxLen; i++) {
-    const b1 = parseInt(h1[i], 16);
-    const b2 = parseInt(h2[i], 16);
-    const xor = b1 ^ b2;
-    for (let bit = 0; bit < 4; bit++) {
-      totalBits++;
-      if (((xor >> bit) & 1) === 0) matchingBits++;
-    }
-  }
-
-  return totalBits > 0 ? Math.round((matchingBits / totalBits) * 100) : 0;
-}
-
-export function ReverseImageSearch({ imageUrl, onComplete, onBack }: ReverseImageSearchProps) {
+export function ReverseImageSearch({
+  imageUrl,
+  onComplete,
+  onBack,
+}: ReverseImageSearchProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ReverseImageResult | null>(null);
 
-  useEffect(() => {
-    runSearch();
-  }, [imageUrl]);
-
-    const runSearch = async () => {
+  const runSearch = async () => {
     setLoading(true);
     setError(null);
-    console.log("[ReverseImageSearch] Starting search...");
+    setResult(null);
+
+    console.log("[ReverseImageSearch] Starting Gemini AI analysis...");
 
     try {
-      // ---------------------------------------------------------
-      // STEP 1: Convert imageUrl to Base64 for the AI
-      // ---------------------------------------------------------
+      // STEP 1: Convert the image to Base64.
+
       let base64Image = "";
       let mimeType = "image/jpeg";
 
@@ -132,140 +138,266 @@ export function ReverseImageSearch({ imageUrl, onComplete, onBack }: ReverseImag
         mimeType = imageUrl.split(";")[0].split(":")[1];
         base64Image = imageUrl.split(",")[1];
       } else {
-        // If it's a blob or URL, fetch it and convert
         const response = await fetch(imageUrl);
+
+        if (!response.ok) {
+          throw new Error("Could not load the selected image.");
+        }
+
         const blob = await response.blob();
+
         mimeType = blob.type || "image/jpeg";
-        base64Image = await new Promise<string>((resolve) => {
+
+        base64Image = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader();
-          reader.onloadend = () => resolve((reader.result as string).split(",")[1]);
+
+          reader.onloadend = () => {
+            const dataUrl = reader.result as string;
+            resolve(dataUrl.split(",")[1]);
+          };
+
+          reader.onerror = () => {
+            reject(new Error("Could not convert image to Base64."));
+          };
+
           reader.readAsDataURL(blob);
         });
       }
 
-      // ---------------------------------------------------------
-      // STEP 2: Call the Hugging Face Edge Function
-      // ---------------------------------------------------------
-      console.log("🤖 Calling AI to check image...");
-      const { data: aiData, error: aiError } = await supabase.functions.invoke(
-        "rapid-function",
-        {
-          body: { imageBase64: base64Image, mimeType: mimeType },
-        }
+      if (!base64Image) {
+        throw new Error("Image data is empty.");
+      }
+
+      // STEP 2: Send the image to the Gemini Edge Function.
+
+      console.log("🤖 Sending image to Gemini AI...");
+
+      const { data: aiData, error: aiError } =
+        await supabase.functions.invoke("rapid-function", {
+          body: {
+            imageBase64: base64Image,
+            mimeType: mimeType,
+          },
+        });
+
+      console.log("🤖 Gemini response:", aiData);
+      console.log("🤖 Gemini error:", aiError);
+
+      // Do not show a safe result if the AI request failed.
+
+      if (aiError) {
+        throw new Error(aiError.message || "Gemini AI request failed.");
+      }
+
+      if (!aiData || !aiData.success) {
+        throw new Error(
+          aiData?.error || "Gemini did not return a valid analysis."
+        );
+      }
+
+      // STEP 3: Process Gemini's result ONLY.
+      // No copyrighted_images database search is performed here.
+
+      const detectedItems: string[] = Array.isArray(aiData.detected_items)
+        ? aiData.detected_items.filter(
+            (item: unknown): item is string =>
+              typeof item === "string" &&
+              item.trim().length > 0 &&
+              item.toLowerCase() !== "none detected"
+          )
+        : [];
+
+      const potentialRisk = Boolean(
+        aiData.potential_ip_risk || aiData.is_copyrighted
       );
 
-      // 🚨 THIS IS THE LINE THAT PROVES IT WORKS! Look for this in F12 Console 🚨
-      console.log("🤖 AI says:", aiData, "ERROR:", aiError);
+      const rawConfidence = Number(aiData.confidence);
+
+      const confidencePercent = Number.isFinite(rawConfidence)
+        ? Math.max(
+            0,
+            Math.min(
+              100,
+              Math.round(
+                rawConfidence <= 1
+                  ? rawConfidence * 100
+                  : rawConfidence
+              )
+            )
+          )
+        : 0;
 
       let aiMatches: ReverseImageMatch[] = [];
-      let aiScore = 100;
 
-      if (!aiError && aiData) {
-        if (aiData.is_copyrighted && aiData.detected_items[0] !== "None detected") {
-          aiScore = 25; // Drop score significantly if AI finds copyright
-          aiMatches = aiData.detected_items.map((item: string) => ({
-            term: item,
-            owner: "AI Detected",
-            category: "Copyright/Trademark",
-            similarity: 100,
-            sourceUrl: null,
-          }));
+      if (potentialRisk) {
+        // If Gemini reports risk but does not provide an item name,
+        // use its explanation as a fallback.
+
+        if (detectedItems.length === 0) {
+          const fallback =
+            typeof aiData.risk_reason === "string" &&
+            aiData.risk_reason.trim()
+              ? aiData.risk_reason
+              : "Potential intellectual-property risk detected";
+
+          detectedItems.push(fallback);
         }
+
+        aiMatches = detectedItems.map((item) => ({
+          term: item,
+          owner: "Gemini AI",
+          category: "Potential IP Risk",
+          similarity: confidencePercent,
+          sourceUrl: null,
+        }));
       }
 
-      // ---------------------------------------------------------
-      // STEP 3: Keep your existing Hash logic as a backup
-      // ---------------------------------------------------------
-      const imageHash = await generatePerceptualHash(imageUrl);
-      const { data: copyrightedImages, error: dbError } = await supabase
-        .from("copyrighted_images")
-        .select("*");
+      console.log("GEMINI DETECTED ITEMS:", detectedItems);
+      console.log("GEMINI IP RISK:", potentialRisk);
+      console.log("GEMINI RESULTS:", aiMatches);
 
-      let hashMatches: ReverseImageMatch[] = [];
-      if (!dbError && copyrightedImages) {
-        for (const ci of copyrightedImages) {
-          const similarity = calculateSimilarity(imageHash, ci.image_hash);
-          if (similarity >= 60) {
-            hashMatches.push({
-              term: ci.term,
-              owner: ci.owner,
-              category: ci.category,
-              similarity,
-              sourceUrl: ci.source_url,
-            });
-          }
-        }
+      // STEP 4: Generate the image fingerprint.
+      // This is kept for duplicate tracking, not for copyright matching.
+
+      let imageHash = "";
+
+      try {
+        imageHash = await generatePerceptualHash(imageUrl);
+      } catch (hashError) {
+        console.warn(
+          "[ReverseImageSearch] Could not generate image hash:",
+          hashError
+        );
       }
 
-      // Combine AI matches and Hash matches
-      const allMatches = [...aiMatches, ...hashMatches];
-      allMatches.sort((a, b) => b.similarity - a.similarity);
+      // STEP 5: Store the fingerprint for signed-in users.
+      // The copyrighted_images table is NOT queried.
 
-      // Calculate final score (AI copyright detection overrides hash score)
-      let finalScore = aiScore;
-      if (aiScore === 100 && allMatches.length > 0) {
-        const topSimilarity = allMatches[0].similarity;
-        if (topSimilarity >= 90) finalScore = 0;
-        else if (topSimilarity >= 80) finalScore = 25;
-        else if (topSimilarity >= 70) finalScore = 50;
-        else finalScore = 75;
-      }
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      // Step 4: Store hash in uploaded_images for duplicate detection
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
+      if (user && imageHash) {
         try {
-          await supabase.from("uploaded_images").insert({
-            user_id: user.id,
-            image_hash: imageHash,
-            is_copyrighted: allMatches.length > 0,
-          });
-        } catch {
-          // Ignore errors if table doesn't exist yet
+          const { error: insertError } = await supabase
+            .from("uploaded_images")
+            .insert({
+              user_id: user.id,
+              image_hash: imageHash,
+              is_copyrighted: potentialRisk,
+            });
+
+          if (insertError) {
+            console.warn(
+              "[ReverseImageSearch] Could not store image fingerprint:",
+              insertError
+            );
+          }
+        } catch (storageError) {
+          console.warn(
+            "[ReverseImageSearch] Fingerprint storage failed:",
+            storageError
+          );
         }
       }
 
-      const res: ReverseImageResult = { score: finalScore, matches: allMatches, imageHash };
-      setResult(res);
+      // STEP 6: Prepare the final result.
+
+      const finalScore = potentialRisk ? 25 : 100;
+
+      const finalResult: ReverseImageResult = {
+        score: finalScore,
+        matches: aiMatches,
+        imageHash,
+      };
+
+      console.log("FINAL GEMINI RESULTS:", finalResult);
+
+      setResult(finalResult);
     } catch (err: any) {
       console.error("[ReverseImageSearch] Error:", err);
-      setError(err?.message || "Failed to perform reverse image search");
-      toast.error(err?.message || "Reverse image search failed");
+
+      const message =
+        err?.message || "Failed to perform AI image analysis.";
+
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   };
 
-  const getScoreColor = (s: number) => s >= 80 ? "text-success" : s >= 50 ? "text-warning" : "text-destructive";
-  const getScoreBg = (s: number) => s >= 80 ? "bg-success/10" : s >= 50 ? "bg-warning/10" : "bg-destructive/10";
+  useEffect(() => {
+    runSearch();
+  }, [imageUrl]);
+
+  const getScoreColor = (s: number) =>
+    s >= 80
+      ? "text-success"
+      : s >= 50
+        ? "text-warning"
+        : "text-destructive";
+
+  const getScoreBg = (s: number) =>
+    s >= 80
+      ? "bg-success/10"
+      : s >= 50
+        ? "bg-warning/10"
+        : "bg-destructive/10";
+
+  // LOADING SCREEN
 
   if (loading) {
     return (
       <Card>
         <CardContent className="py-16 flex flex-col items-center gap-4">
           <Loader2 className="h-10 w-10 animate-spin text-primary" />
+
           <div className="text-center">
-            <p className="font-semibold">Running Reverse Image Search...</p>
-            <p className="text-sm text-muted-foreground mt-1">Generating image fingerprint and comparing against known copyrighted artwork</p>
+            <p className="font-semibold">
+              Analyzing Image with Gemini AI...
+            </p>
+
+            <p className="text-sm text-muted-foreground mt-1">
+              Checking the image for recognizable brands, logos,
+              characters, and potential intellectual-property risks.
+            </p>
           </div>
-          <Badge variant="outline" className="mt-2">🛡️ Local Processing — Images are not uploaded</Badge>
+
+          <Badge variant="outline" className="mt-2">
+            Gemini AI Analysis
+          </Badge>
         </CardContent>
       </Card>
     );
   }
+
+  // ERROR SCREEN
 
   if (error) {
     return (
       <Card>
         <CardContent className="py-16 flex flex-col items-center gap-4">
           <AlertTriangle className="h-10 w-10 text-destructive" />
+
           <div className="text-center">
-            <p className="font-semibold">Reverse Image Search Failed</p>
-            <p className="text-sm text-muted-foreground mt-1">{error}</p>
+            <p className="font-semibold">
+              AI Image Analysis Failed
+            </p>
+
+            <p className="text-sm text-muted-foreground mt-1">
+              {error}
+            </p>
           </div>
+
           <div className="flex gap-3">
-            <Button variant="outline" onClick={onBack}>Back</Button>
-            <Button onClick={runSearch}>Retry</Button>
+            <Button variant="outline" onClick={onBack}>
+              Back
+            </Button>
+
+            <Button onClick={runSearch}>
+              Retry
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -274,86 +406,151 @@ export function ReverseImageSearch({ imageUrl, onComplete, onBack }: ReverseImag
 
   if (!result) return null;
 
+  // RESULTS SCREEN
+
   return (
     <Card>
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Search className="h-5 w-5 text-primary" />
-            Step 2: Reverse Image Search Results
+            Step 2: AI Image Analysis Results
           </CardTitle>
-          <Badge variant="outline" className="text-xs">🛡️ Local Processing</Badge>
+
+          <Badge variant="outline" className="text-xs">
+            Gemini AI
+          </Badge>
         </div>
       </CardHeader>
+
       <CardContent className="space-y-6">
-        {/* Score */}
+        {/* AI RISK SCORE */}
+
         <div className="flex items-center gap-6">
-          <div className={cn("h-24 w-24 rounded-full flex items-center justify-center", getScoreBg(result.score))}>
-            <span className={cn("text-3xl font-extrabold", getScoreColor(result.score))}>{result.score}</span>
+          <div
+            className={cn(
+              "h-24 w-24 rounded-full flex items-center justify-center",
+              getScoreBg(result.score)
+            )}
+          >
+            <span
+              className={cn(
+                "text-3xl font-extrabold",
+                getScoreColor(result.score)
+              )}
+            >
+              {result.score}
+            </span>
           </div>
+
           <div className="space-y-2">
             {result.matches.length === 0 ? (
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="h-5 w-5 text-success" />
-                <span className="text-lg font-semibold text-success">No copyright matches found</span>
+
+                <span className="text-lg font-semibold text-success">
+                  No Potential IP Risk Detected
+                </span>
               </div>
             ) : (
               <div className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-destructive" />
+
                 <span className="text-lg font-semibold text-destructive">
-                  ⚠️ {result.matches.length} potential copyright match{result.matches.length !== 1 ? "es" : ""} found
+                  Potential IP Risk Detected
                 </span>
               </div>
             )}
-            <p className="text-sm text-muted-foreground">
-              Image fingerprint: <code className="text-xs bg-muted px-1 py-0.5 rounded">{result.imageHash.substring(0, 16)}...</code>
-            </p>
+
+            {result.imageHash && (
+              <p className="text-sm text-muted-foreground">
+                Image fingerprint:{" "}
+                <code className="text-xs bg-muted px-1 py-0.5 rounded">
+                  {result.imageHash.substring(0, 16)}...
+                </code>
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Matches */}
+        {/* GEMINI FINDINGS */}
+
         {result.matches.length > 0 && (
           <div className="space-y-3">
-            <p className="text-sm font-medium">Potential Matches</p>
+            <p className="text-sm font-medium">
+              Items Identified by Gemini
+            </p>
+
             {result.matches.map((m, i) => (
-              <div key={i} className="flex items-center justify-between border rounded-lg p-3 bg-destructive/5">
+              <div
+                key={i}
+                className="flex items-center justify-between border rounded-lg p-3 bg-destructive/5"
+              >
                 <div>
-                  <p className="font-medium text-sm">Similar to: {m.term}</p>
-                  <p className="text-xs text-muted-foreground">Owner: {m.owner} · Category: {m.category}</p>
+                  <p className="font-medium text-sm">
+                    AI detected: {m.term}
+                  </p>
+
+                  <p className="text-xs text-muted-foreground">
+                    Source: {m.owner} · Category: {m.category}
+                  </p>
                 </div>
-                <Badge variant="destructive" className="text-xs">
-                  {m.similarity}% match
-                </Badge>
+
+                {m.similarity > 0 && (
+                  <Badge variant="destructive" className="text-xs">
+                    {m.similarity}% AI confidence
+                  </Badge>
+                )}
               </div>
             ))}
+
             <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3">
-              <p className="text-sm font-medium text-destructive">⚠️ Recommendation: Use original artwork only</p>
+              <p className="text-sm font-medium text-destructive">
+                Potential Intellectual-Property Concern
+              </p>
+
               <p className="text-xs text-muted-foreground mt-1">
-                This image appears similar to copyrighted artwork. Using copyrighted designs can result in legal action, account suspension, and financial penalties.
+                Gemini identified content that may involve
+                intellectual-property rights. Review the image and
+                verify the relevant rights before using it.
               </p>
             </div>
           </div>
         )}
 
+        {/* NO RISK IDENTIFIED */}
+
         {result.matches.length === 0 && (
           <div className="rounded-lg border border-success/30 bg-success/5 p-3">
             <p className="text-sm font-medium text-success flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4" /> Good to go!
+              <ShieldCheck className="h-4 w-4" />
+              No Potential Risk Identified
             </p>
+
             <p className="text-xs text-muted-foreground mt-1">
-              No matches found against our database of 55+ known copyrighted images and logos.
+              Gemini did not identify a potential intellectual-property
+              risk in this image. This automated analysis is not a
+              guarantee that the image is copyright-free.
             </p>
           </div>
         )}
 
-        {/* Privacy disclaimer */}
+        {/* PRIVACY INFORMATION */}
+
         <div className="text-xs text-muted-foreground bg-muted/30 rounded-lg p-3 border border-muted">
-          <strong>🔒 Privacy:</strong> Images are processed locally in your browser. Only a fingerprint hash is stored for duplicate detection — we do not store your actual images.
+          <strong>Privacy:</strong> The selected image is sent to our
+          Supabase Edge Function and Google's Gemini API for AI analysis.
+          For signed-in users, the app stores an image fingerprint and
+          the AI risk result in the uploaded_images table.
         </div>
 
-        {/* Actions */}
+        {/* ACTIONS */}
+
         <div className="flex gap-3 pt-2">
-          <Button variant="outline" onClick={onBack}>Back</Button>
+          <Button variant="outline" onClick={onBack}>
+            Back
+          </Button>
+
           <Button onClick={() => onComplete(result)}>
             Continue to IP Check
           </Button>
